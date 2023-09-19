@@ -35,6 +35,11 @@ public class DefaultContextFactory : IContextFactory
         var context = this.contextAccessor.Context;
         this.contextAccessor.Context = null;
 
+        if (context?.Items is null)
+        {
+            return;
+        }
+
         foreach (var item in context.Items)
         {
             if (item.Value is IDisposable disposableItem)
@@ -48,7 +53,7 @@ public class DefaultContextFactory : IContextFactory
             }
         }
 
-        this.logger.LogTrace($"ContextDisposed: {context.GetHashCode()}");
+        this.logger.LogTrace($"ContextDisposed: {context?.GetHashCode()}");
     }
 
     protected virtual void AddItems(IContext context)
