@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Gems.Kafka.Hosting": {
+      "commandName": "Project"
+    }
+  }
+}

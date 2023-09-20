@@ -1,0 +1,3 @@
+﻿delete_property
+username;.*;***
+phone;.(?=.{4});*

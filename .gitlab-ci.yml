@@ -1,0 +1,29 @@
+image: ${CI_REGISTRY}/build-images/python-gems:latest
+
+stages:
+  - build
+  - mirror_to_github
+  - publish_to_nuget
+
+build:
+  stage: build
+  script:
+    - python3 /app/build_gems.py
+  only:
+    - main
+
+mirror_to_github:
+  stage: mirror_to_github
+  when: manual
+  script:
+    - python3 /app/mirror_to_github.py
+  only:
+    - main
+
+publish_to_nuget:
+  stage: publish_to_nuget
+  when: manual
+  script:
+    - python3 /app/publish_to_nuget.py
+  only:
+    - main

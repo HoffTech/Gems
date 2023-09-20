@@ -1,0 +1,26 @@
+﻿{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:26829",
+      "sslPort": 0
+    }
+  },
+  "profiles": {
+    "GetSettings": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "Sample1",
+      "applicationUrl": "http://localhost:5132",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "GITLAB_CONFIGURATION_URL": "<<gitlab_root_url>>",
+        "GITLAB_CONFIGURATION_TOKEN": "<<your_token>>",
+        "GITLAB_CONFIGURATION_PROJECTID": "<<your_project_id>>"
+      }
+    }
+  }
+}

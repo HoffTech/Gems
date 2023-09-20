@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+    <FileVersion>0.0.0.0</FileVersion>
+    <Version>0.0.0</Version>
+    <Description>Содержит типы, которые можно применять при стандартных сценариях в MVC такие как валидация и т.д</Description>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <LangVersion>latestmajor</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.5.2" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.5.2" />
+	  <PackageReference Include="MediatR" Version="12.0.1" />
+	  <PackageReference Include="Npgsql" Version="6.0.9" />
+	  <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Logging\Security\src\Gems.Logging.Security.csproj" />
+    <ProjectReference Include="..\..\..\Text\Json\src\Gems.Text.Json.csproj" />
+  </ItemGroup>
+
+</Project>
