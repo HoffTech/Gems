@@ -18,7 +18,7 @@ mirror_to_github:
   script:
     - python3 /app/mirror_to_github.py
   only:
-    - main
+    - /20\d\d\/v\d\d\d/
 
 publish_to_nuget:
   stage: publish_to_nuget
@@ -26,4 +26,4 @@ publish_to_nuget:
   script:
     - python3 /app/publish_to_nuget.py
   only:
-    - main
+    - /20\d\d\/v\d\d\d/
