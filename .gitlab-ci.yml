@@ -14,16 +14,16 @@ build:
 
 mirror_to_github:
   stage: mirror_to_github
-  when: manual
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+      when: manual
   script:
     - python3 /app/mirror_to_github.py
-  only:
-    - /20\d\d\/v\d\d\d/
 
 publish_to_nuget:
   stage: publish_to_nuget
-  when: manual
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+      when: manual
   script:
     - python3 /app/publish_to_nuget.py
-  only:
-    - /20\d\d\/v\d\d\d/
