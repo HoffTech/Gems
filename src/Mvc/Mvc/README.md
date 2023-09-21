@@ -149,3 +149,13 @@ public class CreatePersonCommandHandler : IRequestHandler<CreatePersonCommand, G
 
 # Метрики
 Многие метрики пишутся автоматически при подключении пайплайнов для Mediatr (см. [здесь](/src/Metrics/Metrics/README.md#использование-пайплайнов)).
+
+# Обработка ошибок
+Для исключения распространения действия фильтра обработки ошибок для всех контроллеров сервиса (Стандартные и Generic), добавьте следующую конфигурацию
+```json
+{
+  "ExceptionHandlingOptions": {
+    "UseHandleErrorFilterOnNonGenericControllers": false // по умолчанию true - работает для всех контроллеров
+  }
+}
+```
