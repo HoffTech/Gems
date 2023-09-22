@@ -2,16 +2,24 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
 
 using Gems.Jobs.Quartz.Configuration;
 using Gems.Jobs.Quartz.Handlers.FireJobImmediately;
 using Gems.Jobs.Quartz.Handlers.Shared;
 using Gems.Mvc.GenericControllers;
 
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Quartz;
+using Quartz.Impl;
+
+using Quartzmon;
 
 namespace Gems.Jobs.Quartz
 {
@@ -84,31 +92,75 @@ namespace Gems.Jobs.Quartz
                 q.SetProperty("quartz.threadPool.type", "Quartz.Simpl.DefaultThreadPool, Quartz");
                 q.SetProperty("quartz.threadPool.maxConcurrency", jobsOptions.MaxConcurrency?.ToString() ?? "25");
 
-                foreach (var (jobType, jobName) in JobRegister.JobInfos)
+                if (jobsOptions.EnableAdminUiPersistentJobHistory)
                 {
-                    if (!jobsOptions.Triggers.TryGetValue(jobName, out var cronExpression))
-                    {
-                        continue;
-                    }
+                    q.SetProperty("quartz.plugin.recentHistory.type", "Quartzmon.Plugins.RecentHistory.PostgreSql.PostgreSqlExecutionHistoryPlugin, Quartzmon.Plugins.RecentHistory.PostgreSql");
+                    q.SetProperty("quartz.plugin.recentHistory.storeType", "Quartzmon.Plugins.RecentHistory.PostgreSql.Store.PostgreSqlExecutionHistoryStore, Quartzmon.Plugins.RecentHistory.PostgreSql");
+                    q.SetProperty("quartz.plugin.recentHistory.connectionString", jobsOptions.ConnectionString);
+                    q.SetProperty("quartz.plugin.recentHistory.entryTtlInMinutes", (jobsOptions.PersistentRecentHistoryEntryTtl ?? 60).ToString());
+                    q.SetProperty("quartz.plugin.recentHistory.tablePrefix", jobsOptions.TablePrefix);
+                }
+
+                foreach (var (jobType, jobName) in JobRegister.JobNameByJobTypeMap)
+                {
+                    var cronExpression = jobsOptions.Triggers.GetValueOrDefault(jobName);
 
                     var jobKey = new JobKey(jobName);
 
                     q.AddJob(jobType, jobKey, c => c.StoreDurably());
 
-                    q.AddTrigger(t => t
-                        .ForJob(jobKey)
-                        .WithIdentity(jobName)
-                        .WithDescription(jobName)
-                        .WithCronSchedule(cronExpression));
+                    q.AddTrigger(tConf =>
+                    {
+                        var configuredTrigger = tConf
+                            .ForJob(jobKey)
+                            .WithIdentity(jobName)
+                            .WithDescription(jobName);
+                        if (!string.IsNullOrWhiteSpace(cronExpression))
+                        {
+                            configuredTrigger.WithCronSchedule(cronExpression);
+                        }
+                    });
                 }
             });
 
             services.AddQuartzHostedService();
-            services.AddMediatR(config => config.RegisterServicesFromAssemblyContaining<FireJobImmediatelyCommand>());
-            ControllerRegister.RegisterControllers(typeof(FireJobImmediatelyCommand).Assembly);
+
+            ControllerRegister.RegisterControllers(Assembly.GetExecutingAssembly());
+            services.AddQuartzmon();
 
             services.AddSingleton<SchedulerProvider>();
             services.AddHostedService<JobRecoveryHostedService>();
+        }
+
+        public static IApplicationBuilder UseQuartzAdminUI(this IApplicationBuilder app, IConfiguration configuration)
+        {
+            var jobsOptions = configuration.GetSection(JobsOptions.Jobs).Get<JobsOptions>();
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Path.StartsWithSegments(jobsOptions.AdminUiUrl))
+                {
+                    var syncIoFeature = context.Features.Get<IHttpBodyControlFeature>();
+                    if (syncIoFeature != null)
+                    {
+                        syncIoFeature.AllowSynchronousIO = true;
+                    }
+                }
+
+                await next();
+            });
+            app.UseQuartzmon(
+                new QuartzmonOptions
+            {
+                VirtualPathRoot = jobsOptions.AdminUiUrl,
+                DefaultDateFormat = "dd.MM.yyyy",
+                DefaultTimeFormat = "HH:mm:ss"
+            }, services =>
+                {
+                    var scheduler = SchedulerRepository.Instance.Lookup(jobsOptions.SchedulerName, CancellationToken.None).GetAwaiter().GetResult();
+                    services.Scheduler = scheduler;
+                });
+
+            return app;
         }
     }
 }

@@ -47,6 +47,21 @@ namespace Gems.Jobs.Quartz.Configuration
         /// </summary>
         public int JobRecoveryDelayInMilliseconds { get; set; } = 15 * 60 * 1000;
 
+        /// <summary>
+        /// Подключение/отключение персистентной истории запуска заданий в Quartz AdminUi
+        /// </summary>
+        public bool EnableAdminUiPersistentJobHistory { get; set; }
+
+        /// <summary>
+        /// TTL записи в истории запуска заданий в Quartz AdminUI
+        /// </summary>
+        public int? PersistentRecentHistoryEntryTtl { get; set; }
+
+        /// <summary>
+        /// AdminUI URL
+        /// </summary>
+        public string AdminUiUrl { get; set; } = "/dashboard";
+
         public void RegisterJobsFromAssemblyContaining<T>()
         {
             JobRegister.RegisterJobs(typeof(T).Assembly);

@@ -32,10 +32,24 @@
 - Добавьте регистрацию Quartz в конфигурацию сервисов в классе Startup.cs
 ```csharp
 //...
-services.AddQuartzWithJobs(this.Configuration, options => options.RegisterJobsFromAssemblyContaining<Startup>());
+    public void ConfigureServices(IServiceCollection services)
+    {
+        //...
+        services.AddQuartzWithJobs(this.Configuration, options => options.RegisterJobsFromAssemblyContaining<Startup>());
+        //...
+    }
+    
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        //...
+        app.UseQuartzAdminUI(this.Configuration);
+        //...
+    }
 //...
 ```
+
 - Примените миграцию для БД
+С использованием sql-скриптов
 ```sql
 DO
 $do$
@@ -478,6 +492,23 @@ CREATE INDEX IF NOT EXISTS idx_qrtz_ft_job_group ON quartz.qrtz_fired_triggers U
 
 CREATE INDEX IF NOT EXISTS idx_qrtz_ft_job_req_recovery ON quartz.qrtz_fired_triggers USING btree (requests_recovery);
 ```
+С использованием EF Core (с использованием пакета `appany.quartz.entityframeworkcore.migrations.postgresql`)
+```csharp
+public class DatabaseContext : DbContext
+{
+  // ...
+
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    // Prefix and schema can be passed as parameters
+    
+    modelBuilder.AddQuartz(builder => builder.UsePostgreSql());
+
+  }
+}
+```
+Затем примените миграцию с помощью `databaseContext.Database.MigrateAsync()` или `dotnet ef database update`
+
 # Перезапуск задачи по ошибке
 Пайплайн ReFireJobOnFailedBehavior позволяет повторно запустить задачу после задержки в случае возникновения исключения. По умолчанию задержка равна 10 секундам.<br>
 Для регистрации пайплайна, добавьте в конфигурацию сервисов в классе Startup.cs
@@ -607,3 +638,89 @@ DEV_Jobs_Triggers_TestJob_Cron: 0/10 \* \* \? \* \*
 в поле группы подставляется **"DEFAULT"**. После выполнения метода, для указанного джоба 
 удаляется активный триггер, и джоб перестает выполняться периодически. Стоит учитывать, что 
 после деплоя сервиса, триггеры автоматически регистрируются согласно конфигурации Jobs__Triggers.
+```
+
+# Принудительный вызов JobHandler'a с поддержкой Commands, содержащих данные
+Принудительный запуск JobHandler'a возможен с помощью `IQuartzEnqueueManager`: 
+```csharp
+    ...
+    this.enqueueManager.Enqueue(
+                new SomeCommand
+                {
+                    Prop1 = prop1Value,
+                    Prop2 = prop2Value,
+                }, cancellationToken);
+    ...
+```
+
+Передача данных в JobHandler работает за счет сериализации команды в один из ключей [JobData](https://www.quartz-scheduler.net/documentation/quartz-3.x/tutorial/more-about-jobs.html#jobdatamap) 
+
+# Подключение Admin UI для менеджмента тасков
+Для подключения визуального интерфейса для просмотра/управления тасками, а также анализа ошибок при их выполнении необходимо:
+1. Подключить AdminUI в Startup.cs 
+```csharp
+    ...
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env) 
+	{
+		...
+		app.UseQuartzAdminUI(configuration);
+		...
+	|
+    ...
+```
+2. Если необходима персистентная история запуска тасков, то необходимо дополнительно:
+2.1. Указать необходимые настройки в `appsettings` в секции `Jobs`:
+```csharp
+    ...
+    /// <summary>
+    /// Подключение/отключение персистентной истории запуска заданий в Quartz AdminUi
+    /// </summary>
+    public bool EnableAdminUiPersistentJobHistory { get; set; }
+
+    /// <summary>TTL записи в истории запуска заданий в Quartz AdminUI</summary>
+    public int? PersistentRecentHistoryEntryTtl { get; set; }
+
+    /// <summary>AdminUI URL</summary>
+    public string AdminUiUrl { get; set; } = "/dashboard";
+    ...
+```
+2.2. Создать таблицы для хранения истории запусков в PostgreSQL с помощью скрипта:
+```sql
+	DROP TABLE IF EXISTS quartz.qrtz_execution_history_entries ;
+
+	CREATE TABLE IF NOT EXISTS quartz.qrtz_execution_history_entries (
+		fire_instance_id varchar(140) NOT NULL,
+		scheduler_instance_id varchar(200) NOT NULL,
+		sched_name varchar(120) NOT NULL,
+		job_name varchar(150) NOT NULL,
+		trigger_name varchar(150) NOT NULL,
+		scheduled_fire_time_utc timestamp NULL,
+		actual_fire_time_utc timestamp NOT NULL,
+		recovering bool NOT NULL DEFAULT false,
+		vetoed bool NOT NULL DEFAULT false,
+		finished_time_utc timestamp NULL,
+		exception_message text NULL,
+		trial168 bpchar(1) NULL,
+		CONSTRAINT pk_qrtz_execution_history_entries PRIMARY KEY (fire_instance_id)
+	);
+	CREATE INDEX ix_actual_fire_time_utc ON quartz.qrtz_execution_history_entries USING btree (actual_fire_time_utc);
+	CREATE INDEX ix_job_name_actual_fire_time_utc ON quartz.qrtz_execution_history_entries USING btree (job_name, actual_fire_time_utc);
+	CREATE INDEX ix_sched_name ON quartz.qrtz_execution_history_entries USING btree (sched_name);
+	CREATE INDEX ix_trigger_name_actual_fire_time_utc ON quartz.qrtz_execution_history_entries USING btree (trigger_name, actual_fire_time_utc);
+
+	GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE quartz.qrtz_execution_history_entries TO quartz_jobstore_user;
+
+	-- quartz.qrtz_execution_history_stats definition
+
+	DROP TABLE IF EXISTS quartz.qrtz_execution_history_stats;
+
+	CREATE TABLE IF NOT EXISTS quartz.qrtz_execution_history_stats (
+		sched_name varchar(120) NOT NULL,
+		stat_name varchar(120) NOT NULL,
+		stat_value int8 NULL,
+		trial171 bpchar(1) NULL,
+		CONSTRAINT pk_execution_history_stats PRIMARY KEY (sched_name, stat_name)
+	);
+	
+	GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE quartz.qrtz_execution_history_stats TO quartz_jobstore_user;
+```

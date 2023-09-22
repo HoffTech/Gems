@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 
 using Gems.Jobs.Quartz.Jobs;
+using Gems.Jobs.Quartz.Jobs.JobWithData;
 
 using MediatR;
 
@@ -14,7 +15,9 @@ namespace Gems.Jobs.Quartz
 {
     public static class JobRegister
     {
-        public static ConcurrentDictionary<Type, string> JobInfos { get; set; } = new ConcurrentDictionary<Type, string>();
+        public static ConcurrentDictionary<Type, string> JobNameByRequestTypeMap { get; set; } = new ConcurrentDictionary<Type, string>();
+
+        public static ConcurrentDictionary<Type, string> JobNameByJobTypeMap { get; set; } = new ConcurrentDictionary<Type, string>();
 
         public static void RegisterJob<TRequestHandler>(string name, bool isConcurrent)
         {
@@ -23,22 +26,39 @@ namespace Gems.Jobs.Quartz
 
         public static void RegisterJob(Type type, string name, bool isConcurrent)
         {
-            var requestType = typeof(IRequestHandler<>);
-            var targetRequestType = type.GetInterfaces()
-                .FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == requestType);
-            if (targetRequestType == null)
+            var requestHandlerType = typeof(IRequestHandler<>);
+            var targetRequestHandlerType = type.GetInterfaces()
+                .FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == requestHandlerType);
+            if (targetRequestHandlerType == null)
             {
                 throw new NotImplementedException($"You should implement a generic job for name: {name}");
             }
 
-            var jobType = isConcurrent
-                ? typeof(ConcurrentQuartzJob<>).MakeGenericType(targetRequestType.GetGenericArguments())
-                : typeof(DisallowConcurrentQuartzJob<>).MakeGenericType(targetRequestType.GetGenericArguments());
+            var targetRequestHandlerTypeArguments = targetRequestHandlerType.GetGenericArguments();
+            var requestType = targetRequestHandlerTypeArguments.FirstOrDefault();
 
-            if (!JobInfos.TryAdd(jobType, name))
+            var jobType = GetJobType(targetRequestHandlerType, targetRequestHandlerTypeArguments, isConcurrent);
+
+            if (!JobNameByJobTypeMap.TryAdd(jobType, name) || !JobNameByRequestTypeMap.TryAdd(requestType, name))
             {
                 throw new InvalidOperationException($"Failed register job: {name}");
             }
+        }
+
+        private static Type GetJobType(Type requestType, Type[] targetRequestHandlerTypeArguments, bool isConcurrent)
+        {
+            var commandHasProperties = requestType?.GetProperties().Any() ?? false;
+
+            if (commandHasProperties)
+            {
+                return isConcurrent
+                    ? typeof(ConcurrentQuartzJobWithData<>).MakeGenericType(targetRequestHandlerTypeArguments)
+                    : typeof(DisallowConcurrentQuartzJobWithData<>).MakeGenericType(targetRequestHandlerTypeArguments);
+            }
+
+            return isConcurrent
+                ? typeof(ConcurrentQuartzJob<>).MakeGenericType(targetRequestHandlerTypeArguments)
+                : typeof(DisallowConcurrentQuartzJob<>).MakeGenericType(targetRequestHandlerTypeArguments);
         }
 
         public static void RegisterJobs(params Assembly[] assemblies)
