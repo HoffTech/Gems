@@ -152,6 +152,7 @@ namespace Gems.Jobs.Quartz
                 new QuartzmonOptions
             {
                 VirtualPathRoot = jobsOptions.AdminUiUrl,
+                UrlPartPrefix = jobsOptions.AdminUiUrlPrefix,
                 DefaultDateFormat = "dd.MM.yyyy",
                 DefaultTimeFormat = "HH:mm:ss"
             }, services =>

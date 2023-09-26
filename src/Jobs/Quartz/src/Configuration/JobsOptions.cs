@@ -62,6 +62,11 @@ namespace Gems.Jobs.Quartz.Configuration
         /// </summary>
         public string AdminUiUrl { get; set; } = "/dashboard";
 
+        /// <summary>
+        /// AdminUI URL Prefix (если приложение развернуто не в root сайта)
+        /// </summary>
+        public string AdminUiUrlPrefix { get; set; }
+
         public void RegisterJobsFromAssemblyContaining<T>()
         {
             JobRegister.RegisterJobs(typeof(T).Assembly);

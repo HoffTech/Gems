@@ -682,6 +682,11 @@ DEV_Jobs_Triggers_TestJob_Cron: 0/10 \* \* \? \* \*
 
     /// <summary>AdminUI URL</summary>
     public string AdminUiUrl { get; set; } = "/dashboard";
+    
+    /// <summary>
+    /// AdminUI URL Prefix (если приложение развернуто не в root сайта)
+    /// </summary>
+    public string AdminUiUrlPrefix { get; set; }
     ...
 ```
 2.2. Создать таблицы для хранения истории запусков в PostgreSQL с помощью скрипта:
