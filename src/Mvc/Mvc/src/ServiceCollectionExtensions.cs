@@ -30,20 +30,14 @@ namespace Gems.Mvc
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <param name="configureOptions">An <see cref="Action{MvcOptions}"/> to configure the provided <see cref="MvcOptions"/>.</param>
-        /// <param name="configuration">configuration.</param>
         /// <returns>An <see cref="IMvcBuilder"/> that can be used to further configure the MVC services.</returns>
-        public static IMvcBuilder AddControllersWithMediatR(
-            this IServiceCollection services,
-            Action<MvcOptions> configureOptions = null,
-            IConfiguration configuration = null)
+        public static IMvcBuilder AddControllersWithMediatR(this IServiceCollection services, Action<MvcOptions> configureOptions = null)
         {
             services.ConfigureOptions<MultipleModelBinderSetup>();
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
-            services.Configure<ExceptionHandlingOptions>(configuration?.GetSection(ExceptionHandlingOptions.SectionName));
-
             services.AddSingleton<IConverter<Exception, BusinessErrorViewModel>, ExceptionToBusinessErrorViewModelConverter>();
             return services.AddControllers(options =>
                 {
@@ -61,19 +55,13 @@ namespace Gems.Mvc
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <param name="configureOptions">An <see cref="Action{MvcOptions}"/> to configure the provided <see cref="MvcOptions"/>.</param>
-        /// <param name="configuration">configuration.</param>
-        public static void AddControllersWithViewsAndMediatR(
-            this IServiceCollection services,
-            Action<MvcOptions> configureOptions = null,
-            IConfiguration configuration = null)
+        public static void AddControllersWithViewsAndMediatR(this IServiceCollection services, Action<MvcOptions> configureOptions = null)
         {
             services.ConfigureOptions<MultipleModelBinderSetup>();
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
-            services.Configure<ExceptionHandlingOptions>(configuration?.GetSection(ExceptionHandlingOptions.SectionName));
-
             services.AddSingleton<IConverter<Exception, BusinessErrorViewModel>, ExceptionToBusinessErrorViewModelConverter>();
             services.AddControllersWithViews(options =>
                 {
