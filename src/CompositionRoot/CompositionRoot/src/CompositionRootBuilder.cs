@@ -62,9 +62,7 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
     private void AddControllersWithMediatR()
     {
         var hideEndpointStartWith = this.configuration.GetValue<string>("HideEndpointStartWith");
-        this.services.AddControllersWithMediatR(
-            options => options.RegisterControllersFromAssemblyContaining<TFromAssemblyContaining>(hideEndpointStartWith),
-            this.configuration);
+        this.services.AddControllersWithMediatR(options => options.RegisterControllersFromAssemblyContaining<TFromAssemblyContaining>(hideEndpointStartWith));
     }
 
     private void AddPrometheus()
