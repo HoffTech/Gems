@@ -70,6 +70,7 @@ services.AddPostgresqlUnitOfWork(
     }
   ]
 ```
+В качестве "<connection_string>" можно указать ссылку на другой раздел в appsettings: "${ConnectionStrings.Dax}".
 # Pg Sql мапперы
 В postgresql обычно поля именуются в undescore и для dto необходимо прописывать наименование полей в PgAttribute, н-р:
 ```csharp

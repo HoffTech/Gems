@@ -69,6 +69,7 @@ services.AddMsSqlUnitOfWork(
     }
   ]
 ```
+В качестве "<connection_string>" можно указать ссылку на другой раздел в appsettings: "${ConnectionStrings.Dax}".
 # Cкалярная функция
 Расширение SqlDapperHelper предоставляет методы для вызова скалярной функции mssql:
 ```csharp

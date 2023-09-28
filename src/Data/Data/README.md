@@ -17,6 +17,8 @@
 * [Sql выражение](#sql-выражение)
 * [Unit of work](#unit-of-work)
 * [UnitOfWorkBehavior](#unitofworkbehavior)
+* [Использование Linked Token](#использование-linked-token)
+* [Использование контекста](#использование-контекста)
 * [Метрики](#метрики)
 
 # Cкалярная функция
@@ -98,7 +100,7 @@ await this.unitOfWorkProvider.RemoveUnitOfWork(cancellationToken);
 
 # UnitOfWorkBehavior
 Пайплайн UnitOfWorkBehavior создает unit of work для команды и закрепляет его за cancellationToken. После выполнения команды делается сommit транзакции и объект unit of work уничтожается.
-Команда должна быть унаследована от интерфейса IRequestTransaction. Если команда не будет унаследована от данного интерфейса, то транзакция не будет создаваться и в случае возникновения
+Команда должна быть унаследована от интерфейса IRequestUnitOfWork. Если команда не будет унаследована от данного интерфейса, то транзакция не будет создаваться и в случае возникновения
 исключения, операции в бд не будут откатываться.
 
 Внутри команды все запросы к бд должны вызываться от объекта unit of work, который был закреплен за cancellationToken.
@@ -112,6 +114,32 @@ await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken).CallSt
         ["p_param1"] = "value1",
         ["p_param2"] = "value2",
     }).ConfigureAwait(false);
+```
+По умолчанию пайплайн UnitOfWorkBehavior может создать только один объект unit of work. Доменные обработчики (внутренние обработчики) не создают объект unit of work (даже если их команда или запрос наследуется от интерфейса IRequestUnitOfWork), а использует тот, который создался командой веб запроса или воркера. Смотрите разделы ниже "Использование Linked Token" и "Использование контекста" для того чтобы дать возможность доменному обработчику создавать свой объект unit of work.
+# Использование Linked Token
+Связанные токены позволяют доменным обработчикам создать собственные объекты unit of work.
+```csharp
+var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken).Token;
+await this.mediator.Send(new SomeInnerCommand(), linkedToken);
+```
+Связанные токены является obsolete. Смотрите раздел "Использование контекста".
+
+# Использование контекста
+Провадер Unit of Work (UnitOfWorkProvider) можно сконфигурировать на работу с контекстом. 
+Тем самым делегировать источник хранения объектов Unit of Work на контекст вместо собственного словаря (в UnitOfWorkProvider).
+```json
+"UnitOfWorkProviderOptions": {
+    "UseContext": true
+  }
+```
+Это добавляет возможность доменным обработчикам создать собственные объекты unit of work, что по факту избавляет нас от использования связанных токенов. Вместо такого кода:
+```csharp
+var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken).Token;
+await this.mediator.Send(new SomeInnerCommand(), linkedToken);
+```
+Можно теперь писать так:
+```csharp
+await this.mediator.Send(new SomeInnerCommand(), linkedToken);
 ```
 
 # Метрики
