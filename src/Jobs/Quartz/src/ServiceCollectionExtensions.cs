@@ -126,6 +126,8 @@ namespace Gems.Jobs.Quartz
             services.AddQuartzHostedService();
 
             ControllerRegister.RegisterControllers(Assembly.GetExecutingAssembly());
+            services.AddMediatR(config => config.RegisterServicesFromAssemblyContaining<FireJobImmediatelyCommand>());
+
             services.AddQuartzmon();
 
             services.AddSingleton<SchedulerProvider>();
