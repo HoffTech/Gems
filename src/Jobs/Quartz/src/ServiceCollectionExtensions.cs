@@ -36,6 +36,8 @@ namespace Gems.Jobs.Quartz
         /// <param name="configureOptions">Quartz options.</param>
         public static void AddQuartzWithJobs(this IServiceCollection services, IConfiguration configuration, Action<JobsOptions> configureOptions = null)
         {
+            services.AddSingleton<SchedulerProvider>();
+
             services.Configure<JobsOptions>(configuration.GetSection(JobsOptions.Jobs));
             var jobsOptions = configuration.GetSection(JobsOptions.Jobs).Get<JobsOptions>();
             if (jobsOptions == null)
@@ -130,7 +132,6 @@ namespace Gems.Jobs.Quartz
 
             services.AddQuartzmon();
 
-            services.AddSingleton<SchedulerProvider>();
             services.AddHostedService<JobRecoveryHostedService>();
         }
 
