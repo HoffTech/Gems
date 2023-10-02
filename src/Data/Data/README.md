@@ -139,7 +139,7 @@ await this.mediator.Send(new SomeInnerCommand(), linkedToken);
 ```
 Можно теперь писать так:
 ```csharp
-await this.mediator.Send(new SomeInnerCommand(), linkedToken);
+await this.mediator.Send(new SomeInnerCommand(), cancellationToken);
 ```
 
 # Метрики
