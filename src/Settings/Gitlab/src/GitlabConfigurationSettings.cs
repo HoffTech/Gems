@@ -17,7 +17,7 @@ namespace Gems.Settings.Gitlab
         {
             { "Development", "DEV_" },
             { "Staging", "STAGING_" },
-            { "Production", "PROD_" },
+            { "Production", "PROD_" }
         };
     }
 }

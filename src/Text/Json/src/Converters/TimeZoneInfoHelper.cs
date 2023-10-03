@@ -134,7 +134,7 @@ namespace Gems.Text.Json.Converters
             { "Pacific/Honolulu", "Hawaiian Standard Time" },
             { "Pacific/Pago_Pago", "UTC-11" },
             { "Pacific/Port_Moresby", "West Pacific Standard Time" },
-            { "Pacific/Tongatapu", "Tonga Standard Time" },
+            { "Pacific/Tongatapu", "Tonga Standard Time" }
         };
 
         private static readonly Dictionary<string, string> OlsonWindowsTimesReversed = new Dictionary<string, string>();

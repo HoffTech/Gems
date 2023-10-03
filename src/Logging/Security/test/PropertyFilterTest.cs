@@ -137,7 +137,7 @@ namespace Gems.Logging.Security.Tests
             var filter = sp.GetRequiredService<IPropertyFilter<ObjectToJsonProjection>>();
             var result = filter.FilterObject(new
             {
-                Delete_Property = 123,
+                Delete_Property = 123
             });
             logger.LogInformation("{@result}", result);
             Assert.That(result.Delete_Property, Is.EqualTo(default(int)));
@@ -155,9 +155,9 @@ namespace Gems.Logging.Security.Tests
                 {
                     new
                     {
-                        Delete_Property = (int?)123,
+                        Delete_Property = (int?)123
                     }
-                },
+                }
             });
             logger.LogInformation("{@result}", result);
             Assert.That(result.Arr[0].Delete_Property, Is.EqualTo(default(int?)));
@@ -177,7 +177,7 @@ namespace Gems.Logging.Security.Tests
                 {
                     Dummy2 = "Dummy2Value",
                     HideMe2 = "9165550206"
-                },
+                }
             });
             logger.LogInformation("{@result}", result);
             Assert.That(result.HideMe, Is.EqualTo(default(string)));

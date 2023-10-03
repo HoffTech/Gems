@@ -29,13 +29,13 @@ namespace Gems.HealthChecks
                 "/liveness",
                 new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
                 {
-                    Predicate = h => h.Tags.Contains("live"),
+                    Predicate = h => h.Tags.Contains("live")
                 });
             endpoints.MapHealthChecks(
                 "/readiness",
                 new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
                 {
-                    Predicate = h => h.Tags.Contains("ready"),
+                    Predicate = h => h.Tags.Contains("ready")
                 });
             return endpoints;
         }

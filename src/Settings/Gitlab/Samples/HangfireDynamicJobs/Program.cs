@@ -50,7 +50,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapHangfireDashboard("/dashboard", new DashboardOptions
     {
         Authorization = new[] { new HangfireAuthFilter() },
-        IgnoreAntiforgeryToken = true,
+        IgnoreAntiforgeryToken = true
     });
 });
 

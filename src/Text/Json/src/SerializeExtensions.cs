@@ -51,7 +51,7 @@ namespace Gems.Text.Json
             var options = new JsonSerializerOptions
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                Encoder = encoder ?? JavaScriptEncoder.Create(UnicodeRanges.All),
+                Encoder = encoder ?? JavaScriptEncoder.Create(UnicodeRanges.All)
             };
 
             if (camelCase)
