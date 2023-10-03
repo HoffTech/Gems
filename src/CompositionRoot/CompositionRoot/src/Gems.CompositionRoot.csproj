@@ -29,8 +29,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\BusinessRules\BusinessRules\src\Gems.BusinessRules.csproj" />
     <ProjectReference Include="..\..\..\Caching\Caching\src\Gems.Caching.csproj" />
+    <ProjectReference Include="..\..\..\Data\MySql\src\Gems.Data.MySql.csproj" />
     <ProjectReference Include="..\..\..\Data\Npgsql\src\Gems.Data.Npgsql.csproj" />
     <ProjectReference Include="..\..\..\Data\SqlServer\src\Gems.Data.SqlServer.csproj" />
+    <ProjectReference Include="..\..\..\Data\MySql\src\Gems.Data.MySql.csproj" />
     <ProjectReference Include="..\..\..\HealthChecks\HealthChecks\src\Gems.HealthChecks.csproj" />
     <ProjectReference Include="..\..\..\Http\Http\src\Gems.Http.csproj" />
     <ProjectReference Include="..\..\..\Jobs\Jobs\src\Gems.Jobs.csproj" />

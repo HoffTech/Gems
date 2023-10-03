@@ -11,10 +11,12 @@ using Gems.Metrics;
 using Gems.Metrics.Contracts;
 using Gems.Metrics.Data;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 [assembly: InternalsVisibleTo("Gems.Data.Tests")]
 [assembly: InternalsVisibleTo("Gems.Data.Npgsql")]
+[assembly: InternalsVisibleTo("Gems.Data.MySql")]
 [assembly: InternalsVisibleTo("Gems.Data.SqlServer")]
 
 namespace Gems.Data.UnitOfWork
@@ -43,11 +45,15 @@ namespace Gems.Data.UnitOfWork
 
         public string Key { get; set; }
 
+        public SshClientOptions SshClientOptions { get; set; }
+
         internal Func<IConnectionStringProvider, bool, TimeMetricProvider, ILogger<IUnitOfWork>, CancellationToken, IUnitOfWork> Factory { get; set; }
 
         internal Action<Assembly> RegisterMappersInternal { get; set; }
 
         internal Action<Type> RegisterMapperInternal { get; set; }
+
+        internal IConfiguration Configuration { get; set; }
 
         public void RegisterMappersFromAssemblyContaining<T>()
         {

@@ -7,6 +7,7 @@ using System.Linq;
 using Gems.Caching;
 using Gems.Caching.Behaviors;
 using Gems.Data.Behaviors;
+using Gems.Data.MySql;
 using Gems.Data.Npgsql;
 using Gems.Data.SqlServer;
 using Gems.HealthChecks;
@@ -126,6 +127,12 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
         foreach (var key in msSqlUnitOfWorkKeys)
         {
             this.services.AddMsSqlUnitOfWork(this.configuration, key, options => options.RegisterMappersFromAssemblyContaining<TFromAssemblyContaining>());
+        }
+
+        var mysqlUnitOfWorkKeys = this.configuration.GetSection(MySqlUnitOfWorkOptionsList.Name).Get<MySqlUnitOfWorkOptionsList>()?.Select(x => x.Key) ?? Array.Empty<string>();
+        foreach (var key in mysqlUnitOfWorkKeys)
+        {
+            this.services.AddMySqlUnitOfWork(this.configuration, key, options => options.RegisterMappersFromAssemblyContaining<TFromAssemblyContaining>());
         }
     }
 
