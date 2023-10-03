@@ -36,7 +36,7 @@ namespace Gems.Jobs.Hangfire
                     {
                         SchemaName = "hangfire",
                         QueuePollInterval = TimeSpan.FromMilliseconds(1000),
-                        InvisibilityTimeout = TimeSpan.FromMinutes(720),
+                        InvisibilityTimeout = TimeSpan.FromMinutes(720)
                     }));
 
             services.AddHangfireServer(options => options.WorkerCount = workerCount);
@@ -55,7 +55,7 @@ namespace Gems.Jobs.Hangfire
             {
                 Authorization = new[] { new HangfireAuthFilter() },
                 PrefixPath = string.IsNullOrEmpty(serviceRoot) ? null : "/" + serviceRoot,
-                IgnoreAntiforgeryToken = true,
+                IgnoreAntiforgeryToken = true
             });
 
             return endpoints;
@@ -76,7 +76,7 @@ namespace Gems.Jobs.Hangfire
                     HandlerType = x,
                     HandlerInterface = x.GetInterfaces()
                         .Where(i => i.IsGenericType)
-                        .FirstOrDefault(i => i.GetGenericTypeDefinition() == handlerType),
+                        .FirstOrDefault(i => i.GetGenericTypeDefinition() == handlerType)
                 })
                 .Where(x => x.HandlerInterface != null)
                 .SelectMany(x => x.HandlerType.GetCustomAttributes(false)
@@ -85,7 +85,7 @@ namespace Gems.Jobs.Hangfire
                     {
                         CommandType = x.HandlerInterface.GetGenericArguments().First(),
                         Name = (a as JobHandlerAttribute).Name,
-                        ChronExpression = mapCronExpression((a as JobHandlerAttribute).Name),
+                        ChronExpression = mapCronExpression((a as JobHandlerAttribute).Name)
                     }))
                 .Where(x => !string.IsNullOrEmpty(x.ChronExpression))
                 .Where(x => !string.IsNullOrEmpty(x.Name))

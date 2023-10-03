@@ -44,12 +44,12 @@ namespace Gems.Swagger.Filters
                                 Reference = new OpenApiReference
                                 {
                                     Type = ReferenceType.SecurityScheme,
-                                    Id = "oauth2",
-                                },
+                                    Id = "oauth2"
+                                }
                             }
 
-                        ] = new[] { this.option.Value.SwaggerSchema },
-                    },
+                        ] = new[] { this.option.Value.SwaggerSchema }
+                    }
                 };
             }
         }

@@ -149,7 +149,7 @@ namespace Gems.Metrics.Prometheus
                 caugeConfiguration = new PrometheusThirdParty.GaugeConfiguration
                 {
                     LabelNames = config.LabelNames,
-                    StaticLabels = config.StaticLabels,
+                    StaticLabels = config.StaticLabels
                 };
             }
             else
@@ -173,7 +173,7 @@ namespace Gems.Metrics.Prometheus
                 caugeConfiguration = new PrometheusThirdParty.CounterConfiguration
                 {
                     LabelNames = config.LabelNames,
-                    StaticLabels = config.StaticLabels,
+                    StaticLabels = config.StaticLabels
                 };
             }
             else
@@ -197,7 +197,7 @@ namespace Gems.Metrics.Prometheus
                 caugeConfiguration = new PrometheusThirdParty.HistogramConfiguration
                 {
                     LabelNames = config.LabelNames,
-                    StaticLabels = config.StaticLabels,
+                    StaticLabels = config.StaticLabels
                 };
             }
             else

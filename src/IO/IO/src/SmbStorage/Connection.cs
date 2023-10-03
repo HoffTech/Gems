@@ -121,7 +121,7 @@ namespace Gems.IO.SmbStorage
                 return new BasePathConnection
                 {
                     ServerName = this.options.ServerName,
-                    ShareName = this.options.ShareName,
+                    ShareName = this.options.ShareName
                 };
             }
 
@@ -136,7 +136,7 @@ namespace Gems.IO.SmbStorage
             var basePathData = new BasePathConnection
             {
                 ServerName = split[0],
-                ShareName = split[1],
+                ShareName = split[1]
             };
 
             if (string.IsNullOrEmpty(basePathData.ServerName) || string.IsNullOrEmpty(basePathData.ShareName))

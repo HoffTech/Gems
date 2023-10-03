@@ -6,6 +6,6 @@ namespace Gems.Jobs.Quartz.Configuration
     public enum QuartzDbType
     {
         PostgreSql,
-        MsSql,
+        MsSql
     }
 }

@@ -34,7 +34,7 @@ namespace Gems.Swagger.Filters
 
             var response = new OpenApiResponse
             {
-                Description = "Not Found",
+                Description = "Not Found"
             };
 
             var schema = context.SchemaGenerator.GenerateSchema(this.notFoundResultType, context.SchemaRepository);
@@ -42,8 +42,8 @@ namespace Gems.Swagger.Filters
             {
                 Schema = new OpenApiSchema
                 {
-                    Reference = schema.Reference,
-                },
+                    Reference = schema.Reference
+                }
             });
             operation.Responses.Add(status404NotFoundAsString, response);
         }

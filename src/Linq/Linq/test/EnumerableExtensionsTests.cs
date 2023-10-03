@@ -25,7 +25,7 @@ namespace Gems.Linq.Tests
                                         new TestObject { Id = 1, Name = Guid.NewGuid().ToString() },
                                         new TestObject { Id = 2, Name = Guid.NewGuid().ToString() },
                                         new TestObject { Id = 3, Name = Guid.NewGuid().ToString() },
-                                        new TestObject { Id = 4, Name = Guid.NewGuid().ToString() },
+                                        new TestObject { Id = 4, Name = Guid.NewGuid().ToString() }
                                     };
 
             // Act
@@ -51,7 +51,7 @@ namespace Gems.Linq.Tests
                            new TestObject { Id = 1, Name = Guid.NewGuid().ToString() },
                            new TestObject { Id = 2, Name = Guid.NewGuid().ToString() },
                            new TestObject { Id = 3, Name = Guid.NewGuid().ToString() },
-                           new TestObject { Id = 4, Name = Guid.NewGuid().ToString() },
+                           new TestObject { Id = 4, Name = Guid.NewGuid().ToString() }
                        };
 
             // Act
@@ -77,7 +77,7 @@ namespace Gems.Linq.Tests
                            new TestObject { Id = 1, Name = Guid.NewGuid().ToString() },
                            new TestObject { Id = 2, Name = Guid.NewGuid().ToString() },
                            new TestObject { Id = 3, Name = Guid.NewGuid().ToString() },
-                           new TestObject { Id = 4, Name = Guid.NewGuid().ToString() },
+                           new TestObject { Id = 4, Name = Guid.NewGuid().ToString() }
                        };
 
             // Act

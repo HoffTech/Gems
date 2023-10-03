@@ -6,14 +6,14 @@ using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-using Gems.Authentication.Options;
+using Gems.Authentication.Jwt.Options;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Gems.Authentication
+namespace Gems.Authentication.Jwt
 {
     /// <summary>
     /// Class with middleware extensions.
@@ -38,14 +38,14 @@ namespace Gems.Authentication
                 // Validate the JWT Issuer (iss) claim
                 ValidateIssuer = false,
                 ValidIssuer = adOptions.ValidIssuer,
-                ValidIssuers = new List<string>() { adOptions.Authority },
+                ValidIssuers = new List<string> { adOptions.Authority },
 
                 // Validate the JWT Audience (aud) claim
                 ValidateAudience = false,
                 ValidAudience = adOptions.ClientId,
 
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = key,
+                IssuerSigningKey = key
             };
 
             services.AddAuthentication("Bearer")
@@ -65,7 +65,7 @@ namespace Gems.Authentication
                             ctx.Principal?.AddIdentity(new ClaimsIdentity(new List<Claim>()));
 
                             return Task.CompletedTask;
-                        },
+                        }
                     };
                 });
         }

@@ -45,7 +45,7 @@ namespace Gems.Settings.Gitlab
                         {
                             'n' => '\n',
                             'r' => '\r',
-                            _ => c,
+                            _ => c
                         });
                         mode = 0;
                         break;

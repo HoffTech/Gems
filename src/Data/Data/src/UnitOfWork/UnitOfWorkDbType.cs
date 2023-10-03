@@ -7,6 +7,6 @@ namespace Gems.Data.UnitOfWork
     {
         PostgreSql,
 
-        MsSql,
+        MsSql
     }
 }

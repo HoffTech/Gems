@@ -29,7 +29,7 @@ namespace Gems.Patterns.Outbox
                 this.options.Value.ReadOutboxMessagesFunctionName,
                 new Dictionary<string, object>
                 {
-                    ["p_count"] = 1000,
+                    ["p_count"] = 1000
                 });
         }
 
@@ -39,7 +39,7 @@ namespace Gems.Patterns.Outbox
                 this.options.Value.ChangeOutboxMessageProcessedDateProcedureName,
                 new Dictionary<string, object>
                 {
-                    ["p_message_id"] = messageId,
+                    ["p_message_id"] = messageId
                 });
         }
 
@@ -49,7 +49,7 @@ namespace Gems.Patterns.Outbox
                     this.options.Value.WriteOutboxMessagesProcedureName,
                     new Dictionary<string, object>
                     {
-                        ["p_messages"] = outboxMessages.ToArray(),
+                        ["p_messages"] = outboxMessages.ToArray()
                     });
         }
     }

@@ -32,7 +32,7 @@ namespace Gems.Patterns.SyncTables.Tests.Infrastructure.Clients
 
                 this.processorFactory
                     .CreateChangeTrackingMergeProcessor<RealExternalChangeTrackingEntity, RealTargetEntity, MergeResult>(
-                        mergeInfo2),
+                        mergeInfo2)
             });
 
             return await mergeCollection.ProcessCollectionAsync(cancellationToken).ConfigureAwait(false);

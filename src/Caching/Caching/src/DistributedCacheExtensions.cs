@@ -25,7 +25,7 @@ namespace Gems.Caching
                 DateTimeZoneHandling = DateTimeZoneHandling.Utc,
                 NullValueHandling = NullValueHandling.Ignore
             };
-            Options = new DistributedCacheEntryOptions()
+            Options = new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             };

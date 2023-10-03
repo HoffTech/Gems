@@ -34,7 +34,7 @@ namespace Gems.Swagger.Filters
 
             var response = new OpenApiResponse
             {
-                Description = "Bad Request",
+                Description = "Bad Request"
             };
 
             var schema = context.SchemaGenerator.GenerateSchema(this.validationResultType, context.SchemaRepository);
@@ -42,8 +42,8 @@ namespace Gems.Swagger.Filters
             {
                 Schema = new OpenApiSchema
                 {
-                    Reference = schema.Reference,
-                },
+                    Reference = schema.Reference
+                }
             });
             operation.Responses.Add(status400BadRequestAsString, response);
         }

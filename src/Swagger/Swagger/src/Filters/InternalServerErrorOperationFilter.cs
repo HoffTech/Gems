@@ -34,7 +34,7 @@ namespace Gems.Swagger.Filters
 
             var response = new OpenApiResponse
             {
-                Description = "Server Error",
+                Description = "Server Error"
             };
 
             var schema = context.SchemaGenerator.GenerateSchema(this.genericErrorType, context.SchemaRepository);
@@ -42,8 +42,8 @@ namespace Gems.Swagger.Filters
             {
                 Schema = new OpenApiSchema
                 {
-                    Reference = schema.Reference,
-                },
+                    Reference = schema.Reference
+                }
             });
             operation.Responses.Add(status500InternalServerError, response);
         }

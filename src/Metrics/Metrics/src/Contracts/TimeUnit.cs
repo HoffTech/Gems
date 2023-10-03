@@ -6,6 +6,6 @@ namespace Gems.Metrics.Contracts
     public enum TimeUnit
     {
         Seconds = 1,
-        Milliseconds = 2,
+        Milliseconds = 2
     }
 }

@@ -3,7 +3,7 @@
 
 using System;
 
-using Gems.Authentication.Options;
+using Gems.Authentication.Jwt.Options;
 using Gems.Mvc.Filters.Errors;
 using Gems.Swagger.Filters;
 using Gems.Swagger.Options;
@@ -53,9 +53,9 @@ namespace Gems.Swagger
                         {
                             Implicit = new OpenApiOAuthFlow
                             {
-                                AuthorizationUrl = new Uri($"{adOptions.Authority}/oauth2/authorize/"),
-                            },
-                        },
+                                AuthorizationUrl = new Uri($"{adOptions.Authority}/oauth2/authorize/")
+                            }
+                        }
                     });
                     options.OperationFilter<AuthorizeCheckOperationFilter>();
                 }

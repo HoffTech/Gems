@@ -31,7 +31,7 @@ namespace Gems.Patterns.SyncTables.Tests
                 {
                     new () { Name = "Name1", Age = "25" },
                     new () { Name = "Name2", Age = "30" },
-                    new () { Name = "Name3", Age = "35" },
+                    new () { Name = "Name3", Age = "35" }
                 },
                 MergeResult = new MergeResult { Value = "Success" }
             };
@@ -83,7 +83,7 @@ namespace Gems.Patterns.SyncTables.Tests
                 {
                     new () { Name = "Name1", Age = "25" },
                     new () { Name = "Name2", Age = "30" },
-                    new () { Name = "Name3", Age = "35" },
+                    new () { Name = "Name3", Age = "35" }
                 },
                 MergeResult = new MergeResult { Value = "Success" }
             };
