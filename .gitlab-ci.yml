@@ -11,10 +11,13 @@ build:
     - python3 /app/build_gems.py
   only:
     - main
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /^20\d\d\/v\d+\s*$/
 
 mirror_to_github:
   stage: mirror_to_github
-  when: manual
+  #when: manual
   script:
     - python3 /app/mirror_to_github.py
   only:
@@ -23,7 +26,7 @@ mirror_to_github:
 
 publish_to_nuget:
   stage: publish_to_nuget
-  when: manual
+  #when: manual
   script:
     - python3 /app/publish_to_nuget.py  
   only:
