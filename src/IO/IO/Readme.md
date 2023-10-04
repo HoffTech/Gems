@@ -51,8 +51,8 @@ public class SaveToFileCollectionElement
     "ServerName": "127.0.0.1", // наименование сервера - хост или IP адрес
     "Credentials": {
       "DomainName": "127.0.0.1", // наименование домена
-      "UserName": "data1", // логин
-      "Password": "123456" // пароль
+      "UserName": "", // логин
+      "Password": "" // пароль
     }
   }
 ```
