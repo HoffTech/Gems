@@ -61,9 +61,9 @@ namespace Gems.Data.MySql
             options ??= new UnitOfWorkOptions();
             options.RegisterMappersInternal = MySqlMapper.RegisterMappers;
             options.RegisterMapperInternal = MySqlMapper.RegisterMapper;
-            configureOptions?.Invoke(options);
             options.Key = key;
             options.Factory = CreateUnitOfWork;
+            configureOptions?.Invoke(options);
             if (options.SshClientOptions != null)
             {
                 OpenSsh(options.SshClientOptions);

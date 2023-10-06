@@ -49,9 +49,9 @@ namespace Gems.Data.SqlServer
         public static void AddMsSqlUnitOfWork(this IServiceCollection services, string key, UnitOfWorkOptions options, Action<UnitOfWorkOptions> configureOptions = null)
         {
             options ??= new UnitOfWorkOptions();
-            configureOptions?.Invoke(options);
             options.Key = key;
             options.Factory = CreateUnitOfWork;
+            configureOptions?.Invoke(options);
 
             services.AddSingleton(options);
 

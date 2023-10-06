@@ -25,7 +25,7 @@ namespace Gems.Data.UnitOfWork
     {
         public const string DefaultKey = "default";
 
-        private static readonly ConcurrentDictionary<Assembly, bool> ScannedAssemblies = new ConcurrentDictionary<Assembly, bool>();
+        private static readonly ConcurrentDictionary<string, Assembly> ScannedAssemblies = new ConcurrentDictionary<string, Assembly>();
 
         public string ConnectionString { get; set; }
 
@@ -62,13 +62,13 @@ namespace Gems.Data.UnitOfWork
                 return;
             }
 
-            var assembly = typeof(T).Assembly;
-            if (ScannedAssemblies.TryGetValue(assembly, out _))
+            var targetAssembly = typeof(T).Assembly;
+            if (ScannedAssemblies.TryGetValue(this.Key, out var assembly) && assembly == targetAssembly)
             {
                 return;
             }
 
-            if (ScannedAssemblies.TryAdd(assembly, true))
+            if (ScannedAssemblies.TryAdd(this.Key, assembly))
             {
                 this.RegisterMappersInternal?.Invoke(typeof(T).Assembly);
             }

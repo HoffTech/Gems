@@ -13,6 +13,7 @@ using Gems.Data.SqlServer;
 using Gems.HealthChecks;
 using Gems.Http;
 using Gems.Jobs.Quartz;
+using Gems.Jobs.Quartz.Behaviors;
 using Gems.Logging.Mvc;
 using Gems.Logging.Mvc.Behaviors;
 using Gems.Metrics.Behaviors;
@@ -103,6 +104,7 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
         this.services.AddPipeline(typeof(TimeMetricBehavior<,>));
         this.services.AddPipeline(typeof(ValidatorBehavior<,>));
         this.services.AddPipeline(typeof(UnitOfWorkBehavior<,>));
+        this.services.AddPipeline(typeof(ReFireJobOnFailedBehavior<,>));
     }
 
     private void AddValidation()

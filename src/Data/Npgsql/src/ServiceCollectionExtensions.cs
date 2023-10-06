@@ -51,9 +51,9 @@ namespace Gems.Data.Npgsql
             options ??= new UnitOfWorkOptions();
             options.RegisterMappersInternal = PgSqlMapper.RegisterMappers;
             options.RegisterMapperInternal = PgSqlMapper.RegisterMapper;
-            configureOptions?.Invoke(options);
             options.Key = key;
             options.Factory = CreateUnitOfWork;
+            configureOptions?.Invoke(options);
             services.AddSingleton(options);
 
             if (services.All(d => d.ServiceType != typeof(IUnitOfWorkProvider)))
