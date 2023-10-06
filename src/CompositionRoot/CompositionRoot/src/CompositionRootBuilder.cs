@@ -120,19 +120,19 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
     private void AddUnitOfWorks()
     {
         var postgreSqlUnitOfWorkKeys = this.configuration.GetSection(PostgresqlUnitOfWorkOptionsList.Name).Get<PostgresqlUnitOfWorkOptionsList>()?.Select(x => x.Key) ?? Array.Empty<string>();
-        foreach (var key in postgreSqlUnitOfWorkKeys)
+        foreach (var key in postgreSqlUnitOfWorkKeys.Where(x => x != null))
         {
             this.services.AddPostgresqlUnitOfWork(this.configuration, key, options => options.RegisterMappersFromAssemblyContaining<TFromAssemblyContaining>());
         }
 
         var msSqlUnitOfWorkKeys = this.configuration.GetSection(MsSqlUnitOfWorkOptionsList.Name).Get<MsSqlUnitOfWorkOptionsList>()?.Select(x => x.Key) ?? Array.Empty<string>();
-        foreach (var key in msSqlUnitOfWorkKeys)
+        foreach (var key in msSqlUnitOfWorkKeys.Where(x => x != null))
         {
             this.services.AddMsSqlUnitOfWork(this.configuration, key, options => options.RegisterMappersFromAssemblyContaining<TFromAssemblyContaining>());
         }
 
         var mysqlUnitOfWorkKeys = this.configuration.GetSection(MySqlUnitOfWorkOptionsList.Name).Get<MySqlUnitOfWorkOptionsList>()?.Select(x => x.Key) ?? Array.Empty<string>();
-        foreach (var key in mysqlUnitOfWorkKeys)
+        foreach (var key in mysqlUnitOfWorkKeys.Where(x => x != null))
         {
             this.services.AddMySqlUnitOfWork(this.configuration, key, options => options.RegisterMappersFromAssemblyContaining<TFromAssemblyContaining>());
         }

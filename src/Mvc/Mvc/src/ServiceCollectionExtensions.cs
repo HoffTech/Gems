@@ -13,6 +13,7 @@ using Gems.Mvc.Filters.Errors;
 using Gems.Mvc.GenericControllers;
 using Gems.Mvc.MultipleModelBinding;
 using Gems.Mvc.Validation;
+using Gems.Text.Json.Converters;
 
 using MediatR;
 
@@ -45,6 +46,10 @@ namespace Gems.Mvc
                     options.Filters.Add(typeof(HandleErrorFilter));
                     options.Conventions.Add(new GenericControllerRouteConvention());
                     configureOptions?.Invoke(options);
+                })
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
                 })
                 .ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider()));
         }

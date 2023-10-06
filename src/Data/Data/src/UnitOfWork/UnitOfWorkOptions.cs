@@ -68,9 +68,9 @@ namespace Gems.Data.UnitOfWork
                 return;
             }
 
-            if (ScannedAssemblies.TryAdd(this.Key, assembly))
+            if (ScannedAssemblies.TryAdd(this.Key, targetAssembly))
             {
-                this.RegisterMappersInternal?.Invoke(typeof(T).Assembly);
+                this.RegisterMappersInternal?.Invoke(targetAssembly);
             }
         }
 

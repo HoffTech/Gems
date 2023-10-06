@@ -5,6 +5,8 @@ using System;
 using System.Linq;
 using System.Threading;
 
+using Dapper;
+
 using Gems.Context;
 using Gems.Data.UnitOfWork;
 using Gems.Metrics.Data;
@@ -58,16 +60,9 @@ namespace Gems.Data.SqlServer
             if (services.All(d => d.ServiceType != typeof(IUnitOfWorkProvider)))
             {
                 services.AddSingleton<IUnitOfWorkProvider, UnitOfWorkProvider>();
-            }
-
-            if (services.All(d => d.ServiceType != typeof(ITimeMetricProviderFactory)))
-            {
                 services.AddSingleton<ITimeMetricProviderFactory, TimeMetricProviderFactory>();
-            }
-
-            if (services.All(d => d.ServiceType != typeof(IContextFactory)))
-            {
                 services.AddContext<UnitOfWorkContextFactory>();
+                SqlMapper.AddTypeHandler(new SqlMappers.DapperSqlDateOnlyTypeHandler());
             }
         }
 

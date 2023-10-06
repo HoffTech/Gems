@@ -7,6 +7,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 
+using Gems.Text.Json.Converters;
+
 namespace Gems.Text.Json
 {
     /// <summary>
@@ -25,7 +27,7 @@ namespace Gems.Text.Json
         {
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             options.Converters.Add(new JsonStringEnumConverter());
-
+            options.Converters.Add(new DateOnlyJsonConverter());
             if (additionalConverters != null)
             {
                 foreach (var converter in additionalConverters)
@@ -59,6 +61,7 @@ namespace Gems.Text.Json
                 options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             }
 
+            options.Converters.Add(new DateOnlyJsonConverter());
             if (additionalConverters != null)
             {
                 foreach (var converter in additionalConverters)

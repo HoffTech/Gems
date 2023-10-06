@@ -405,6 +405,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.MySql", "src\Data
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.MySql.Tests", "src\Data\MySql\test\Gems.Data.MySql.Tests.csproj", "{0BC63CAE-1AB3-4058-AAAF-474719B2802D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Text.Json.Tests", "src\Text\Json\test\Gems.Text.Json.Tests.csproj", "{D56B0A3B-E02B-4912-8E45-FB72FB4C3AFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -615,6 +617,10 @@ Global
 		{0BC63CAE-1AB3-4058-AAAF-474719B2802D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BC63CAE-1AB3-4058-AAAF-474719B2802D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BC63CAE-1AB3-4058-AAAF-474719B2802D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D56B0A3B-E02B-4912-8E45-FB72FB4C3AFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D56B0A3B-E02B-4912-8E45-FB72FB4C3AFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D56B0A3B-E02B-4912-8E45-FB72FB4C3AFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D56B0A3B-E02B-4912-8E45-FB72FB4C3AFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -737,5 +743,6 @@ Global
 		{58579A0B-3240-4953-A02F-301DDE3493D4} = {38940F5E-EA23-46CA-9E9F-A1BD486DB649}
 		{80963401-CFCD-40C0-8C26-E338711E2182} = {38940F5E-EA23-46CA-9E9F-A1BD486DB649}
 		{0BC63CAE-1AB3-4058-AAAF-474719B2802D} = {38940F5E-EA23-46CA-9E9F-A1BD486DB649}
+		{D56B0A3B-E02B-4912-8E45-FB72FB4C3AFB} = {0CA9C83E-04C2-43E6-9D18-521EA49DA6A7}
 	EndGlobalSection
 EndGlobal
