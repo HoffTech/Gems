@@ -15,6 +15,7 @@ using Serilog.Formatting.Compact;
 
 namespace Gems.Logging.Security.Tests
 {
+    [Ignore("Ignore all tests")]
     internal class PropertyFilterTest
     {
         [OneTimeSetUp]

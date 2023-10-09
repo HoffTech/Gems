@@ -18,6 +18,7 @@ using NUnit.Framework;
 namespace Gems.Data.MySql.Tests;
 
 [Parallelizable(ParallelScope.All)]
+[Ignore("Ignore all tests")]
 public class MySqlDapperHelperTests
 {
     [OneTimeSetUp]

@@ -1,6 +1,7 @@
 image: ${CI_REGISTRY}/build-images/python-gems:latest
 
 stages:
+  - test
   - build
   - mirror_to_github
   - publish_to_nuget
@@ -32,3 +33,14 @@ publish_to_nuget:
   only:
     variables:
       - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+
+test:
+  stage: test
+  image: ${CI_REGISTRY}/build-images/core/sdk:6.0
+  script:
+    - dotnet test -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=\"cobertura,opencover\" /p:CoverletOutput=../results/
+  coverage: '/Total\s*\|\s*(\d+\.?\d+)/'
+  artifacts:
+    reports:
+      cobertura: ./results/coverage.cobertura.xml
+
