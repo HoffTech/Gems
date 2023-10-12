@@ -32,7 +32,8 @@ public static class SshAgent
             return;
         }
 
-        sshClient.Connect();
+        sshClient.Dispose();
+        SshClients.TryUpdate(sshClientOptions, CreateSshClient(sshClientOptions), sshClient);
     }
 
     private static SshClient CreateSshClient(SshClientOptions sshClientOptions)
