@@ -27,8 +27,5 @@
 
 
 
-  <ItemGroup>
-    <Folder Include="EfUnitOfWork\" />
-  </ItemGroup>
 
 </Project>

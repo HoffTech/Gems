@@ -47,7 +47,7 @@ namespace Gems.Data.UnitOfWork
 
         public SshClientOptions SshClientOptions { get; set; }
 
-        internal Func<IConnectionStringProvider, bool, TimeMetricProvider, ILogger<IUnitOfWork>, CancellationToken, IUnitOfWork> Factory { get; set; }
+        internal Func<IConnectionStringProvider, bool, TimeMetricProvider, ILogger<IUnitOfWork>, SshClientOptions, CancellationToken, IUnitOfWork> Factory { get; set; }
 
         internal Action<Assembly> RegisterMappersInternal { get; set; }
 

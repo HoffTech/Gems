@@ -437,7 +437,7 @@ public class UnitOfWorkBehaviorTests
     {
         var options = new UnitOfWorkOptions();
         options.Key = "default";
-        options.Factory = (_, needTransaction, _, logger, cancellationToken) => new Fixtures.UnitOfWork(needTransaction, logger, cancellationToken);
+        options.Factory = (_, needTransaction, _, logger, _, cancellationToken) => new Fixtures.UnitOfWork(needTransaction, logger, cancellationToken);
         services.AddSingleton(options);
 
         services.AddCommonUnitOfWorkServices();

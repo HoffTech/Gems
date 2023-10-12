@@ -63,21 +63,10 @@ namespace Gems.Data.MySql
             options.Key = key;
             options.Factory = CreateUnitOfWork;
             configureOptions?.Invoke(options);
-            if (options.SshClientOptions != null)
-            {
-                OpenSsh(options.SshClientOptions);
-            }
 
             services.AddSingleton(options);
 
             services.AddCommonUnitOfWorkServices();
-        }
-
-        private static void OpenSsh(SshClientOptions options)
-        {
-            var sshClientFactory = new SshClientFactory(options);
-            var sshClient = sshClientFactory.GetSshClient();
-            Console.WriteLine($"SshClient.IsConnected: {sshClient.IsConnected}");
         }
 
         private static void SetConnectionString(IConfiguration configuration, UnitOfWorkOptions options)
@@ -97,9 +86,10 @@ namespace Gems.Data.MySql
             bool needTransaction,
             TimeMetricProvider timeMetricProvider,
             ILogger<IUnitOfWork> logger,
+            SshClientOptions sshClientOptions,
             CancellationToken cancellationToken)
         {
-            return new MySqlUnitOfWork(connectionStringProvider, needTransaction, timeMetricProvider, cancellationToken);
+            return new MySqlUnitOfWork(connectionStringProvider, needTransaction, timeMetricProvider, sshClientOptions, cancellationToken);
         }
     }
 }

@@ -143,7 +143,7 @@ namespace Gems.Data.UnitOfWork
             options.ConnectionString ??= this.configuration?.GetConnectionString(DefaultConnectionStringProvider.DefaultConnectionName);
             var connectionStringProvider = new DefaultConnectionStringProvider(options.ConnectionString);
             var timeMetricManager = this.metricProviderFactory.Create(options.DbQueryMetricInfo);
-            return options.Factory(connectionStringProvider, needTransaction, timeMetricManager, this.logger, cancellationToken);
+            return options.Factory(connectionStringProvider, needTransaction, timeMetricManager, this.logger, options.SshClientOptions, cancellationToken);
         }
     }
 }

@@ -22,6 +22,7 @@ namespace Gems.Data.MySql
         private readonly IConnectionStringProvider connectionStringProvider;
         private readonly bool needTransaction;
         private readonly TimeMetricProvider timeMetricProvider;
+        private readonly SshClientOptions sshClientOptions;
         private MySqlConnection connection;
         private MySqlTransaction transaction;
 
@@ -29,11 +30,13 @@ namespace Gems.Data.MySql
             IConnectionStringProvider connectionStringProvider,
             bool needTransaction,
             TimeMetricProvider timeMetricProvider,
+            SshClientOptions sshClientOptions,
             CancellationToken cancellationToken)
         {
             this.connectionStringProvider = connectionStringProvider;
             this.needTransaction = needTransaction;
             this.timeMetricProvider = timeMetricProvider;
+            this.sshClientOptions = sshClientOptions;
             this.cancellationToken = cancellationToken;
         }
 
@@ -1138,6 +1141,8 @@ namespace Gems.Data.MySql
 
         private async Task OpenConnectionAsync()
         {
+            SshAgent.OpenSsh(this.sshClientOptions);
+
             if (this.connection != null)
             {
                 return;

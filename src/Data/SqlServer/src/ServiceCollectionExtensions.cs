@@ -74,6 +74,7 @@ namespace Gems.Data.SqlServer
             bool needTransaction,
             TimeMetricProvider timeMetricProvider,
             ILogger<IUnitOfWork> logger,
+            SshClientOptions sshClientOptions,
             CancellationToken cancellationToken)
         {
             return new SqlUnitOfWork(connectionStringProvider, needTransaction, timeMetricProvider, cancellationToken);

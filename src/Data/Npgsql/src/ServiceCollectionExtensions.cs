@@ -75,6 +75,7 @@ namespace Gems.Data.Npgsql
             bool needTransaction,
             TimeMetricProvider timeMetricProvider,
             ILogger<IUnitOfWork> logger,
+            SshClientOptions sshClientOptions,
             CancellationToken cancellationToken)
         {
             return new NpgsqlUnitOfWork(connectionStringProvider, needTransaction, timeMetricProvider, cancellationToken);

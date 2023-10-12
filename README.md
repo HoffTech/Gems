@@ -38,6 +38,7 @@
 - [Gems.Data](/src/Data/Data)
 - [Gems.Data.Npgsql](/src/Data/Npgsql)
 - [Gems.Data.SqlServer](/src/Data/SqlServer)
+- [Gems.Data.MySql](/src/Data/MySql)
 
 # Http запросы
 - [Gems.Http](/src/Http/Http)
