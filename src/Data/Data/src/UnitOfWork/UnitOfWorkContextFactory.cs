@@ -1,12 +1,14 @@
 ﻿// Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
 using Gems.Context;
+using Gems.Data.UnitOfWork.EntityFramework;
 
 using Microsoft.Extensions.Logging;
 
@@ -28,5 +30,6 @@ public class UnitOfWorkContextFactory : DefaultContextFactory
     {
         base.AddItems(context);
         context.Items.TryAdd(UnitOfWorkProvider.UnitOfWorkMapName, this.options.ToDictionary(x => x.Key, _ => new ConcurrentDictionary<CancellationToken, IUnitOfWork>()));
+        context.Items.TryAdd(EfUnitOfWorkProvider.EfUnitOfWorkMapName, new ConcurrentDictionary<Type, IEfUnitOfWork>());
     }
 }

@@ -5,9 +5,6 @@ using System;
 using System.Linq;
 using System.Threading;
 
-using Dapper;
-
-using Gems.Context;
 using Gems.Data.UnitOfWork;
 using Gems.Metrics.Data;
 
@@ -58,13 +55,7 @@ namespace Gems.Data.Npgsql
             configureOptions?.Invoke(options);
             services.AddSingleton(options);
 
-            if (services.All(d => d.ServiceType != typeof(IUnitOfWorkProvider)))
-            {
-                services.AddSingleton<IUnitOfWorkProvider, UnitOfWorkProvider>();
-                services.AddSingleton<ITimeMetricProviderFactory, TimeMetricProviderFactory>();
-                services.AddContext<UnitOfWorkContextFactory>();
-                SqlMapper.AddTypeHandler(new SqlMappers.DapperSqlDateOnlyTypeHandler());
-            }
+            services.AddCommonUnitOfWorkServices();
         }
 
         private static void SetConnectionString(IConfiguration configuration, UnitOfWorkOptions options)

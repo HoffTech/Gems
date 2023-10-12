@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.16" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,5 +25,10 @@
     <ProjectReference Include="..\..\..\Metrics\Data\src\Gems.Metrics.Data.csproj" />
   </ItemGroup>
 
+
+
+  <ItemGroup>
+    <Folder Include="EfUnitOfWork\" />
+  </ItemGroup>
 
 </Project>

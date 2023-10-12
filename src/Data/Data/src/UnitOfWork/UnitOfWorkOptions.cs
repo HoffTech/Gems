@@ -43,7 +43,7 @@ namespace Gems.Data.UnitOfWork
 
         public bool SuspendRegisterMappersFromAssemblyContaining { get; set; }
 
-        public string Key { get; set; }
+        public string Key { get; set; } = DefaultKey;
 
         public SshClientOptions SshClientOptions { get; set; }
 

@@ -1094,11 +1094,13 @@ namespace Gems.Data.MySql
             if (this.transaction != null)
             {
                 await this.transaction.DisposeAsync().ConfigureAwait(false);
+                this.transaction = null;
             }
 
             if (this.connection != null)
             {
                 await this.connection.DisposeAsync().ConfigureAwait(false);
+                this.connection = null;
             }
         }
 

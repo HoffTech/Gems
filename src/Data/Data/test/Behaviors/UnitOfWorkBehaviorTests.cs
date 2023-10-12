@@ -8,13 +8,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Gems.Context;
 using Gems.Data.Behaviors;
 using Gems.Data.Tests.Behaviors.Fixtures;
 using Gems.Data.Tests.SeedWork;
 using Gems.Data.UnitOfWork;
 using Gems.Metrics;
-using Gems.Metrics.Data;
 using Gems.Mvc;
 
 using MediatR;
@@ -442,9 +440,7 @@ public class UnitOfWorkBehaviorTests
         options.Factory = (_, needTransaction, _, logger, cancellationToken) => new Fixtures.UnitOfWork(needTransaction, logger, cancellationToken);
         services.AddSingleton(options);
 
-        services.AddSingleton<IUnitOfWorkProvider, UnitOfWorkProvider>();
-        services.AddSingleton<ITimeMetricProviderFactory, TimeMetricProviderFactory>();
-        services.AddContext<UnitOfWorkContextFactory>();
+        services.AddCommonUnitOfWorkServices();
     }
 
     private static IConfiguration BuildConfiguration()

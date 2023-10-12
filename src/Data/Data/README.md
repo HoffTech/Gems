@@ -18,8 +18,9 @@
 * [Unit of work](#unit-of-work)
 * [UnitOfWorkBehavior](#unitofworkbehavior)
 * [Использование Linked Token](#использование-linked-token)
-* [Использование контекста](#использование-контекста)
+* [Использование локального контекста](#использование-локального-контекста)
 * [Метрики](#метрики)
+* [Работа с EF](#работа-с-ef)
 
 # Cкалярная функция
 ```csharp
@@ -124,9 +125,9 @@ await this.mediator.Send(new SomeInnerCommand(), linkedToken);
 ```
 Связанные токены является obsolete. Смотрите раздел "Использование контекста".
 
-# Использование контекста
-Провадер Unit of Work (UnitOfWorkProvider) можно сконфигурировать на работу с контекстом. 
-Тем самым делегировать источник хранения объектов Unit of Work на контекст вместо собственного словаря (в UnitOfWorkProvider).
+# Использование локального контекста
+Провадер Unit of Work (UnitOfWorkProvider) можно сконфигурировать на работу с локальным контекстом. 
+Тем самым делегировать источник хранения объектов Unit of Work на локальный контекст вместо собственного словаря (в UnitOfWorkProvider).
 ```json
 "UnitOfWorkProviderOptions": {
     "UseContext": true
@@ -144,3 +145,47 @@ await this.mediator.Send(new SomeInnerCommand(), cancellationToken);
 
 # Метрики
 В unit of work можно настроить автоматическую запись метрик для хранимых процедур и функций. Как работать с метриками с бд смотрите [здесь](/src/Metrics/Data/README.md#метрики-с-iunitofwork).
+
+# Работа с EF
+Библиотека предоставляет DbContextProvider для доступа к дб контексту EF. DbContextProvider хранит дб контекст в локальном контексте.    
+Это добавляет возможность доменным обработчикам создать собственные дб контексты.  
+Если обработчику нужна транзакция, то необходимо предварять команду/запрос - интерфейсом IRequestUnitOfWork. Это избавляет разработчика от прямых вызовов SaveChangeAsync и CommitAsync. За все эти вызовы отвечает пайплайн UnitOfWorkBehavior.
+
+Для того чтобы использовать DbContextProvider необходимо вместо регистрации дб контекста: 
+```csharp
+services.AddDbContext<SomeDbContext>(options => options.UseNpgsql(this.Configuration.GetConnectionString("connectionString")));
+```
+зарегистрировать фабрику дб контекста:
+```csharp
+services.AddDbContextFactory<SomeDbContext>(options => options.UseNpgsql(this.Configuration.GetConnectionString("connectionString")));
+```
+И зарегистрировать сам DbContextProvider:
+```csharp
+services.AddDbContextProvider();
+```
+Внимание: регистрировать провайдер не нужно, если уже был зарегистрирован любой unit of work.
+
+Пример использования дб контекста:
+```csharp
+public class SomeCommand : IRequest, IRequestUnitOfWork
+{
+}
+
+public class SomeCommandHandler : IRequestHandler<SomeCommand>
+{
+    private readonly IDbContextProvider dbContextProvider;
+
+    public SomeCommandHandler(IDbContextProvider dbContextProvider)
+    {
+        this.dbContextProvider = dbContextProvider;
+    }
+
+    public async Task Handle(SomeCommand command, CancellationToken cancellationToken)
+    {
+        var dbContext = await this.dbContextProvider.GetDbContext<SomeDbContext>(cancellationToken).ConfigureAwait(false);
+        // ...
+    }
+}
+```
+
+
