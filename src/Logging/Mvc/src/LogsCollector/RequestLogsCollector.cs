@@ -143,7 +143,7 @@ namespace Gems.Logging.Mvc.LogsCollector
                 return dataAsString;
             }
 
-            return data.Serialize();
+            return data.Serialize(camelCase: true);
         }
 
         private static bool NeedToLog(MemberInfo property)

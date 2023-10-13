@@ -8,6 +8,7 @@ using Gems.Logging.Security;
 
 using Microsoft.Extensions.Logging;
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Gems.Logging.Mvc.LogsCollector
@@ -84,7 +85,9 @@ namespace Gems.Logging.Mvc.LogsCollector
                 var token = JToken.FromObject(data);
                 var root = new ObjectToJsonProjection(data, token);
                 this.objectFilter.Filter(root);
-                return token.ToObject(data.GetType());
+                var jsonSerializer = JsonSerializer.CreateDefault();
+                jsonSerializer.Converters.Add(new EnumConverter());
+                return token.ToObject(data.GetType(), jsonSerializer);
             }
             catch
             {
