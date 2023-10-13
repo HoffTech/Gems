@@ -42,6 +42,10 @@ namespace Gems.Jobs.Quartz.Configuration
         /// </summary>
         public int? MaxConcurrency { get; set; }
 
+        public int? BatchTriggerAcquisitionMaxCount { get; set; }
+
+        public bool? AcquireTriggersWithinLock { get; set; }
+
         /// <summary>
         /// Задержка перед итерацией мониторинга и восстановления триггеров, находящихся в состоянии Error.
         /// </summary>
