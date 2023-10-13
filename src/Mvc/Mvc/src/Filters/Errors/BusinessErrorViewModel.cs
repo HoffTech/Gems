@@ -65,14 +65,15 @@ namespace Gems.Mvc.Filters.Errors
             };
         }
 
-        public BusinessErrorViewModel(System.InvalidOperationException exception)
+        public BusinessErrorViewModel(System.InvalidOperationException exception, int statusCode)
         {
+            this.StatusCode = statusCode;
             this.Exception = exception;
             var message = GetParseCode(exception, out var code);
 
             this.Error = new ErrorInside
             {
-                IsBusiness = true,
+                IsBusiness = statusCode < 499,
                 Message = message,
                 Code = code
             };

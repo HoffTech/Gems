@@ -42,11 +42,10 @@ namespace Gems.Mvc.Filters
                     {
                         StatusCode = 400
                     };
+                case System.InvalidOperationException { Source: not null } e when e.Source.StartsWith("System."):
+                    return new BusinessErrorViewModel(e, 499);
                 case System.InvalidOperationException e:
-                    return new BusinessErrorViewModel(e)
-                    {
-                        StatusCode = 422
-                    };
+                    return new BusinessErrorViewModel(e, 422);
                 case BusinessException e:
                     return new BusinessErrorViewModel(e);
                 case RequestException { StatusCode: { } } e when (int)e.StatusCode < 499:
