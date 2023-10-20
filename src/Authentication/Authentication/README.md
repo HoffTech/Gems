@@ -10,10 +10,10 @@
 * [JWT аутентификация](#JWTАутентификация)
 * [Keycloak аутентификация](#KeycloakАутентификация)
 
-# Установка и настройка
+# Установка и настройка <a name="УстановкаИНастройка"></a>
 - Установите нугет пакет Gems.Authentication через менеджер пакетов.
 
-# JWT аутентификация
+# JWT аутентификация <a name="JWTАутентификация"></a>
 
 Реализация подключения аутентификации по протоколу OpenId Connect(https://openid.net/connect/) на основе JWT токена.
 
@@ -39,7 +39,7 @@ app.UseAuthorization();
 
 Для работы c авторизацией, необходимо, чтобы в AD зарегистрировали redirect_ url. Пример: https://api-dev.kifr-ru.local/{GitLabSwaggerPrefix}/swagger/oauth2-redirect.html
 
-# Keycloak аутентификация
+# Keycloak аутентификация <a name="KeycloakАутентификация"></a>
 Реализация подключения keycloak аутентификации по протоколу OpenId Connect(https://openid.net/connect/) посредством code flow потока (https://www.keycloak.org/docs/latest/securing_apps/#_oidc).
 Данный тип аутентификации предназначен для web, нативных и мобильных приложений, в которые возможно встроить пользовательский агент. 
 
