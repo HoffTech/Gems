@@ -71,12 +71,6 @@ namespace Gems.Jobs.Quartz.Configuration
         /// </summary>
         public string AdminUiUrlPrefix { get; set; }
 
-        /// <summary>
-        /// Параметры quartz.*.
-        /// Параметры, которые указаны через свойства данного класса являются приоритетными (н-р: MaxConcurrency, BatchTriggerAcquisitionMaxCount, AcquireTriggersWithinLock).
-        /// </summary>
-        public Dictionary<string, object> Properties { get; set; }
-
         public void RegisterJobsFromAssemblyContaining<T>()
         {
             JobRegister.RegisterJobs(typeof(T).Assembly);
