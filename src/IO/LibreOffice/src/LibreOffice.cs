@@ -89,16 +89,13 @@ namespace Gems.IO.LibreOffice
             try
             {
                 var arguments = this.GetCommandArguments(docxPath, userId, tempFolder);
-                var process = new Process
+                using var process = new Process();
+                process.StartInfo = new ProcessStartInfo(this.options.Value.LibreOfficeExecutablePath)
                 {
-                    StartInfo = new ProcessStartInfo(this.options.Value.LibreOfficeExecutablePath)
-                    {
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        WorkingDirectory = Environment.CurrentDirectory,
-                        RedirectStandardError = true
-                    }
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WorkingDirectory = Environment.CurrentDirectory,
+                    RedirectStandardError = true
                 };
 
                 foreach (var arg in arguments)
