@@ -22,8 +22,11 @@
   "Jobs": {
     "SchedulerName": "Service Name",            // наименование планировщика
     "TablePrefix": "quartz.qrtz_",              // префикс таблиц, хранящих данные по элементам Quartz(Jobs, Triggers etc.)
-    "MaxConcurrency": 25                        // (опционально, по умолчанию 25) Количество потоков, доступных для одновременного выполнения заданий в Quartz
+    "MaxConcurrency": 25,                       // (опционально, по умолчанию 25) Количество потоков, доступных для одновременного выполнения заданий в Quartz
+    "BatchTriggerAcquisitionMaxCount": 1,       // (опционально, по умолчанию 1) Количество тригеров, доступных для получения узлов планировщика за раз
+    "AcquireTriggersWithinLock": true,          // (опционально, по умолчанию false) Получение следующих тригеров, происходит с блокировкой бд. Необходимо ставить true, если BatchTriggerAcquisitionMaxCount > 1.
     "JobRecoveryDelayInMilliseconds": 600000,   // Задержка перед итерацией мониторинга и восстановления триггеров, находящихся в состоянии Error (по умолчанию 15000)
+    "Properties": {},                           // Параметры quartz.*. Параметры, которые указаны через свойства данного класса являются приоритетными (н-р: MaxConcurrency, BatchTriggerAcquisitionMaxCount, AcquireTriggersWithinLock).
     "Triggers": {                               // словарь триггеров
       "UploadSelloutGoods": "0 0 0 * * ?"       // триггер, где ключ - наименование задания, значение - крон выполнения
     }

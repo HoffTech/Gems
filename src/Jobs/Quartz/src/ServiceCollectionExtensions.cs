@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -90,6 +91,11 @@ namespace Gems.Jobs.Quartz
 
                     x.UseJsonSerializer();
                 });
+
+                foreach (var property in jobsOptions.Properties.Where(property => property.Value != null))
+                {
+                    q.SetProperty(property.Key, property.Value.ToString().ToLower());
+                }
 
                 q.SetProperty("quartz.threadPool.type", "Quartz.Simpl.DefaultThreadPool, Quartz");
                 q.SetProperty("quartz.threadPool.maxConcurrency", jobsOptions.MaxConcurrency?.ToString() ?? "25");
