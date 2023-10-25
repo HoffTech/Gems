@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Impl.Matchers;
+using Quartz.Impl.Triggers;
 
 namespace Gems.Jobs.Quartz
 {
@@ -42,6 +43,7 @@ namespace Gems.Jobs.Quartz
                 var triggerKeys = await scheduler
                     .GetTriggerKeys(GroupMatcher<TriggerKey>.AnyGroup(), cancellationToken)
                     .ConfigureAwait(false);
+                var workersToRecoverFromBlockedState = this.options.Value.WorkersToRecoverFromBlockedState;
 
                 foreach (var key in triggerKeys)
                 {
@@ -49,6 +51,23 @@ namespace Gems.Jobs.Quartz
                     if (triggerState is TriggerState.Error)
                     {
                         await scheduler.ResetTriggerFromErrorState(key, cancellationToken).ConfigureAwait(false);
+                    }
+
+                    if (triggerState is TriggerState.Blocked
+                        && workersToRecoverFromBlockedState != null && workersToRecoverFromBlockedState.Count > 0)
+                    {
+                        var trigger = await scheduler.GetTrigger(key, cancellationToken).ConfigureAwait(false);
+                        if (trigger != null
+                            && workersToRecoverFromBlockedState.Contains(trigger.JobKey.Name)
+                            && trigger is CronTriggerImpl cronTrigger
+                            && !string.IsNullOrWhiteSpace(cronTrigger.CronExpressionString))
+                        {
+                            var newTrigger = (CronTriggerImpl)cronTrigger.Clone();
+                            newTrigger.CronExpression = new CronExpression(cronTrigger.CronExpressionString);
+
+                            await scheduler.UnscheduleJob(trigger.Key, cancellationToken).ConfigureAwait(false);
+                            await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
+                        }
                     }
                 }
 

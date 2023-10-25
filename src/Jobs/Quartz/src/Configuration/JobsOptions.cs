@@ -68,6 +68,11 @@ namespace Gems.Jobs.Quartz.Configuration
         public int? PersistentRecentHistoryEntryTtl { get; set; }
 
         /// <summary>
+        /// Список worker'ов, для которых нужно пересоздавать Job'ы и Trigger'ы, если они находятся в Blocked состоянии в течение <seealso cref="JobsOptions.JobRecoveryDelayInMilliseconds" />
+        /// </summary>
+        public List<string> WorkersToRecoverFromBlockedState { get; set; }
+
+        /// <summary>
         /// AdminUI URL
         /// </summary>
         public string AdminUiUrl { get; set; } = "/dashboard";
