@@ -1,6 +1,7 @@
 // Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 
 namespace Gems.Jobs.Quartz.Configuration
@@ -42,10 +43,13 @@ namespace Gems.Jobs.Quartz.Configuration
         /// <summary>
         /// Количество потоков, доступных для одновременного выполнения заданий в Quartz.
         /// </summary>
+        [Obsolete("Использовать QuartzProperties.ThreadPool.MaxConcurrency")]
         public int? MaxConcurrency { get; set; }
 
+        [Obsolete("Использовать QuartzProperties.Scheduler.BatchTriggerAcquisitionMaxCount")]
         public int? BatchTriggerAcquisitionMaxCount { get; set; }
 
+        [Obsolete("Использовать QuartzProperties.Scheduler.AcquireTriggersWithinLock")]
         public bool? AcquireTriggersWithinLock { get; set; }
 
         /// <summary>
