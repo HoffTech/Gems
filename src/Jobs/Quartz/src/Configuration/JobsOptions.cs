@@ -37,6 +37,8 @@ namespace Gems.Jobs.Quartz.Configuration
         /// </summary>
         public string TablePrefix { get; set; }
 
+        public QuartzProperties QuartzProperties { get; set; }
+
         /// <summary>
         /// Количество потоков, доступных для одновременного выполнения заданий в Quartz.
         /// </summary>
