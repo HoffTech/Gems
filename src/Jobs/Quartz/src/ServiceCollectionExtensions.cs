@@ -91,16 +91,19 @@ namespace Gems.Jobs.Quartz
                     x.UseJsonSerializer();
                 });
 
+
                 q.SetProperty("quartz.threadPool.type", "Quartz.Simpl.DefaultThreadPool, Quartz");
                 q.SetProperty("quartz.threadPool.maxConcurrency", jobsOptions.MaxConcurrency?.ToString() ?? "25");
                 if (jobsOptions.BatchTriggerAcquisitionMaxCount != null)
                 {
-                    q.SetProperty("quartz.scheduler.batchTriggerAcquisitionMaxCount", jobsOptions.BatchTriggerAcquisitionMaxCount.ToString());
+                    q.SetProperty("quartz.scheduler.batchTriggerAcquisitionMaxCount",
+                        jobsOptions.BatchTriggerAcquisitionMaxCount.ToString());
                 }
 
                 if (jobsOptions.AcquireTriggersWithinLock != null)
                 {
-                    q.SetProperty("quartz.jobStore.acquireTriggersWithinLock", jobsOptions.AcquireTriggersWithinLock.ToString().ToLower());
+                    q.SetProperty("quartz.jobStore.acquireTriggersWithinLock",
+                        jobsOptions.AcquireTriggersWithinLock.ToString().ToLower());
                 }
 
                 if (jobsOptions.EnableAdminUiPersistentJobHistory)
@@ -111,6 +114,8 @@ namespace Gems.Jobs.Quartz
                     q.SetProperty("quartz.plugin.recentHistory.entryTtlInMinutes", (jobsOptions.PersistentRecentHistoryEntryTtl ?? 60).ToString());
                     q.SetProperty("quartz.plugin.recentHistory.tablePrefix", jobsOptions.TablePrefix);
                 }
+
+                QuartzPropertiesSetter.SetProperties(q, jobsOptions.QuartzProperties);
 
                 foreach (var (jobType, jobName) in JobRegister.JobNameByJobTypeMap)
                 {

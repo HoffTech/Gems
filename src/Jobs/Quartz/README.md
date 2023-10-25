@@ -22,10 +22,21 @@
   "Jobs": {
     "SchedulerName": "Service Name",            // наименование планировщика
     "TablePrefix": "quartz.qrtz_",              // префикс таблиц, хранящих данные по элементам Quartz(Jobs, Triggers etc.)
-    "MaxConcurrency": 25                        // (опционально, по умолчанию 25) Количество потоков, доступных для одновременного выполнения заданий в Quartz
     "JobRecoveryDelayInMilliseconds": 600000,   // Задержка перед итерацией мониторинга и восстановления триггеров, находящихся в состоянии Error (по умолчанию 15000)
     "Triggers": {                               // словарь триггеров
       "UploadSelloutGoods": "0 0 0 * * ?"       // триггер, где ключ - наименование задания, значение - крон выполнения
+    },
+    "MaxConcurrency": 25,                       // (опционально, по умолчанию 25) Количество потоков, доступных для одновременного выполнения заданий в Quartz    
+    "BatchTriggerAcquisitionMaxCount": 1,       // (опционально, по умолчанию 1) Количество тригеров, доступных для получения узлов планировщика за раз
+    "AcquireTriggersWithinLock": true,          // (опционально, по умолчанию false) Получение следующих тригеров, происходит с блокировкой бд. Необходимо ставить true, если BatchTriggerAcquisitionMaxCount > 1.
+    "QuartzProperties": {                       // установка параметров quartz.*. Данные параметры, переопределяют все раннее установленные параметры (SchedulerName, TablePrefix, MaxConcurrency, BatchTriggerAcquisitionMaxCount, AcquireTriggersWithinLock и другие, установленные при инициализации библиотекой Quartz).
+         "ThreadPool": { ... },                 // установка параметров quartz.threadPool.* (см. описание https://www.quartz-scheduler.net/documentation/quartz-3.x/configuration/reference.html#threadpool)
+         "Scheduler": {
+             ...                                // установка параметров quartz.scheduler.* (см. описание https://www.quartz-scheduler.net/documentation/quartz-3.x/configuration/reference.html#main-configuration)
+             "SchedulerExporter": { ... },      // установка параметров quartz.threadPool.* (см. описание https://www.quartz-scheduler.net/documentation/quartz-3.x/configuration/reference.html#remoting-server-and-client)
+          },         
+         "JobStore": { ... },                   // установка параметров quartz.threadPool.* (см. описание https://www.quartz-scheduler.net/documentation/quartz-3.x/configuration/reference.html#jobstoretx-ado-net)
+         "DataSource": { ... }                  // установка параметров quartz.threadPool.* (см. описание https://www.quartz-scheduler.net/documentation/quartz-3.x/configuration/reference.html#datasources-ado-net-jobstores)
     }
 }
 ```
