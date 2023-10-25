@@ -68,6 +68,11 @@ namespace Gems.Jobs.Quartz.Configuration
         public int? PersistentRecentHistoryEntryTtl { get; set; }
 
         /// <summary>
+        /// Настройки восстановления воркеров, находящихся в состоянии Blocked
+        /// </summary>
+        public BlockedJobsRecoveryOptions BlockedJobsRecovery { get; set; }
+
+        /// <summary>
         /// AdminUI URL
         /// </summary>
         public string AdminUiUrl { get; set; } = "/dashboard";

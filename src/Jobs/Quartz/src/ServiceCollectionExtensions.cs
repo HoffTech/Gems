@@ -147,6 +147,7 @@ namespace Gems.Jobs.Quartz
             services.AddQuartzmon();
 
             services.AddHostedService<JobRecoveryHostedService>();
+            services.AddHostedService<BlockedJobsRecoveryHostedService>();
         }
 
         public static IApplicationBuilder UseQuartzAdminUI(this IApplicationBuilder app, IConfiguration configuration)
