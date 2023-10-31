@@ -20,9 +20,22 @@ namespace Gems.MessageBrokers.Kafka.AppData.KafkaOptions
         /// </summary>
         public AutoOffsetReset? AutoOffsetReset { get; set; }
 
+        public bool? EnableAutoCommit { get; set; }
+
+        public bool? EnableAutoOffsetStore { get; set; }
+
+        public RetryAttempts[] RetryAttempts { get; set; }
+
         /// <summary>
         /// Topic postfix.
         /// </summary>
         public string TopicPostfix { get; set; }
+    }
+
+    public class RetryAttempts
+    {
+        public int DelayInMilliseconds { get; set; }
+
+        public int CountAttempts { get; set; }
     }
 }

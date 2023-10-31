@@ -17,6 +17,11 @@ namespace Gems.MessageBrokers.Kafka.Entities.KafkaBuilder
 
         protected override void SetValueDeserializer(ConsumerBuilder<TKey, TValue> consumerBuilder)
         {
+            if (typeof(TValue) == typeof(string))
+            {
+                return;
+            }
+
             consumerBuilder.SetValueDeserializer(new JsonDeserializer<TValue>().AsSyncOverAsync());
         }
     }

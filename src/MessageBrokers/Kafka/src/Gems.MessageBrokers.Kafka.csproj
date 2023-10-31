@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\HealthChecks\HealthChecks\src\Gems.HealthChecks.csproj" />
     <ProjectReference Include="..\..\..\Tasks\Tasks\src\Gems.Tasks.csproj" />
+    <ProjectReference Include="..\..\..\Text\Json\src\Gems.Text.Json.csproj" />
     <ProjectReference Include="..\..\MessageBrokers\src\Gems.MessageBrokers.csproj" />
   </ItemGroup>
 

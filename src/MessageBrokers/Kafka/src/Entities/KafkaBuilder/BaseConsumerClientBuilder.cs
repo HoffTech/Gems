@@ -14,6 +14,8 @@ namespace Gems.MessageBrokers.Kafka.Entities.KafkaBuilder
     /// </summary>
     public class BaseConsumerClientBuilder<TKey, TValue>
     {
+        private const int DefaultRetryDelayInMilliseconds = 5 * 60 * 1000;
+
         /// <summary>
         /// Kafka configuration.
         /// </summary>
@@ -49,6 +51,24 @@ namespace Gems.MessageBrokers.Kafka.Entities.KafkaBuilder
 
         public IConsumer<TKey, TValue> BuildTypeConsumer()
         {
+            if (this.kafkaConfiguration.Consumers[this.topic].EnableAutoCommit != null)
+            {
+                this.consumerConfig.EnableAutoCommit = false;
+            }
+
+            if (this.kafkaConfiguration.Consumers[this.topic].EnableAutoOffsetStore != null)
+            {
+                this.consumerConfig.EnableAutoOffsetStore = false;
+            }
+
+            this.kafkaConfiguration.Consumers[this.topic].RetryAttempts ??= new[]
+            {
+                new RetryAttempts
+                {
+                    DelayInMilliseconds = DefaultRetryDelayInMilliseconds
+                }
+            };
+
             var consumerBuilder = new ConsumerBuilder<TKey, TValue>(this.consumerConfig);
             this.SetValueDeserializer(consumerBuilder);
 

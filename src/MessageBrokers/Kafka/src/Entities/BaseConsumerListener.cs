@@ -2,6 +2,7 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,6 +30,7 @@ namespace Gems.MessageBrokers.Kafka.Entities
         private readonly string topic;
         private readonly ILivenessProbe livenessProbe;
         private IConsumer<TKey, TValue> consumer;
+        private Queue<int> retryAttemptDelaysQueue;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса .
@@ -93,9 +95,10 @@ namespace Gems.MessageBrokers.Kafka.Entities
                         await this.StartConsumerLoop(stoppingToken)
                             .ConfigureAwait(false);
                     }
-                    catch (Exception exception)
+                    finally
                     {
-                        this.logger.LogError(exception, "Error in consumer loop");
+                        this.livenessProbe.ServiceIsAlive = false;
+                        this.consumer?.Close();
                     }
                 },
                 stoppingToken);
@@ -104,8 +107,7 @@ namespace Gems.MessageBrokers.Kafka.Entities
         protected virtual THandlerCommand GetConsumerCommand(ConsumeResult<TKey, TValue> consumeResult, CancellationToken cancellationToken)
         {
             var command = new THandlerCommand();
-
-            if (!(command is IConsumerRequest<TValue> extCommand))
+            if (command is not IConsumerRequest<TValue> extCommand)
             {
                 return command;
             }
@@ -133,43 +135,93 @@ namespace Gems.MessageBrokers.Kafka.Entities
         /// <returns>Task result.</returns>
         private async Task StartConsumerLoop(CancellationToken cancellationToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            TopicPartitionOffset currentTopicPartitionOffset = null;
+            while (true)
             {
                 try
                 {
                     var consumeResult = this.consumer.Consume(cancellationToken);
-
                     if (consumeResult == null)
                     {
-                        continue;
+                        throw new InvalidOperationException("ConsumeResult is null");
                     }
+
+                    currentTopicPartitionOffset = consumeResult.TopicPartitionOffset;
 
                     var command = this.GetConsumerCommand(consumeResult, cancellationToken);
 
                     // обработать результат чтения топика:
                     await this.mediator.Send(command, cancellationToken).ConfigureAwait(false);
+
+                    this.CommitConsumeResult(consumeResult);
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException exception)
                 {
-                    break;
+                    this.logger.LogError(exception, $"Consumer canceled.");
+                    throw;
+                }
+                catch (ConsumeException exception) when (exception.Error.IsFatal)
+                {
+                    this.logger.LogError(exception, $"ConsumeException {exception.Error.Reason}");
+                    throw;
                 }
                 catch (ConsumeException exception)
                 {
-                    // Consumer errors should generally be ignored (or logged) unless fatal.
                     this.logger.LogError(exception, $"ConsumeException {exception.Error.Reason}");
-
-                    if (exception.Error.IsFatal)
-                    {
-                        break;
-                    }
+                    await this.RetryConsume(currentTopicPartitionOffset).ConfigureAwait(false);
                 }
                 catch (Exception exception)
                 {
                     this.logger.LogError(exception, "Unexpected error");
+                    await this.RetryConsume(currentTopicPartitionOffset).ConfigureAwait(false);
+                }
+            }
+        }
+
+        private void CommitConsumeResult(ConsumeResult<TKey, TValue> consumeResult)
+        {
+            if (this.kafkaConfiguration.Consumers[this.topic].EnableAutoCommit != true)
+            {
+                this.consumer.Commit(consumeResult);
+            }
+
+            if (this.kafkaConfiguration.Consumers[this.topic].EnableAutoOffsetStore != true)
+            {
+                this.consumer.StoreOffset(consumeResult);
+            }
+
+            this.retryAttemptDelaysQueue = null;
+        }
+
+        private async Task RetryConsume(TopicPartitionOffset currentTopicPartitionOffset)
+        {
+            if (currentTopicPartitionOffset == null)
+            {
+                throw new InvalidOperationException("TopicPartitionOffset is null");
+            }
+
+            this.retryAttemptDelaysQueue ??= this.CreateRetryAttemptsQueue();
+            var delay = this.retryAttemptDelaysQueue.Count > 0
+                ? this.retryAttemptDelaysQueue.Dequeue()
+                : this.kafkaConfiguration.Consumers[this.topic].RetryAttempts[^1].DelayInMilliseconds;
+
+            this.consumer.Assign(currentTopicPartitionOffset);
+            await Task.Delay(delay).ConfigureAwait(false);
+        }
+
+        private Queue<int> CreateRetryAttemptsQueue()
+        {
+            var retryAttemptDelaysQueue = new Queue<int>();
+            foreach (var retryAttempts in this.kafkaConfiguration.Consumers[this.topic].RetryAttempts)
+            {
+                var countAttempts = retryAttempts.CountAttempts <= 0 ? 1 : retryAttempts.CountAttempts;
+                for (var i = 0; i < countAttempts; i++)
+                {
+                    retryAttemptDelaysQueue.Enqueue(retryAttempts.DelayInMilliseconds);
                 }
             }
 
-            this.livenessProbe.ServiceIsAlive = false;
+            return retryAttemptDelaysQueue;
         }
     }
 }

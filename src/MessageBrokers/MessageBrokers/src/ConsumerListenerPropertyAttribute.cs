@@ -8,6 +8,11 @@ namespace Gems.MessageBrokers
     [AttributeUsage(AttributeTargets.Class)]
     public class ConsumerListenerPropertyAttribute : Attribute
     {
+        public ConsumerListenerPropertyAttribute(string topicName)
+        {
+            this.TopicName = topicName;
+        }
+
         public ConsumerListenerPropertyAttribute(Type keyType, Type valueType, string topicName)
         {
             this.KeyType = keyType;
@@ -15,10 +20,16 @@ namespace Gems.MessageBrokers
             this.TopicName = topicName;
         }
 
-        public Type KeyType { get; }
+        public Type KeyType { get; set; } = typeof(string);
 
-        public Type ValueType { get; }
+        public Type ValueType { get; set; }
 
         public string TopicName { get; }
+
+        /// <summary>
+        /// Необходимо распарсить json значение из строки.
+        /// ValueType должно быть установлено в System.String.
+        /// </summary>
+        public bool NeedParseJsonFromString { get; set; }
     }
 }

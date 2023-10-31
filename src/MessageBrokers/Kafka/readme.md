@@ -6,71 +6,105 @@
 
 1. Подключить к проекту библиотеку MediatR, при необходимости FluentValidation;
 
-2. Подключить библиотеку Gems.Kafka.Hosting;
+2. Подключить библиотеку Gems.MessageBrokers.Kafka;
 
-3. Создать записи в файлах `appsettings.json` в раздел `KafkaConfiguration`:
-    
-      ```
-    "BootstrapServers": "kafka-s-001.kifr-ru.local:9092,kafka-s-001.kifr-ru.local:9093,kafka-s-001.kifr-ru.local:9094",
-    "SecurityProtocol": "0", //PLAINTEXT
-    "SaslMechanism": "1", //PLAIN
-    "SaslUsername": "",
-    "SaslPassword": "",
-    "SchemaRegistryUrl": "http://kafka-s-001:8081"
-      ```
-    где `BootstrapServers` - список серверов через запятую, 
-    `SecurityProtocol` - протокол безопасности, 
-    `SaslMechanism` - механизм аутентификации, 
-    `SaslUsername` - логин пользователя, 
-    `SaslPassword` - пароль пользователя, 
-    `SchemaRegistryUrl` - ссылка на ресурс со схемами;
+3. Добавить настройки в `appsettings.json`:
 
-    Для настройки продюсеров создать структуру вида:
-      ```
-    "Producers": {
-    "producertopicname1": {
-        "ClientId": "ClientId"
+```json
+{
+  "KafkaConfiguration": 
+  {
+    "BootstrapServers": "", // список серверов через запятую
+    "SecurityProtocol": "0", // протокол безопасности - PLAINTEXT
+    "SaslMechanism": "1", // механизм аутентификации - PLAIN
+    "SaslUsername": "", // логин пользователя
+    "SaslPassword": "", // пароль пользователя
+    "SchemaRegistryUrl": "", // ссылка на ресурс со схемами
+    "Producers": // списко продюсеров 
+    {
+      "producertopicname1": // имя вашего конкретного топика 
+      {
+        "ClientId": "ClientId" // идентификатор клиента-продюсера (указываете произвольный, но обычно как названия вашего приложения)
+      },
+      "producertopicname2": // имя вашего конкретного топика 
+      {
+        "ClientId": "ClientId" // идентификатор клиента-продюсера (указываете произвольный, но обычно как названия вашего приложения)
+      }
     },
-    "producertopicname2": {
-        "ClientId": "ClientId"
+    "Consumers": // список консьюмеров 
+    {
+      "consumertopicname1": // имя вашего конкретного топика 
+      {
+        "GroupId": "GroupId", // идентификатор клиента-консьюмера (указываете произвольный, но обычно как названия вашего приложения). Если реплик несколько, то будет зарегистрирована группа консьюмеров 
+        "AutoOffsetReset": 1,           // Earliest, в случае если будет не понятно какое сообщение обрабатывать из топика, начнется с первого. Такое может произойти из-за сбоев и ребалансировки партиций. 
+        "EnableAutoCommit" : true,      // будет ли делаться автоматический коммит после обработки сообщения, даже если безуспешно. По умолчанию true. Рекомендуется устанавливать в false, тогда коммится будет только после успешной обработки.
+        "EnableAutoOffsetStore": true,  // будет ли делаться предварительное сохранение коммита в памяти. По умолчанию true. Рекомендуется устанавливать в false, тогда коммится будет сразу
+        "RetryAttempts": [              // настройка повторных запусков обработки сообщения. По умолчанию 5 минут.         
+          {
+            "DelayInMilliseconds": 5000,  // запуск повторной обработки через 5 секунд
+            "CountAttempts": 3            // количество повторений. По умолчанию 1
+          },
+          {
+            "DelayInMilliseconds": 15000,  // запуск повторной обработки через 15 секунд
+            "CountAttempts": 3            // количество повторений. По умолчанию 1
+          },
+          // ... Some other RetryAttempts settings 
+          {
+            "DelayInMilliseconds": 3600000,  // запуск повторной обработки через 1 час
+            "CountAttempts": 1000            // количество повторений. Данное значение не важно. Повторения для последней настройки будет бесконечно 
+          }
+        ]
+      },
+      "consumertopicname2": // имя вашего конкретного топика 
+      {
+        "GroupId": "GroupId", // идентификатор клиента-консьюмера (указываете произвольный, но обычно как названия вашего приложения). Если реплик несколько, то будет зарегистрирована группа консьюмеров
+        "AutoOffsetReset": 1 // Earliest, в случае если будет не понятно какое сообщение обрабатывать из топика, начнется с первого. Такое может произойти из-за сбоев и ребалансировки партиций
+        "EnableAutoCommit" : true, // будет ли делаться автоматический коммит после обработки сообщения, даже если безуспешно. По умолчанию true. Рекомендуется устанавливать в false, тогда коммится будет только после успешной обработки.
+        "EnableAutoOffsetStore": true // будет ли делаться предварительное сохранение коммита в памяти. По умолчанию true. Рекомендуется устанавливать в false, тогда коммится будет сразу
+      }
     }
-    }
-      ```
-    где `producertopicname1` - имя вашего конкретного топика,
-    `ClientId` - идентификатор клиента-продюсера;
+  }
+}
+```    
 
-    Для настройки консамеров создать структуру вида:
-      ```
-        "Consumers": {
-        "consumertopicname1": {
-            "GroupId": "GroupId",
-            "AutoOffsetReset": 1 //Earliest
-        },
-        "consumertopicname2": {
-            "GroupId": "GroupId",
-            "AutoOffsetReset": 1 //Earliest
-        },
-      ```
-    где `consumertopicname1` - имя вашего конкретного топика,
-    `GroupId` - идентификатор группы подписчиков,
-    `AutoOffsetReset` - смещение сообщения в топике по умолчанию;
-	
-4. Реализовать классы команд для библиотеки MediatR, класс должен реализовать `IConsumerRequest<T>`, где T - тип значения сообщения полученного из топика, например:
-      ```
-        public class TestRequest1 : IRequest<string>, IConsumerRequest<string>
+4. Зарегистрировать сервисы в Startup:
+```csharp
+services.AddProducers(); 
+services.AddConsumers();
+```
+5. Реализовать классы команд для библиотеки MediatR:
+      ```csharp
+        public class TestCommand : IRequest
         {
-            public string Value { get; set; }
         }
       ```
    Класс команды должен иметь публичный конструктор без параметров, в противном случае при старте приложения будут возникать исключения вида   violates the constraint of type 'THandlerCommand'.
   
 5. Реализовать классы обработчики команд для библиотеки MediatR, сами классы пометить кастомным свойством `ConsumerListenerProperty`, например так:
+      ```csharp
+        [ConsumerListenerProperty("consumertopicname1")]
+        public class TestCommandHandler : IRequestHandler<TestCommand>
       ```
-        [ConsumerListenerProperty(typeof(string), typeof(string), "consumertopicname1")]
-        public class TestHandler_String : IRequestHandler<Request, string>
-      ```
-    Свойству в качестве параметров передаются тип ключа, тип значнеия, читаемый топик. Логику обработки прочитанных сообщений следует размещать в данном классе.
+    Где consumertopicname1 - это читаемый топик (тот что в appsettings.json). Логику обработки прочитанных сообщений следует размещать в данном классе.
 	
-6. Прописать вызов методов `services.AddProducers()` и `services.AddConsumers()` в методе регистрации зависимостей.
+6. Отправка сообщений в топик осуществляется через метод `ProduceAsync<TKey, TValue>(string topic, TKey key, TValue message)` интерфейса `IMessageProducer`.:
+```csharp
+public class SomeClass
+{
+    private readonly IMessageProducer messageProducer;
 
-7. Для отправки сообщений в топик необходимо вызвать метод `ProduceAsync<TKey, TValue>(string topic, TKey key, TValue message)` интерфейса `IMessageProducer`. В метод передаются топик, тип ключа и тип сообщения.
+    public SomeClass(IMessageProducer messageProducer)
+    {
+        this.messageProducer = messageProducer;
+    }
+
+    public async Task SomeMethod()
+    {
+        await this.messageProducer.ProduceAsync(
+            "consumertopicname1",
+            "some_key",
+            new SomeDto { SomeValue = "<some_value>" });
+    }
+}
+```
+В метод ProduceAsync передаются топик, тип ключа и тип сообщения
