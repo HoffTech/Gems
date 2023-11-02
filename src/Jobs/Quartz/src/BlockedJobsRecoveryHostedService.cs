@@ -38,9 +38,8 @@ namespace Gems.Jobs.Quartz
                 .ConfigureAwait(false);
             if (scheduler is null)
             {
-                throw new ArgumentNullException(
-                    nameof(scheduler),
-                    $"Can't find Scheduler with name \"{this.options.Value.SchedulerName}\"");
+                this.logger.LogWarning("Can't find Scheduler with name \"{SchedulerName}\"", this.options.Value.SchedulerName);
+                return;
             }
 
             while (true)
