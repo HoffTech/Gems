@@ -75,7 +75,7 @@ namespace Gems.Jobs.Quartz
                             continue;
                         }
 
-                        var lastFireTime = trigger.GetPreviousFireTimeUtc();
+                        var lastFireTime = trigger.GetPreviousFireTimeUtc() ?? DateTimeOffset.MinValue;
                         var needToRecover = (DateTime.UtcNow - lastFireTime) >
                                             maxDelayBetweenLastFireTimeAndRecoverTime;
                         this.logger.LogInformation("Trigger ({TriggerKey}) fired at ({TriggerLastFireTime}). Should it be recovered? ({TriggerShouldBeRecovered})", trigger.JobKey.Name, lastFireTime, needToRecover);
