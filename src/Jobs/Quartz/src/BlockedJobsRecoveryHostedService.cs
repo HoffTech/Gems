@@ -52,52 +52,58 @@ namespace Gems.Jobs.Quartz
                     var maxDelayBetweenLastFireTimeAndRecoverTime = new TimeSpan(blockedJobsRecoveryOptions
                         .MaxDelayBetweenLastFireTimeAndRecoverTimeInMilliseconds);
 
-                    if (workersToRecover != null && workersToRecover.Count > 0)
+                    if (workersToRecover is not { Count: > 0 })
                     {
-                        var triggerKeys = await scheduler
-                            .GetTriggerKeys(GroupMatcher<TriggerKey>.AnyGroup(), cancellationToken)
-                            .ConfigureAwait(false);
+                        continue;
+                    }
 
-                        foreach (var key in triggerKeys)
+                    var triggerKeys = await scheduler
+                                          .GetTriggerKeys(GroupMatcher<TriggerKey>.AnyGroup(), cancellationToken)
+                                          .ConfigureAwait(false);
+
+                    foreach (var key in triggerKeys)
+                    {
+                        var triggerState = await scheduler.GetTriggerState(key, cancellationToken)
+                                               .ConfigureAwait(false);
+                        if (triggerState is not TriggerState.Blocked)
                         {
-                            var triggerState = await scheduler.GetTriggerState(key, cancellationToken)
-                                .ConfigureAwait(false);
-                            if (triggerState is TriggerState.Blocked)
-                            {
-                                var trigger = await scheduler.GetTrigger(key, cancellationToken).ConfigureAwait(false);
-                                if (trigger != null && workersToRecover.Contains(trigger.JobKey.Name))
-                                {
-                                    var lastFireTime = trigger.GetPreviousFireTimeUtc();
-                                    var needToRecover = (DateTime.UtcNow - lastFireTime) >
-                                                        maxDelayBetweenLastFireTimeAndRecoverTime;
-                                    this.logger.LogInformation("Trigger ({TriggerKey}) fired at ({TriggerLastFireTime}). Should it be recovered? ({TriggerShouldBeRecovered})", trigger.JobKey.Name, lastFireTime, needToRecover);
-                                    if (needToRecover
-                                        && trigger is CronTriggerImpl cronTrigger
-                                        && !string.IsNullOrWhiteSpace(cronTrigger.CronExpressionString))
-                                    {
-                                        var newTrigger = (CronTriggerImpl)cronTrigger.Clone();
-                                        newTrigger.CronExpression =
-                                            new CronExpression(cronTrigger.CronExpressionString);
+                            continue;
+                        }
 
-                                        var unscheduleResult = await scheduler.UnscheduleJob(trigger.Key, cancellationToken)
-                                            .ConfigureAwait(false);
-                                        if (unscheduleResult)
-                                        {
-                                            await scheduler.ScheduleJob(newTrigger, cancellationToken)
-                                                .ConfigureAwait(false);
-                                            this.logger.LogInformation("Trigger ({TriggerKey}) successfully rescheduled", trigger.JobKey.Name);
-                                        }
-                                        else
-                                        {
-                                            this.logger.LogInformation("Trigger ({TriggerKey}) failed to unschedule", trigger.JobKey.Name);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        this.logger.LogInformation("Trigger ({TriggerKey}) shouldn't be recovered", trigger.JobKey.Name);
-                                    }
-                                }
+                        var trigger = await scheduler.GetTrigger(key, cancellationToken).ConfigureAwait(false);
+                        if (trigger == null || !workersToRecover.Contains(trigger.JobKey.Name))
+                        {
+                            continue;
+                        }
+
+                        var lastFireTime = trigger.GetPreviousFireTimeUtc();
+                        var needToRecover = (DateTime.UtcNow - lastFireTime) >
+                                            maxDelayBetweenLastFireTimeAndRecoverTime;
+                        this.logger.LogInformation("Trigger ({TriggerKey}) fired at ({TriggerLastFireTime}). Should it be recovered? ({TriggerShouldBeRecovered})", trigger.JobKey.Name, lastFireTime, needToRecover);
+                        if (needToRecover
+                            && trigger is CronTriggerImpl cronTrigger
+                            && !string.IsNullOrWhiteSpace(cronTrigger.CronExpressionString))
+                        {
+                            var newTrigger = (CronTriggerImpl)cronTrigger.Clone();
+                            newTrigger.CronExpression =
+                                new CronExpression(cronTrigger.CronExpressionString);
+
+                            var unscheduledResult = await scheduler.UnscheduleJob(trigger.Key, cancellationToken)
+                                                       .ConfigureAwait(false);
+                            if (unscheduledResult)
+                            {
+                                await scheduler.ScheduleJob(newTrigger, cancellationToken)
+                                    .ConfigureAwait(false);
+                                this.logger.LogInformation("Trigger ({TriggerKey}) successfully rescheduled", trigger.JobKey.Name);
                             }
+                            else
+                            {
+                                this.logger.LogInformation("Trigger ({TriggerKey}) failed to unschedule", trigger.JobKey.Name);
+                            }
+                        }
+                        else
+                        {
+                            this.logger.LogInformation("Trigger ({TriggerKey}) shouldn't be recovered", trigger.JobKey.Name);
                         }
                     }
                 }

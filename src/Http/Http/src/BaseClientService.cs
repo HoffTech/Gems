@@ -1050,7 +1050,7 @@ namespace Gems.Http
                     sw.Stop();
                     throw new RequestException<TError>(e.Message, e, HttpStatusCode.GatewayTimeout);
                 }
-                catch (HttpRequestException e) when (e.InnerException is SocketException se && se.SocketErrorCode == SocketError.TimedOut)
+                catch (HttpRequestException e) when (e.InnerException is SocketException { SocketErrorCode: SocketError.TimedOut })
                 {
                     sw.Stop();
                     throw new RequestException<TError>(e.Message, e, HttpStatusCode.GatewayTimeout);

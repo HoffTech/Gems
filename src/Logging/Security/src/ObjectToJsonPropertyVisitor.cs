@@ -18,7 +18,7 @@ namespace Gems.Logging.Security
                 if (child is JProperty prop)
                 {
                     var propValue = prop.Value;
-                    if (propValue != null && propValue is JObject objPropValueToken)
+                    if (propValue is JObject objPropValueToken)
                     {
                         var subObject = root.ObjectType.GetProperty(prop.Name);
                         if (subObject != null)
@@ -27,7 +27,7 @@ namespace Gems.Logging.Security
                             this.Visit(new ObjectToJsonProjection(subObjectValue, objPropValueToken), accept);
                         }
                     }
-                    else if (propValue != null && propValue is JArray arrPropValue)
+                    else if (propValue is JArray arrPropValue)
                     {
                         var subObject = root.ObjectType.GetProperty(prop.Name);
                         if (subObject != null)
