@@ -17,11 +17,11 @@ namespace Gems.Logging.Security
                 if (child is JProperty prop)
                 {
                     var propValue = prop.Value;
-                    if (propValue != null && propValue is JObject objPropValue)
+                    if (propValue is JObject objPropValue)
                     {
                         this.Visit(objPropValue, accept);
                     }
-                    else if (propValue != null && propValue is JArray arrPropValue)
+                    else if (propValue is JArray arrPropValue)
                     {
                         this.Visit(arrPropValue, accept);
                     }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Gems.Jobs.Quartz.Configuration;
 
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Quartz;
@@ -19,10 +20,14 @@ namespace Gems.Jobs.Quartz
     public class JobRecoveryHostedService : BackgroundService
     {
         private readonly IOptions<JobsOptions> options;
+        private readonly ILogger<JobRecoveryHostedService> logger;
 
-        public JobRecoveryHostedService(IOptions<JobsOptions> options)
+        public JobRecoveryHostedService(
+            IOptions<JobsOptions> options,
+            ILogger<JobRecoveryHostedService> logger)
         {
             this.options = options;
+            this.logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -32,27 +37,36 @@ namespace Gems.Jobs.Quartz
                 .ConfigureAwait(false);
             if (scheduler is null)
             {
-                throw new ArgumentNullException(
-                    nameof(scheduler),
-                    $"Can't find Scheduler with name \"{this.options.Value.SchedulerName}\"");
+                this.logger.LogWarning("Can't find Scheduler with name \"{SchedulerName}\"", this.options.Value.SchedulerName);
+                return;
             }
 
             while (true)
             {
-                var triggerKeys = await scheduler
-                    .GetTriggerKeys(GroupMatcher<TriggerKey>.AnyGroup(), cancellationToken)
-                    .ConfigureAwait(false);
-
-                foreach (var key in triggerKeys)
+                try
                 {
-                    var triggerState = await scheduler.GetTriggerState(key, cancellationToken).ConfigureAwait(false);
-                    if (triggerState is TriggerState.Error)
+                    var triggerKeys = await scheduler
+                        .GetTriggerKeys(GroupMatcher<TriggerKey>.AnyGroup(), cancellationToken)
+                        .ConfigureAwait(false);
+
+                    foreach (var key in triggerKeys)
                     {
-                        await scheduler.ResetTriggerFromErrorState(key, cancellationToken).ConfigureAwait(false);
+                        var triggerState =
+                            await scheduler.GetTriggerState(key, cancellationToken).ConfigureAwait(false);
+                        if (triggerState is TriggerState.Error)
+                        {
+                            await scheduler.ResetTriggerFromErrorState(key, cancellationToken).ConfigureAwait(false);
+                        }
                     }
                 }
-
-                await Task.Delay(this.options.Value.JobRecoveryDelayInMilliseconds, cancellationToken).ConfigureAwait(false);
+                catch (Exception e)
+                {
+                    this.logger.LogError(e, "Recovery of jobs with errors failed");
+                }
+                finally
+                {
+                    await Task.Delay(this.options.Value.JobRecoveryDelayInMilliseconds, cancellationToken).ConfigureAwait(false);
+                }
             }
         }
     }

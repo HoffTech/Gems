@@ -666,6 +666,28 @@ DEV_Jobs_Triggers_TestJob_Cron: 0/10 \* \* \? \* \*
 
 Передача данных в JobHandler работает за счет сериализации команды в один из ключей [JobData](https://www.quartz-scheduler.net/documentation/quartz-3.x/tutorial/more-about-jobs.html#jobdatamap) 
 
+# Воссстановление упавших worker'ов
+1. Существует механизм периодического поднятия worker'ов, триггеры которых находятся в состоянии ERROR. Он работает всегда, период проверки задает настройкой ```JobRecoveryDelayInMilliseconds```
+2. Существует опциональный механизм поднятия worker'ов, триггеры которых зависли в состоянии BLOCKED. Для этого существует блок настроек:
+```json
+{
+  "Jobs": {
+    "BlockedJobsRecovery" : {
+      "WorkersToRecover": [
+        "ImportTreatmentFromDax",
+        "ImportCommentsFromDax"
+      ],
+      "CheckIntervalInMilliseconds" : 5000,
+      "MaxDelayBetweenLastFireTimeAndRecoverTimeInMilliseconds": 300000
+    }
+  }
+}
+```
+где
+```WorkersToRecover``` - worker'ы, за состоянием которых необходимо следить. Рекомендуется эмпирически определять этот набор, т.к. пересоздание каждого worker'a может привести к непредсказуемому поведению.
+```CheckIntervalInMilliseconds``` - период проверки наличия BLOCKED-триггеров у worker'ов
+```MaxDelayBetweenLastFireTimeAndRecoverTimeInMilliseconds``` - максимальная разница в мс между временем последнего запуска воркера и текущим временем. Если она будет превышена, то следует перезапустить worker.
+
 # Подключение Admin UI для менеджмента тасков
 Для подключения визуального интерфейса для просмотра/управления тасками, а также анализа ошибок при их выполнении необходимо:
 1. Подключить AdminUI в Startup.cs 
