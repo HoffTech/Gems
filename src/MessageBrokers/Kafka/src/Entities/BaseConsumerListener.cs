@@ -180,12 +180,12 @@ namespace Gems.MessageBrokers.Kafka.Entities
 
         private void CommitConsumeResult(ConsumeResult<TKey, TValue> consumeResult)
         {
-            if (this.kafkaConfiguration.Consumers[this.topic].EnableAutoCommit != true)
+            if (this.kafkaConfiguration.Consumers[this.topic].EnableAutoCommit == false)
             {
                 this.consumer.Commit(consumeResult);
             }
 
-            if (this.kafkaConfiguration.Consumers[this.topic].EnableAutoOffsetStore != true)
+            if (this.kafkaConfiguration.Consumers[this.topic].EnableAutoOffsetStore == false)
             {
                 this.consumer.StoreOffset(consumeResult);
             }
