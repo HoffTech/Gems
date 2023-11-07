@@ -33,6 +33,11 @@ namespace Gems.Jobs.Quartz
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            if (this.options.Value.BlockedJobsRecovery == null)
+            {
+                return;
+            }
+
             var scheduler = await SchedulerRepository.Instance
                 .Lookup(this.options.Value.SchedulerName, cancellationToken)
                 .ConfigureAwait(false);
