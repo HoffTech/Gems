@@ -20,12 +20,14 @@
 Данная библиотека подключает такие gems библиотеки:
 - Gems.BusinessRules
 - Gems.Caching
+- Gems.Data.MySql
 - Gems.Data.Npgsql
 - Gems.Data.SqlServer
 - Gems.HealthChecks
 - Gems.Http.csproj
 - Gems.Jobs.csproj
 - Gems.Jobs.Quartz
+- Gems.MessageBrokers.Kafka
 - Gems.Metrics.Prometheus
 - Gems.Swagger
 Необходимо помнить, что вместе с указанными gems библиотеками, подключаются все зависимые gems и внешние библиотеки. Тем самым для приложения подключаютс почти все необходимые библиотеки.
@@ -46,6 +48,8 @@
 - AddDistributedCache
 - RegisterServices
 - AddSecureLogging
+- AddProducers
+- AddConsumers
 ### Когда можно использовать библиотеку Gems.CompositionRoot?
 Необходимо убедиться, что в вашем проекте используются все библиотеки, указанные в разделах "Внешние библиотеки" и "Gems библиотеки". Если используются другие аналогичные библиотеки (Serilog, Hangfire и тп.), то библиотеку Gems.CompositionRoot нельзя использовать. Если используется все указанные библиотеки, плюс еще дополнительные, то библиотеку Gems.CompositionRoot можно использовать, но дополнительные библиотеки придется конфигурировать самостоятельно.
 
