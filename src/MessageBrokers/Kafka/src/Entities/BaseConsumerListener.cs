@@ -157,7 +157,7 @@ namespace Gems.MessageBrokers.Kafka.Entities
                 }
                 catch (OperationCanceledException exception)
                 {
-                    this.logger.LogError(exception, $"Consumer canceled.");
+                    this.logger.LogError(exception, "Consumer canceled.");
                     throw;
                 }
                 catch (ConsumeException exception) when (exception.Error.IsFatal)

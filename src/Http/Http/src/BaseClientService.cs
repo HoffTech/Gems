@@ -1343,7 +1343,7 @@ namespace Gems.Http
             var content = Encoding.UTF8.GetString(stream.ToArray());
             content = new Regex("^<\\?xml version=\"1.0\"\\?>").Replace(
                 content,
-                $"<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             return content;
         }
 

@@ -34,4 +34,8 @@ public class CompositionRootOptions
     public Action RegisterServices { get; set; }
 
     public Action AddSecureLogging { get; set; }
+
+    public Action AddProducers { get; set; }
+
+    public Action AddConsumers { get; set; }
 }
