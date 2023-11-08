@@ -123,6 +123,11 @@ namespace Gems.MessageBrokers.Kafka.Configuration
         /// <param name="configuration">configuration.</param>
         public static void AddProducers(this IServiceCollection services, IConfiguration configuration)
         {
+            if (!configuration.GetSection(nameof(KafkaConfiguration)).Exists())
+            {
+                return;
+            }
+
             services.Configure<KafkaConfiguration>(configuration.GetSection(nameof(KafkaConfiguration)));
             services.AddSingleton<IMessageProducer, MessageProducer>();
         }
