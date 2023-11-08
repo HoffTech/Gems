@@ -46,7 +46,7 @@ namespace Gems.Metrics.Behaviors
             if (this.metricsConfig?.Value?.ResetMillisecondsDelay == 0)
             {
                 throw new ArgumentNullException(
-                    $"You must specify ResetMillisecondsDelay in MetricsConfig. See documentation of Gems.Metrics.Abstractions library.");
+                    "You must specify ResetMillisecondsDelay in MetricsConfig. See documentation of Gems.Metrics.Abstractions library.");
             }
 
             await Task.Delay(this.metricsConfig!.Value!.ResetMillisecondsDelay).ConfigureAwait(false);

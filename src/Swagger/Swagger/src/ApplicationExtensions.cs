@@ -31,7 +31,7 @@ namespace Gems.Swagger
                         options.OAuthClientId(adOptions.SwaggerKey);
                     }
 
-                    options.SwaggerEndpoint($"v1/swagger.json", adOptions?.SwaggerName ?? string.Empty);
+                    options.SwaggerEndpoint("v1/swagger.json", adOptions?.SwaggerName ?? string.Empty);
                 });
         }
     }

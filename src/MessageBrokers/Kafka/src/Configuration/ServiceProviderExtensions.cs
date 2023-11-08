@@ -62,7 +62,7 @@ namespace Gems.MessageBrokers.Kafka.Configuration
                     var consumerRequestValueType = consumerRequestType.GetGenericArguments().First();
                     if (listenerProperty.ValueType != null && listenerProperty.ValueType != consumerRequestValueType)
                     {
-                        throw new ArgumentException($"Тип ConsumerListenerPropertyAttribute.ValueType должен быть равен типу аргумента интерфейса IConsumerRequest<>.");
+                        throw new ArgumentException("Тип ConsumerListenerPropertyAttribute.ValueType должен быть равен типу аргумента интерфейса IConsumerRequest<>.");
                     }
 
                     if (listenerProperty.NeedParseJsonFromString)
@@ -75,20 +75,19 @@ namespace Gems.MessageBrokers.Kafka.Configuration
                 }
                 else
                 {
-                    if (listenerProperty.NeedParseJsonFromString && !(listenerProperty.ValueType == null || listenerProperty.ValueType == typeof(string)))
+                    switch (listenerProperty.NeedParseJsonFromString)
                     {
-                        throw new ArgumentException($"Аттрибут NeedParseJsonFromString не может быть установлен, если ConsumerListenerPropertyAttribute.ValueType не равен System.String");
+                        case true when !(listenerProperty.ValueType == null || listenerProperty.ValueType == typeof(string)):
+                            throw new ArgumentException("Аттрибут NeedParseJsonFromString не может быть установлен, если ConsumerListenerPropertyAttribute.ValueType не равен System.String");
+                        case false when listenerProperty.ValueType != null && listenerProperty.ValueType != handlerCommandType:
+                            throw new ArgumentException($"Тип ConsumerListenerPropertyAttribute.ValueType должен быть равен типу команды/запроса {handlerCommandType.Name}.");
+                        default:
+                            listenerProperty.ValueType = listenerProperty.NeedParseJsonFromString
+                                                             ? typeof(string)
+                                                             : handlerCommandType;
+                            consumerListenerType = typeof(CustomConsumerListener<,,>);
+                            break;
                     }
-
-                    if (!listenerProperty.NeedParseJsonFromString && listenerProperty.ValueType != null && listenerProperty.ValueType != handlerCommandType)
-                    {
-                        throw new ArgumentException($"Тип ConsumerListenerPropertyAttribute.ValueType должен быть равен типу команды/запроса {handlerCommandType.Name}.");
-                    }
-
-                    listenerProperty.ValueType = listenerProperty.NeedParseJsonFromString
-                        ? typeof(string)
-                        : handlerCommandType;
-                    consumerListenerType = typeof(CustomConsumerListener<,,>);
                 }
 
                 RegisterListener(
