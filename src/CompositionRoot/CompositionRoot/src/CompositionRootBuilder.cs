@@ -168,10 +168,6 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
 
     private void AddConsumers()
     {
-        _ = bool.TryParse(this.configuration.GetSection("EnableConsumers").Value, out var enableConsumers);
-        if (enableConsumers)
-        {
-            this.services.AddConsumers(this.configuration);
-        }
+        this.services.AddConsumers(this.configuration);
     }
 }
