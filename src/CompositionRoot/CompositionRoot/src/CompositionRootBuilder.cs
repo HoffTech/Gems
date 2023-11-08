@@ -16,6 +16,7 @@ using Gems.Jobs.Quartz;
 using Gems.Jobs.Quartz.Behaviors;
 using Gems.Logging.Mvc;
 using Gems.Logging.Mvc.Behaviors;
+using Gems.MessageBrokers.Kafka.Configuration;
 using Gems.Metrics.Behaviors;
 using Gems.Metrics.Prometheus;
 using Gems.Mvc;
@@ -59,6 +60,8 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
         (options.AddDistributedCache ?? this.AddDistributedCache)();
         (options.RegisterServices ?? this.RegisterServices)();
         (options.AddSecureLogging ?? this.AddSecureLogging)();
+        (options.AddProducers ?? this.AddProducers)();
+        (options.AddConsumers ?? this.AddConsumers)();
     }
 
     private void AddControllersWithMediatR()
@@ -156,5 +159,19 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
     private void AddSecureLogging()
     {
         this.services.AddSecureLogging();
+    }
+
+    private void AddProducers()
+    {
+        this.services.AddProducers(this.configuration);
+    }
+
+    private void AddConsumers()
+    {
+        _ = bool.TryParse(this.configuration.GetSection("EnableConsumers").Value, out var enableConsumers);
+        if (enableConsumers)
+        {
+            this.services.AddConsumers(this.configuration);
+        }
     }
 }

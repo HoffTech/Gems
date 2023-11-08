@@ -37,6 +37,7 @@
     <ProjectReference Include="..\..\..\Http\Http\src\Gems.Http.csproj" />
     <ProjectReference Include="..\..\..\Jobs\Jobs\src\Gems.Jobs.csproj" />
     <ProjectReference Include="..\..\..\Jobs\Quartz\src\Gems.Jobs.Quartz.csproj" />
+    <ProjectReference Include="..\..\..\MessageBrokers\Kafka\src\Gems.MessageBrokers.Kafka.csproj" />
     <ProjectReference Include="..\..\..\Metrics\Prometheus\src\Gems.Metrics.Prometheus.csproj" />
     <ProjectReference Include="..\..\..\Swagger\Swagger\src\Gems.Swagger.csproj" />
   </ItemGroup>
