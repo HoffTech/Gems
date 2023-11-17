@@ -42,6 +42,7 @@ namespace Gems.Patterns.SyncTables.MergeProcessor
                     this.MergeInfo.SourceDbKey,
                     this.MergeInfo.ExternalSyncQuery,
                     this.MergeInfo.GetCommandTimeout,
+                    this.MergeInfo.ExternalDbQueryMetricType,
                     cancellationToken)
                 .ConfigureAwait(false);
 

@@ -1,6 +1,7 @@
 ﻿// Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace Gems.Patterns.SyncTables
             long version,
             string query,
             int commandTimeout,
+            Enum dbQueryMetricType,
             CancellationToken cancellationToken)
         {
             return this.unitOfWorkProvider
@@ -30,18 +32,20 @@ namespace Gems.Patterns.SyncTables
                 .QueryAsync<TExternalEntity>(
                     query,
                     commandTimeout,
-                    new Dictionary<string, object> { ["@version"] = version });
+                    new Dictionary<string, object> { ["@version"] = version },
+                    dbQueryMetricType);
         }
 
         public Task<List<TExternalEntity>> GetExternalEntitiesByQueryAsync<TExternalEntity>(
             string sourceDbKey,
             string query,
             int commandTimeout,
+            Enum dbQueryMetricType,
             CancellationToken cancellationToken)
         {
             return this.unitOfWorkProvider
                 .GetUnitOfWork(sourceDbKey, cancellationToken)
-                .QueryAsync<TExternalEntity>(query, commandTimeout);
+                .QueryAsync<TExternalEntity>(query, commandTimeout, dbQueryMetricType);
         }
     }
 }

@@ -23,18 +23,16 @@ namespace Gems.Patterns.SyncTables.Tests
             // Arrange
             const int mergeInfosCount = 2;
 
-            await using var scope = new TestScope
+            await using var scope = new TestScope();
+            scope.SourceDbKey = "axapta";
+            scope.TargetDbKey = "default";
+            scope.ExternalChangeTrackingEntities = new List<RealExternalChangeTrackingEntity>
             {
-                SourceDbKey = "axapta",
-                TargetDbKey = "default",
-                ExternalChangeTrackingEntities = new List<RealExternalChangeTrackingEntity>
-                {
-                    new () { Name = "Name1", Age = "25" },
-                    new () { Name = "Name2", Age = "30" },
-                    new () { Name = "Name3", Age = "35" }
-                },
-                MergeResult = new MergeResult { Value = "Success" }
+                new () { Name = "Name1", Age = "25" },
+                new () { Name = "Name2", Age = "30" },
+                new () { Name = "Name3", Age = "35" }
             };
+            scope.MergeResult = new MergeResult { Value = "Success" };
             scope.BuildServiceProvider();
 
             var client = scope.GetRequiredService<ChangeTrackingMergeClient>();
@@ -75,18 +73,16 @@ namespace Gems.Patterns.SyncTables.Tests
             // Arrange
             const int mergeInfosCount = 3;
 
-            await using var scope = new TestScope
+            await using var scope = new TestScope();
+            scope.SourceDbKey = "axapta";
+            scope.TargetDbKey = "default";
+            scope.ExternalEntities = new List<RealExternalEntity>
             {
-                SourceDbKey = "axapta",
-                TargetDbKey = "default",
-                ExternalEntities = new List<RealExternalEntity>
-                {
-                    new () { Name = "Name1", Age = "25" },
-                    new () { Name = "Name2", Age = "30" },
-                    new () { Name = "Name3", Age = "35" }
-                },
-                MergeResult = new MergeResult { Value = "Success" }
+                new () { Name = "Name1", Age = "25" },
+                new () { Name = "Name2", Age = "30" },
+                new () { Name = "Name3", Age = "35" }
             };
+            scope.MergeResult = new MergeResult { Value = "Success" };
             scope.BuildServiceProvider();
 
             var client = scope.GetRequiredService<MergeClient>();

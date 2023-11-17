@@ -1,6 +1,7 @@
 ﻿// Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 
 using Gems.Patterns.SyncTables.EntitiesViews;
@@ -18,7 +19,8 @@ namespace Gems.Patterns.SyncTables.MergeProcessor.MergeInfos
             string mergeParameterName,
             bool needConvertDateTimeToUtc,
             int getCommandTimeout = 30,
-            string targetDbKey = "default")
+            string targetDbKey = "default",
+            Enum externalDbQueryMetricType = null)
             : base(
                 sourceDbKey,
                 externalSyncQuery,
@@ -26,7 +28,8 @@ namespace Gems.Patterns.SyncTables.MergeProcessor.MergeInfos
                 mergeParameterName,
                 needConvertDateTimeToUtc,
                 getCommandTimeout,
-                targetDbKey)
+                targetDbKey,
+                externalDbQueryMetricType)
         {
             this.TableName = tableName;
         }

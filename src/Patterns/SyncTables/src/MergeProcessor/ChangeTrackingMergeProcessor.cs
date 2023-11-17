@@ -27,7 +27,7 @@ namespace Gems.Patterns.SyncTables.MergeProcessor
         private readonly IMapper mapper;
 
         public ChangeTrackingMergeProcessor(
-            ChangeTrackingMergeInfo<TMergeResult> mergeInfo,
+            MergeInfo<TMergeResult> mergeInfo,
             RowVersionProvider rowVersionProvider,
             RowVersionUpdater rowVersionUpdater,
             ExternalEntitiesProvider externalEntitiesProvider,
@@ -58,6 +58,7 @@ namespace Gems.Patterns.SyncTables.MergeProcessor
                     version,
                     mergeInfo.ExternalSyncQuery,
                     mergeInfo.GetCommandTimeout,
+                    mergeInfo.ExternalDbQueryMetricType,
                     cancellationToken)
                 .ConfigureAwait(false);
 
