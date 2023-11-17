@@ -45,6 +45,12 @@ public class EfUnitOfWork : IEfUnitOfWork
             return;
         }
 
+        if (this.dbContext == null)
+        {
+            return;
+        }
+
+        await this.dbContext.SaveChangesAsync(this.cancellationToken).ConfigureAwait(false);
         await this.transaction.CommitAsync(this.cancellationToken).ConfigureAwait(false);
         await this.transaction.DisposeAsync().ConfigureAwait(false);
         this.transaction = null;
