@@ -32,7 +32,19 @@ services.AddTableSyncer(configuration.GetSection(nameof(SyncTablesOptions)));
       }
     ```
    * Для кастомизации свойств, можно унаследоваться от класса ChangeTrackingSyncOptions и зарегистрировать свою секцию
-
+3. Опционально (Возможность подключения метрик для запросов в БД источник)
+    * Создайте перечисления, включающие данные по метрикам
+    ```csharp
+   public enum SyncServiceOrderDbQueryMetricType
+   {
+        [Metric(
+            Name = "mssql_db_query_time",
+            LabelNames = new[] { "query_name" },
+            LabelValues = new[] { "get_external_entities" })]
+        GetExternalEntities
+   }
+    ```
+   * Передайте объявленное перечисление в параметр **Enum externalDbQueryMetricType** конструктора класса **ChangeTrackingMergeInfo** или **MergeInfo**
 
 # Описание
 Библиотека содержит в себе типовые решения для задач синронизации таблиц из БД источника в целевую БД и включает 2 имплементации синхронизации данных:
