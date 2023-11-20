@@ -36,7 +36,7 @@ publish_to_nuget:
 
 test:
   stage: test
-  image: ${CI_REGISTRY}/build-images/core/sdk:6.0
+  image: ${CI_REGISTRY}/build-images/core/sdk:8.0
   script:
     - dotnet test -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=\"cobertura,opencover\" /p:CoverletOutput=../results/
   coverage: '/Total\s*\|\s*(\d+\.?\d+)/'

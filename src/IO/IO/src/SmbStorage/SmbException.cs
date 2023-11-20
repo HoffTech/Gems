@@ -2,7 +2,9 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
+#if NET6_0
 using System.Runtime.Serialization;
+#endif
 
 namespace Gems.IO.SmbStorage
 {
@@ -20,8 +22,10 @@ namespace Gems.IO.SmbStorage
         {
         }
 
+#if NET6_0
         protected SmbException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
+#endif
     }
 }
