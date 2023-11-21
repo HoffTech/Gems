@@ -58,27 +58,27 @@ namespace Gems.Jobs.Quartz.Configuration
         public int JobRecoveryDelayInMilliseconds { get; set; } = 15 * 60 * 1000;
 
         /// <summary>
-        /// Подключение/отключение персистентной истории запуска заданий в Quartz AdminUi
+        /// Подключение/отключение персистентной истории запуска заданий в Quartz AdminUi.
         /// </summary>
         public bool EnableAdminUiPersistentJobHistory { get; set; }
 
         /// <summary>
-        /// TTL записи в истории запуска заданий в Quartz AdminUI
+        /// TTL записи в истории запуска заданий в Quartz AdminUI.
         /// </summary>
         public int? PersistentRecentHistoryEntryTtl { get; set; }
 
         /// <summary>
-        /// Настройки восстановления воркеров, находящихся в состоянии Blocked
+        /// Настройки восстановления воркеров, находящихся в состоянии Blocked.
         /// </summary>
         public BlockedJobsRecoveryOptions BlockedJobsRecovery { get; set; }
 
         /// <summary>
-        /// AdminUI URL
+        /// AdminUI URL.
         /// </summary>
         public string AdminUiUrl { get; set; } = "/dashboard";
 
         /// <summary>
-        /// AdminUI URL Prefix (если приложение развернуто не в root сайта)
+        /// AdminUI URL Prefix (если приложение развернуто не в root сайта).
         /// </summary>
         public string AdminUiUrlPrefix { get; set; }
 

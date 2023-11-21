@@ -45,6 +45,20 @@ namespace Gems.Jobs.Quartz
             }
         }
 
+        public static void RegisterJobs(params Assembly[] assemblies)
+        {
+            var types = assemblies
+                .SelectMany(a => a.GetTypes())
+                .Where(x => x.GetCustomAttributes<JobHandlerAttribute>().Any())
+                .ToList();
+
+            foreach (var type in types)
+            {
+                var jobAttribute = type.GetCustomAttributes<JobHandlerAttribute>().First();
+                RegisterJob(type, jobAttribute.Name, jobAttribute.IsConcurrent);
+            }
+        }
+
         private static Type GetJobType(Type requestType, Type[] targetRequestHandlerTypeArguments, bool isConcurrent)
         {
             var commandHasProperties = requestType?.GetProperties().Any() ?? false;
@@ -59,20 +73,6 @@ namespace Gems.Jobs.Quartz
             return isConcurrent
                 ? typeof(ConcurrentQuartzJob<>).MakeGenericType(targetRequestHandlerTypeArguments)
                 : typeof(DisallowConcurrentQuartzJob<>).MakeGenericType(targetRequestHandlerTypeArguments);
-        }
-
-        public static void RegisterJobs(params Assembly[] assemblies)
-        {
-            var types = assemblies
-                .SelectMany(a => a.GetTypes())
-                .Where(x => x.GetCustomAttributes<JobHandlerAttribute>().Any())
-                .ToList();
-
-            foreach (var type in types)
-            {
-                var jobAttribute = type.GetCustomAttributes<JobHandlerAttribute>().First();
-                RegisterJob(type, jobAttribute.Name, jobAttribute.IsConcurrent);
-            }
         }
     }
 }

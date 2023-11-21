@@ -91,19 +91,16 @@ namespace Gems.Jobs.Quartz
                     x.UseJsonSerializer();
                 });
 
-
                 q.SetProperty("quartz.threadPool.type", "Quartz.Simpl.DefaultThreadPool, Quartz");
                 q.SetProperty("quartz.threadPool.maxConcurrency", jobsOptions.MaxConcurrency?.ToString() ?? "25");
                 if (jobsOptions.BatchTriggerAcquisitionMaxCount != null)
                 {
-                    q.SetProperty("quartz.scheduler.batchTriggerAcquisitionMaxCount",
-                        jobsOptions.BatchTriggerAcquisitionMaxCount.ToString());
+                    q.SetProperty("quartz.scheduler.batchTriggerAcquisitionMaxCount", jobsOptions.BatchTriggerAcquisitionMaxCount.ToString());
                 }
 
                 if (jobsOptions.AcquireTriggersWithinLock != null)
                 {
-                    q.SetProperty("quartz.jobStore.acquireTriggersWithinLock",
-                        jobsOptions.AcquireTriggersWithinLock.ToString().ToLower());
+                    q.SetProperty("quartz.jobStore.acquireTriggersWithinLock", jobsOptions.AcquireTriggersWithinLock.ToString().ToLower());
                 }
 
                 if (jobsOptions.EnableAdminUiPersistentJobHistory)
@@ -168,12 +165,13 @@ namespace Gems.Jobs.Quartz
             });
             app.UseQuartzmon(
                 new QuartzmonOptions
-            {
-                VirtualPathRoot = jobsOptions.AdminUiUrl,
-                UrlPartPrefix = jobsOptions.AdminUiUrlPrefix,
-                DefaultDateFormat = "dd.MM.yyyy",
-                DefaultTimeFormat = "HH:mm:ss"
-            }, services =>
+                {
+                    VirtualPathRoot = jobsOptions.AdminUiUrl,
+                    UrlPartPrefix = jobsOptions.AdminUiUrlPrefix,
+                    DefaultDateFormat = "dd.MM.yyyy",
+                    DefaultTimeFormat = "HH:mm:ss"
+                },
+                services =>
                 {
                     var scheduler = SchedulerRepository.Instance.Lookup(jobsOptions.SchedulerName, CancellationToken.None).GetAwaiter().GetResult();
                     services.Scheduler = scheduler;
