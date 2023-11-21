@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30907.101
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{61FABA89-6A5A-4465-A56F-9D1DF4F03CC9}"
 	ProjectSection(SolutionItems) = preProject
@@ -10,8 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitlab-ci.yml = .gitlab-ci.yml
 		Directory.Build.props = Directory.Build.props
 		nuget.config = nuget.config
-		stylecop.json = stylecop.json
 		README.md = README.md
+		stylecop.json = stylecop.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{71078BC8-D038-4603-A84A-84BAFDEC4D8B}"
@@ -23,27 +23,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\Data\Data\README.md = src\Data\Data\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data", "src\Data\Data\src\Gems.Data.csproj", "{E357D4FB-AE53-48B6-B57C-126B174E8829}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Data", "src\Data\Data\src\Gems.Data.csproj", "{E357D4FB-AE53-48B6-B57C-126B174E8829}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Npgsql", "Npgsql", "{C59BD8D8-9DE6-4C9C-A07D-18A4F5CE84CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Npgsql", "src\Data\Npgsql\src\Gems.Data.Npgsql.csproj", "{82A04DB5-A1E0-4D3F-8464-BBABC87E586F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Data.Npgsql", "src\Data\Npgsql\src\Gems.Data.Npgsql.csproj", "{82A04DB5-A1E0-4D3F-8464-BBABC87E586F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SqlServer", "SqlServer", "{82BC73FF-6471-4F45-82AE-4CAF794E7132}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.SqlServer", "src\Data\SqlServer\src\Gems.Data.SqlServer.csproj", "{EA97517D-BE88-48A2-8C94-B6C61E1D01C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Data.SqlServer", "src\Data\SqlServer\src\Gems.Data.SqlServer.csproj", "{EA97517D-BE88-48A2-8C94-B6C61E1D01C8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{91F85F9D-455D-4D75-86CE-E71650F07CD1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DependencyInjection", "DependencyInjection", "{B579A5A9-C139-400B-94F8-20203324FA38}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Extensions.DependencyInjection", "src\Extensions\DependencyInjection\src\Gems.Extensions.DependencyInjection.csproj", "{D1465D05-4A83-4962-9473-9AF80CBA0CCB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Extensions.DependencyInjection", "src\Extensions\DependencyInjection\src\Gems.Extensions.DependencyInjection.csproj", "{D1465D05-4A83-4962-9473-9AF80CBA0CCB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Jobs", "Jobs", "{78B28C80-CE82-4DC1-88FA-37BA7DDF92E9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Jobs", "Jobs", "{D489F283-B26F-48EE-B63E-9419ED9E1953}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Jobs", "src\Jobs\Jobs\src\Gems.Jobs.csproj", "{0E552991-F217-4E7F-B47B-C37353FAE70E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Jobs", "src\Jobs\Jobs\src\Gems.Jobs.csproj", "{0E552991-F217-4E7F-B47B-C37353FAE70E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project Items", "{1BE0E9D9-5D43-4222-90D9-7BDD721F4637}"
 	ProjectSection(SolutionItems) = preProject
@@ -52,7 +52,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hangfire", "Hangfire", "{2F4C550D-C78D-467B-AA35-58BC01886A3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Jobs.Hangfire", "src\Jobs\Hangfire\src\Gems.Jobs.Hangfire.csproj", "{F8BB760B-C508-40ED-ABD0-65082C75366C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Jobs.Hangfire", "src\Jobs\Hangfire\src\Gems.Jobs.Hangfire.csproj", "{F8BB760B-C508-40ED-ABD0-65082C75366C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project Items", "{72AD4ECF-ECDC-450B-9B10-1755BBE5CCA2}"
 	ProjectSection(SolutionItems) = preProject
@@ -66,7 +66,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\Jobs\Quartz\README.md = src\Jobs\Quartz\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Jobs.Quartz", "src\Jobs\Quartz\src\Gems.Jobs.Quartz.csproj", "{AB5965AF-A854-4EF3-B62A-4C165FCA7DFD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Jobs.Quartz", "src\Jobs\Quartz\src\Gems.Jobs.Quartz.csproj", "{AB5965AF-A854-4EF3-B62A-4C165FCA7DFD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Metrics", "Metrics", "{94FE9E44-1D7D-4D4B-B161-CB8F159F6BB8}"
 EndProject
@@ -88,14 +88,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Logging", "Logging", "{9F07
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{EBD4A047-E848-4E1A-A436-438B818758E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Logging.Security", "src\Logging\Security\src\Gems.Logging.Security.csproj", "{246CFF76-22F4-4AAD-821E-96EABEE6F92A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Logging.Security", "src\Logging\Security\src\Gems.Logging.Security.csproj", "{246CFF76-22F4-4AAD-821E-96EABEE6F92A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project Items", "{1B556F6B-AEA2-441C-9CB1-BB3DAE3C6824}"
 	ProjectSection(SolutionItems) = preProject
 		src\Logging\Security\README.md = src\Logging\Security\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Logging.Security.Tests", "src\Logging\Security\test\Gems.Logging.Security.Tests.csproj", "{DCF89072-B4EA-4345-90B3-0A93B11AAA76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Logging.Security.Tests", "src\Logging\Security\test\Gems.Logging.Security.Tests.csproj", "{DCF89072-B4EA-4345-90B3-0A93B11AAA76}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mvc", "Mvc", "{5A744E79-A532-4DF0-9507-141E544CA1F3}"
 EndProject
@@ -108,11 +108,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Text", "Text", "{58C93D8E-5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Json", "Json", "{0CA9C83E-04C2-43E6-9D18-521EA49DA6A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Text.Json", "src\Text\Json\src\Gems.Text.Json.csproj", "{75E813CC-5998-480C-B607-510DE33E1630}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Text.Json", "src\Text\Json\src\Gems.Text.Json.csproj", "{75E813CC-5998-480C-B607-510DE33E1630}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mvc", "Mvc", "{F8E7E820-E655-4B27-8E59-5BA6A944AF3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Logging.Mvc", "src\Logging\Mvc\src\Gems.Logging.Mvc.csproj", "{AA9B4D31-5B95-4478-A093-893A6106CCFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Logging.Mvc", "src\Logging\Mvc\src\Gems.Logging.Mvc.csproj", "{AA9B4D31-5B95-4478-A093-893A6106CCFB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prometheus", "Prometheus", "{4C18BFD3-DCDA-466F-B2ED-E39F267A3A85}"
 EndProject
@@ -121,11 +121,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\Metrics\Prometheus\README.md = src\Metrics\Prometheus\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Metrics.Prometheus", "src\Metrics\Prometheus\src\Gems.Metrics.Prometheus.csproj", "{2920D4F3-93F2-472F-9F52-7FA2FE9CAE45}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Metrics.Prometheus", "src\Metrics\Prometheus\src\Gems.Metrics.Prometheus.csproj", "{2920D4F3-93F2-472F-9F52-7FA2FE9CAE45}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Caching", "Caching", "{D9E26A46-58BA-49BC-A83D-723CA5C75294}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Caching", "src\Caching\Caching\src\Gems.Caching.csproj", "{0D2F35CC-5728-40A3-8EDD-93E9381AE034}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Caching", "src\Caching\Caching\src\Gems.Caching.csproj", "{0D2F35CC-5728-40A3-8EDD-93E9381AE034}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tasks", "Tasks", "{91400909-C932-44D4-A201-C3D34565D88B}"
 EndProject
@@ -150,11 +150,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Http", "Http", "{AEE0B5D4-D77C-4F05-99B7-6F59809AEA2B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Metrics.Http", "src\Metrics\Http\src\Gems.Metrics.Http.csproj", "{CF402B3B-94A6-47D8-AA09-C3DC873A06D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Metrics.Http", "src\Metrics\Http\src\Gems.Metrics.Http.csproj", "{CF402B3B-94A6-47D8-AA09-C3DC873A06D8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{9E051E7B-DA03-44B7-A7BD-2E51002A15B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Metrics.Data", "src\Metrics\Data\src\Gems.Metrics.Data.csproj", "{1380CA37-C84B-44A1-8620-80992107907B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Metrics.Data", "src\Metrics\Data\src\Gems.Metrics.Data.csproj", "{1380CA37-C84B-44A1-8620-80992107907B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IO", "IO", "{F6B25818-3C0A-42E2-A68E-0D9E333DB5F2}"
 EndProject
@@ -181,9 +181,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\Patterns\ProducerConsumer\README.md = src\Patterns\ProducerConsumer\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Patterns.ProducerConsumer", "src\Patterns\ProducerConsumer\src\Gems.Patterns.ProducerConsumer.csproj", "{5181B9D1-1B56-4B29-B976-9EBD7BFC2992}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Patterns.ProducerConsumer", "src\Patterns\ProducerConsumer\src\Gems.Patterns.ProducerConsumer.csproj", "{5181B9D1-1B56-4B29-B976-9EBD7BFC2992}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Patterns.ProducerConsumer.Tests", "src\Patterns\ProducerConsumer\test\Gems.Patterns.ProducerConsumer.Tests.csproj", "{E3D46E9E-EB28-45FF-858C-B3206DBC06FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Patterns.ProducerConsumer.Tests", "src\Patterns\ProducerConsumer\test\Gems.Patterns.ProducerConsumer.Tests.csproj", "{E3D46E9E-EB28-45FF-858C-B3206DBC06FB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SyncTables", "SyncTables", "{F26898E6-2F31-47A0-93FB-5A73411A4DD0}"
 EndProject
@@ -192,9 +192,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\Patterns\SyncTables\README.md = src\Patterns\SyncTables\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Patterns.SyncTables", "src\Patterns\SyncTables\src\Gems.Patterns.SyncTables.csproj", "{0657D62B-1757-492D-BFD2-8BF8394F7F6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Patterns.SyncTables", "src\Patterns\SyncTables\src\Gems.Patterns.SyncTables.csproj", "{0657D62B-1757-492D-BFD2-8BF8394F7F6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Patterns.SyncTables.Tests", "src\Patterns\SyncTables\test\Gems.Patterns.SyncTables.Tests.csproj", "{9C1B8011-4A7D-4C2E-8846-D111A2C55D81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Patterns.SyncTables.Tests", "src\Patterns\SyncTables\test\Gems.Patterns.SyncTables.Tests.csproj", "{9C1B8011-4A7D-4C2E-8846-D111A2C55D81}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{441ECABC-BE31-48FC-8DFA-E0BE180D2835}"
 EndProject
@@ -205,15 +205,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\Settings\Gitlab\README.md = src\Settings\Gitlab\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Settings.Gitlab", "src\Settings\Gitlab\src\Gems.Settings.Gitlab.csproj", "{54151B3E-F573-453C-B65D-F8A4CD54C325}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Settings.Gitlab", "src\Settings\Gitlab\src\Gems.Settings.Gitlab.csproj", "{54151B3E-F573-453C-B65D-F8A4CD54C325}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{F785F962-867B-4D23-A428-06909486E957}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicLoggingLevel", "src\Settings\Gitlab\Samples\DynamicLoggingLevel\DynamicLoggingLevel.csproj", "{F106C699-AAA0-4F41-B189-344D88ABA4F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DynamicLoggingLevel", "src\Settings\Gitlab\Samples\DynamicLoggingLevel\DynamicLoggingLevel.csproj", "{F106C699-AAA0-4F41-B189-344D88ABA4F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetSettings", "src\Settings\Gitlab\Samples\GetSettings\GetSettings.csproj", "{62DB6790-1966-4780-8874-A4FA269A9C3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GetSettings", "src\Settings\Gitlab\Samples\GetSettings\GetSettings.csproj", "{62DB6790-1966-4780-8874-A4FA269A9C3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HangfireDynamicJobs", "src\Settings\Gitlab\Samples\HangfireDynamicJobs\HangfireDynamicJobs.csproj", "{240CA7B3-5428-4951-9CE6-AE0DECC723D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HangfireDynamicJobs", "src\Settings\Gitlab\Samples\HangfireDynamicJobs\HangfireDynamicJobs.csproj", "{240CA7B3-5428-4951-9CE6-AE0DECC723D9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BusinessRules", "BusinessRules", "{7FABFC71-5DB4-431D-8683-A5C7A38C5833}"
 EndProject
@@ -236,7 +236,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\Logging\Serilog\README.md = src\Logging\Serilog\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Logging.Serilog", "src\Logging\Serilog\src\Gems.Logging.Serilog.csproj", "{5612AC65-742F-4EB0-AC09-D8422EB6BEBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Logging.Serilog", "src\Logging\Serilog\src\Gems.Logging.Serilog.csproj", "{5612AC65-742F-4EB0-AC09-D8422EB6BEBD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Outbox", "Outbox", "{1E94B99A-AA12-4EAA-A16C-8220C1443160}"
 EndProject
@@ -245,7 +245,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\Patterns\Outbox\README.md = src\Patterns\Outbox\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Patterns.Outbox", "src\Patterns\Outbox\src\Gems.Patterns.Outbox.csproj", "{3CD30AE8-AFFB-4D69-837D-E95630AEB6E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Patterns.Outbox", "src\Patterns\Outbox\src\Gems.Patterns.Outbox.csproj", "{3CD30AE8-AFFB-4D69-837D-E95630AEB6E3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Swagger", "Swagger", "{23D9A946-AD8D-4DDD-ACBC-A4692F5C8E7B}"
 EndProject
@@ -281,7 +281,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\Logging\Mvc\README.md = src\Logging\Mvc\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Metrics", "src\Metrics\Metrics\src\Gems.Metrics.csproj", "{A3F5F5DD-481A-4BE6-8C4A-5A5F6989EEC6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Metrics", "src\Metrics\Metrics\src\Gems.Metrics.csproj", "{A3F5F5DD-481A-4BE6-8C4A-5A5F6989EEC6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project Items", "{CB81E7F6-FE31-4CF7-BB91-FBB7C97A9CA8}"
 	ProjectSection(SolutionItems) = preProject
@@ -298,23 +298,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\Text\Json\README.md = src\Text\Json\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Authentication", "src\Authentication\Authentication\src\Gems.Authentication.csproj", "{8CFA82A4-3D51-45F6-9556-27C30E45498B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Authentication", "src\Authentication\Authentication\src\Gems.Authentication.csproj", "{8CFA82A4-3D51-45F6-9556-27C30E45498B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.BusinessRules", "src\BusinessRules\BusinessRules\src\Gems.BusinessRules.csproj", "{F2170982-361B-447C-B0C3-B9C6A37426FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.BusinessRules", "src\BusinessRules\BusinessRules\src\Gems.BusinessRules.csproj", "{F2170982-361B-447C-B0C3-B9C6A37426FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.DomainEvents", "src\DomainEvents\DomainEvents\src\Gems.DomainEvents.csproj", "{6CA01212-7549-4E52-A15D-B4BD7217302F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.DomainEvents", "src\DomainEvents\DomainEvents\src\Gems.DomainEvents.csproj", "{6CA01212-7549-4E52-A15D-B4BD7217302F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.HealthChecks", "src\HealthChecks\HealthChecks\src\Gems.HealthChecks.csproj", "{F0EB854E-2B09-45C3-9E5A-2B47B69A12AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.HealthChecks", "src\HealthChecks\HealthChecks\src\Gems.HealthChecks.csproj", "{F0EB854E-2B09-45C3-9E5A-2B47B69A12AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Http", "src\Http\Http\src\Gems.Http.csproj", "{1D973416-A062-43D5-9CDA-BA89CC0D5DB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Http", "src\Http\Http\src\Gems.Http.csproj", "{1D973416-A062-43D5-9CDA-BA89CC0D5DB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Http.Tests", "src\Http\Http\test\Gems.Http.Tests.csproj", "{077B11F0-828A-4AD2-BEE0-236E3FD61F01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Http.Tests", "src\Http\Http\test\Gems.Http.Tests.csproj", "{077B11F0-828A-4AD2-BEE0-236E3FD61F01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.IO", "src\IO\IO\src\Gems.IO.csproj", "{616AA865-37BF-4DA3-A921-6C2C63E09AAB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.IO", "src\IO\IO\src\Gems.IO.csproj", "{616AA865-37BF-4DA3-A921-6C2C63E09AAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Linq", "src\Linq\Linq\src\Gems.Linq.csproj", "{BE4D95BF-590F-4E5B-98F4-1FE2FC17FDD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Linq", "src\Linq\Linq\src\Gems.Linq.csproj", "{BE4D95BF-590F-4E5B-98F4-1FE2FC17FDD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Linq.Tests", "src\Linq\Linq\test\Gems.Linq.Tests.csproj", "{205BDC95-47FC-4E8F-99BA-4356E33EEA73}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Linq.Tests", "src\Linq\Linq\test\Gems.Linq.Tests.csproj", "{205BDC95-47FC-4E8F-99BA-4356E33EEA73}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kafka", "Kafka", "{180516E2-B538-4C8E-AD42-E04D5E03E7DC}"
 EndProject
@@ -323,19 +323,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\MessageBrokers\Kafka\readme.md = src\MessageBrokers\Kafka\readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.MessageBrokers.Kafka", "src\MessageBrokers\Kafka\src\Gems.MessageBrokers.Kafka.csproj", "{A9F5D1B3-A1E6-41DD-AFF0-2F0DA09CBF0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.MessageBrokers.Kafka", "src\MessageBrokers\Kafka\src\Gems.MessageBrokers.Kafka.csproj", "{A9F5D1B3-A1E6-41DD-AFF0-2F0DA09CBF0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Swagger", "src\Swagger\Swagger\src\Gems.Swagger.csproj", "{FF31E790-F568-4952-B07D-0063AA696FDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Swagger", "src\Swagger\Swagger\src\Gems.Swagger.csproj", "{FF31E790-F568-4952-B07D-0063AA696FDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Tasks", "src\Tasks\Tasks\src\Gems.Tasks.csproj", "{010BACC1-6EAA-4924-A99B-154CBE7AB94C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Tasks", "src\Tasks\Tasks\src\Gems.Tasks.csproj", "{010BACC1-6EAA-4924-A99B-154CBE7AB94C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Tasks.Tests", "src\Tasks\Tasks\test\Gems.Tasks.Tests.csproj", "{B6CACE68-9904-457D-A58B-1128CB8EA608}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Tasks.Tests", "src\Tasks\Tasks\test\Gems.Tasks.Tests.csproj", "{B6CACE68-9904-457D-A58B-1128CB8EA608}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Utils", "src\Utils\Utils\src\Gems.Utils.csproj", "{519AA36A-03A1-48DD-AD36-0940B4418FA3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Utils", "src\Utils\Utils\src\Gems.Utils.csproj", "{519AA36A-03A1-48DD-AD36-0940B4418FA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Utils.Tests", "src\Utils\Utils\test\Gems.Utils.Tests.csproj", "{9436E37D-DBE9-4E23-9142-74CC6905F9B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Utils.Tests", "src\Utils\Utils\test\Gems.Utils.Tests.csproj", "{9436E37D-DBE9-4E23-9142-74CC6905F9B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Mvc", "src\Mvc\Mvc\src\Gems.Mvc.csproj", "{50028A54-4DE9-4895-AFEB-A768CA97ECB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Mvc", "src\Mvc\Mvc\src\Gems.Mvc.csproj", "{50028A54-4DE9-4895-AFEB-A768CA97ECB3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MessageBrokers", "MessageBrokers", "{1C634B56-5B3C-4A51-B1DB-B7B7CEC390A7}"
 EndProject
@@ -344,7 +344,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\MessageBrokers\MessageBrokers\readme.md = src\MessageBrokers\MessageBrokers\readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.MessageBrokers", "src\MessageBrokers\MessageBrokers\src\Gems.MessageBrokers.csproj", "{1933F618-5F5D-4507-BCC8-21988D03342F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.MessageBrokers", "src\MessageBrokers\MessageBrokers\src\Gems.MessageBrokers.csproj", "{1933F618-5F5D-4507-BCC8-21988D03342F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project Items", "{5933BFF7-A4FF-46FD-A619-A82591FFA675}"
 	ProjectSection(SolutionItems) = preProject
@@ -358,7 +358,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{1ABC8C68-2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CompositionRoot", "CompositionRoot", "{FB735C7A-E599-46B7-9F86-B9E538AD1FA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.CompositionRoot", "src\CompositionRoot\CompositionRoot\src\Gems.CompositionRoot.csproj", "{45C1E58D-C080-484C-BFD0-80FEE62E386C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.CompositionRoot", "src\CompositionRoot\CompositionRoot\src\Gems.CompositionRoot.csproj", "{45C1E58D-C080-484C-BFD0-80FEE62E386C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Context", "Context", "{544D9BFB-41D6-435C-820C-3DE699830159}"
 EndProject
@@ -369,11 +369,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectItems", "ProjectItem
 		src\IO\LibreOffice\Readme.md = src\IO\LibreOffice\Readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.IO.LibreOffice", "src\IO\LibreOffice\src\Gems.IO.LibreOffice.csproj", "{069A1AAE-CFFC-4135-9802-BA4ECA38E398}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.IO.LibreOffice", "src\IO\LibreOffice\src\Gems.IO.LibreOffice.csproj", "{069A1AAE-CFFC-4135-9802-BA4ECA38E398}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Context", "src\Context\Context\src\Gems.Context.csproj", "{963412CB-F8BC-406D-A1E5-A6AF7FE77825}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Context", "src\Context\Context\src\Gems.Context.csproj", "{963412CB-F8BC-406D-A1E5-A6AF7FE77825}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Tests", "src\Data\Data\test\Gems.Data.Tests.csproj", "{01929A84-8D2D-4929-BA39-360B3A009ECA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Data.Tests", "src\Data\Data\test\Gems.Data.Tests.csproj", "{01929A84-8D2D-4929-BA39-360B3A009ECA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project Items", "{EAC12C4C-83BF-452A-81C0-5275456829E5}"
 	ProjectSection(SolutionItems) = preProject
@@ -392,11 +392,39 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 		src\Data\MySql\README.md = src\Data\MySql\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.MySql", "src\Data\MySql\src\Gems.Data.MySql.csproj", "{80963401-CFCD-40C0-8C26-E338711E2182}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Data.MySql", "src\Data\MySql\src\Gems.Data.MySql.csproj", "{80963401-CFCD-40C0-8C26-E338711E2182}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.MySql.Tests", "src\Data\MySql\test\Gems.Data.MySql.Tests.csproj", "{0BC63CAE-1AB3-4058-AAAF-474719B2802D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Data.MySql.Tests", "src\Data\MySql\test\Gems.Data.MySql.Tests.csproj", "{0BC63CAE-1AB3-4058-AAAF-474719B2802D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Text.Json.Tests", "src\Text\Json\test\Gems.Text.Json.Tests.csproj", "{D56B0A3B-E02B-4912-8E45-FB72FB4C3AFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.Text.Json.Tests", "src\Text\Json\test\Gems.Text.Json.Tests.csproj", "{D56B0A3B-E02B-4912-8E45-FB72FB4C3AFB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenTelemetry", "OpenTelemetry", "{D2280B84-930C-40D4-97A3-F270B1896B5A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenTelemetry", "OpenTelemetry", "{D25A3995-8D96-49FB-B6C0-1CE899E20865}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mvc", "Mvc", "{AE168D26-F1FF-4655-B5BA-F8CB45A00314}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.OpenTelemetry", "src\OpenTelemetry\OpenTelemetry\src\Gems.OpenTelemetry.csproj", "{F1540153-DB16-4B6E-91C6-2D5671DD9DBF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project Items", "{A28FB33C-339A-4EF4-AEBD-17B565C1B000}"
+	ProjectSection(SolutionItems) = preProject
+		src\OpenTelemetry\OpenTelemetry\README.md = src\OpenTelemetry\OpenTelemetry\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{357928D1-5C67-47CA-9976-83A7303CF00C}"
+	ProjectSection(SolutionItems) = preProject
+		src\OpenTelemetry\OpenTelemetry\docs\attributes.md = src\OpenTelemetry\OpenTelemetry\docs\attributes.md
+		src\OpenTelemetry\OpenTelemetry\docs\filtering.md = src\OpenTelemetry\OpenTelemetry\docs\filtering.md
+		src\OpenTelemetry\OpenTelemetry\docs\installation.md = src\OpenTelemetry\OpenTelemetry\docs\installation.md
+		src\OpenTelemetry\OpenTelemetry\docs\trace-endpoint.md = src\OpenTelemetry\OpenTelemetry\docs\trace-endpoint.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project Items", "{BDA14551-22EC-46E4-BD65-47EAF979A5AE}"
+	ProjectSection(SolutionItems) = preProject
+		src\OpenTelemetry\Mvc\README.md = src\OpenTelemetry\Mvc\README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.OpenTelemetry.Mvc", "src\OpenTelemetry\Mvc\src\Gems.OpenTelemetry.Mvc.csproj", "{144CFED7-053E-4C9D-9C6F-0AFB50F8E13E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -404,10 +432,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9C8A0352-1816-4FC3-BC2D-DD504CD76E38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9C8A0352-1816-4FC3-BC2D-DD504CD76E38}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9C8A0352-1816-4FC3-BC2D-DD504CD76E38}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9C8A0352-1816-4FC3-BC2D-DD504CD76E38}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E357D4FB-AE53-48B6-B57C-126B174E8829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E357D4FB-AE53-48B6-B57C-126B174E8829}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E357D4FB-AE53-48B6-B57C-126B174E8829}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -608,12 +632,17 @@ Global
 		{D56B0A3B-E02B-4912-8E45-FB72FB4C3AFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D56B0A3B-E02B-4912-8E45-FB72FB4C3AFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D56B0A3B-E02B-4912-8E45-FB72FB4C3AFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1540153-DB16-4B6E-91C6-2D5671DD9DBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1540153-DB16-4B6E-91C6-2D5671DD9DBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1540153-DB16-4B6E-91C6-2D5671DD9DBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1540153-DB16-4B6E-91C6-2D5671DD9DBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{144CFED7-053E-4C9D-9C6F-0AFB50F8E13E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{144CFED7-053E-4C9D-9C6F-0AFB50F8E13E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{144CFED7-053E-4C9D-9C6F-0AFB50F8E13E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{144CFED7-053E-4C9D-9C6F-0AFB50F8E13E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {F59BAF6C-0E34-4F38-A0E7-2227592118CE}
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5900D8A8-135A-4ABA-9BA9-7977458DEF96} = {71078BC8-D038-4603-A84A-84BAFDEC4D8B}
@@ -728,5 +757,15 @@ Global
 		{80963401-CFCD-40C0-8C26-E338711E2182} = {38940F5E-EA23-46CA-9E9F-A1BD486DB649}
 		{0BC63CAE-1AB3-4058-AAAF-474719B2802D} = {38940F5E-EA23-46CA-9E9F-A1BD486DB649}
 		{D56B0A3B-E02B-4912-8E45-FB72FB4C3AFB} = {0CA9C83E-04C2-43E6-9D18-521EA49DA6A7}
+		{D25A3995-8D96-49FB-B6C0-1CE899E20865} = {D2280B84-930C-40D4-97A3-F270B1896B5A}
+		{AE168D26-F1FF-4655-B5BA-F8CB45A00314} = {D2280B84-930C-40D4-97A3-F270B1896B5A}
+		{F1540153-DB16-4B6E-91C6-2D5671DD9DBF} = {D25A3995-8D96-49FB-B6C0-1CE899E20865}
+		{A28FB33C-339A-4EF4-AEBD-17B565C1B000} = {D25A3995-8D96-49FB-B6C0-1CE899E20865}
+		{357928D1-5C67-47CA-9976-83A7303CF00C} = {A28FB33C-339A-4EF4-AEBD-17B565C1B000}
+		{BDA14551-22EC-46E4-BD65-47EAF979A5AE} = {AE168D26-F1FF-4655-B5BA-F8CB45A00314}
+		{144CFED7-053E-4C9D-9C6F-0AFB50F8E13E} = {AE168D26-F1FF-4655-B5BA-F8CB45A00314}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F59BAF6C-0E34-4F38-A0E7-2227592118CE}
 	EndGlobalSection
 EndGlobal
