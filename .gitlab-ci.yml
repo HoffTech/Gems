@@ -29,7 +29,7 @@ publish_to_nuget:
   stage: publish_to_nuget
   #when: manual
   script:
-    - python3 /app/publish_to_nuget.py  
+    - python3 /app/publish_to_nuget.py
   only:
     variables:
       - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
@@ -38,9 +38,9 @@ test:
  stage: test
  image: ${CI_REGISTRY}/build-images/core/sdk:8.0
  script:
-   - dotnet test -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=\"cobertura,opencover\" /p:CoverletOutput=../results/
+   - dotnet test --framework net8.0 -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=\"cobertura,opencover\" /p:CoverletOutput=../results/
  coverage: '/Total\s*\|\s*(\d+\.?\d+)/'
  artifacts:
    reports:
-     cobertura: ./results/coverage.net8.0.cobertura.xml
+     cobertura: ../results/coverage.net8.0.cobertura.xml
 
