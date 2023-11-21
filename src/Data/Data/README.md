@@ -120,8 +120,8 @@ await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken).CallSt
 # Использование Linked Token
 Связанные токены позволяют доменным обработчикам создать собственные объекты unit of work.
 ```csharp
-var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken).Token;
-await this.mediator.Send(new SomeInnerCommand(), linkedToken);
+using var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+await this.mediator.Send(new SomeInnerCommand(), linkedTokenSource.Token);
 ```
 Связанные токены является obsolete. Смотрите раздел "Использование контекста".
 
@@ -135,8 +135,8 @@ await this.mediator.Send(new SomeInnerCommand(), linkedToken);
 ```
 Это добавляет возможность доменным обработчикам создать собственные объекты unit of work, что по факту избавляет нас от использования связанных токенов. Вместо такого кода:
 ```csharp
-var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken).Token;
-await this.mediator.Send(new SomeInnerCommand(), linkedToken);
+using var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+await this.mediator.Send(new SomeInnerCommand(), linkedTokenSource.Token);
 ```
 Можно теперь писать так:
 ```csharp
