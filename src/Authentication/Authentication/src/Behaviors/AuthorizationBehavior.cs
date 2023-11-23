@@ -34,7 +34,7 @@ public class AuthorizationBehavior<TRequest, TResponse> : IPipelineBehavior<TReq
             throw new UnauthorizedAccessException("Вы не авторизованы.");
         }
 
-        if (!request.Roles.Any(x => this.httpContextAccessor.HttpContext.User.IsInRole(x.ToString())))
+        if (!request.GetRoles()?.Any(x => this.httpContextAccessor.HttpContext.User.IsInRole(x.ToString())) ?? true)
         {
             throw new UnauthorizedAccessException("Доступ запрещен.");
         }
