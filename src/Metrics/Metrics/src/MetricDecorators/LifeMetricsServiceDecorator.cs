@@ -15,8 +15,9 @@ namespace Gems.Metrics.MetricDecorators
 {
     public class LifeMetricsServiceDecorator : AMetricsServiceDecorator
     {
-        public const int DefaultResetMillisecondsDelay = 60000;
-        private readonly ConcurrentDictionary<string, MetricLifeInfo> gaugeMetrics = new ConcurrentDictionary<string, MetricLifeInfo>();
+        private const int DefaultResetMillisecondsDelay = 60000;
+
+        private readonly ConcurrentDictionary<MetricInfo, MetricLifeInfo> gaugeMetrics = new ConcurrentDictionary<MetricInfo, MetricLifeInfo>();
         private readonly ILogger<IMetricsService> logger;
         private readonly IOptions<MetricsConfig> metricsConfig;
 
@@ -232,9 +233,9 @@ namespace Gems.Metrics.MetricDecorators
         private void AddOrUpdateGaugeMetric(MetricInfo metricInfo)
         {
             this.gaugeMetrics.AddOrUpdate(
-                metricInfo.Name,
+                metricInfo,
                 _ => new MetricLifeInfo(metricInfo, DateTime.UtcNow),
-                (v1, v2) => new MetricLifeInfo(metricInfo, DateTime.UtcNow));
+                (_, _) => new MetricLifeInfo(metricInfo, DateTime.UtcNow));
         }
 
         private async Task ResetMetricsInternal(int resetMillisecondsDelay)
