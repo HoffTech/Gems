@@ -95,8 +95,8 @@
 - [Gems.Tasks](/src/Tasks/Tasks)
 
 # OpenTelemetry
-- [Gems.OpenTelemety] (/src/OpenTelemetry/OpenTelemetry)
-- [Gems.OpenTelemety.Mvc] (/src/OpenTelemetry/Mvc)
+- [Gems.OpenTelemety](/src/OpenTelemetry/OpenTelemetry)
+- [Gems.OpenTelemety.Mvc](/src/OpenTelemetry/Mvc)
 
 # Утилитарные библиотеки
 - [Gems.Utils](/src/Utils/Utils)
