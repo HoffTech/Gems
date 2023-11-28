@@ -36,6 +36,8 @@ namespace Gems.Metrics.Prometheus
                 lifeMetricsServiceDecorator?.SetComponent(s.GetService<MetricsService>());
                 return lifeMetricsServiceDecorator;
             });
+
+            services.AddHostedService<ResetMetricsHostedService>();
         }
     }
 }
