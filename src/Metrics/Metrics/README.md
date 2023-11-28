@@ -17,10 +17,10 @@
 * [Метки](#метки)
 * [Установка метрики посредством структуры MetricInfo](#установка-метрики-посредством-структуры-metricinfo)
 * [Установка метрики посредством перечисления MetricType](#установка-метрики-посредством-перечисления-metrictype)
+* [Сброс метрик](#сброс-метрик)
 * [Использование пайплайнов](#использование-пайплайнов)
 * [ErrorMetricsBehavior](#errormetricsbehavior)
 * [TimeMetricBehavior](#timemetricbehavior)
-* [ResetMetricsBehavior](#resetmetricsbehavior)
 
 # Установка
 
@@ -169,16 +169,22 @@ await using (var timeMetric = this.metricsService.Time(SomeFeatureMetricType.Cha
     // ваш код, который выполняется 2.8001 секунды
 }
 ```
+# Сброс метрик
+Фоновое задание ResetMetricsHostedService позволяет произвести сброс метрик через временной интервал указанный в appsettings:
+```json
+  "MetricsConfig": {
+    "ResetMillisecondsDelay": 60000 // время, через которое необходимо сбрасывать метрики, по умолчанию 60 секунд
+  }
+```
+
 # Использование пайплайнов
 Некоторые пайплайны применяются ко всем обработчикам, реализующих интерфейс IRequestHandler.
 Это такие пайплайны:
 - TimeMetricBehavior
 - ErrorMetricsBehavior
-- ResetMetricsBehavior
 
 Регистрация пайплайнов:
 ```csharp
-services.AddPipeline(typeof(ResetMetricsBehavior<,>));
 services.AddPipeline(typeof(ErrorMetricsBehavior<,>));
 services.AddPipeline(typeof(TimeMetricBehavior<,>));
 ```
@@ -221,11 +227,4 @@ public interface ILabelsProvider<in TRequest> : ILabelsProvider
 Реализацию данного интерфейса необходимо зарегистрировать в сервисах.
 ```csharp
 services.AddSingleton<ILabelsProvider<ImportInventTableCommand>, LabelsProvider>();
-```
-# ResetMetricsBehavior
-Пайплайн ResetMetricsBehavior сбрасывает метрики через время указанное в appsettings:
-```json
-  "MetricsConfig": {
-    "ResetMillisecondsDelay": 60000 // время, через которое необходимо сбрасывать метрики, по умолчанию 60 секунд
-  }
 ```

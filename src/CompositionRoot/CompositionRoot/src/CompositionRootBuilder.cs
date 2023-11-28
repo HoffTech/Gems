@@ -102,7 +102,6 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
         this.services.AddPipeline(typeof(NotFoundBehavior<,>));
         this.services.AddPipeline(typeof(ExceptionBehavior<,>));
         this.services.AddPipeline(typeof(CacheBehavior<,>));
-        this.services.AddPipeline(typeof(ResetMetricsBehavior<,>));
         this.services.AddPipeline(typeof(ErrorMetricsBehavior<,>));
         this.services.AddPipeline(typeof(TimeMetricBehavior<,>));
         this.services.AddPipeline(typeof(ValidatorBehavior<,>));
