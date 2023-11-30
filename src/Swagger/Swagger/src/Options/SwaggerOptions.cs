@@ -1,6 +1,10 @@
 // Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System.Collections.Generic;
+
+using Microsoft.OpenApi.Models;
+
 namespace Gems.Swagger.Options
 {
     public class SwaggerOptions
@@ -10,10 +14,9 @@ namespace Gems.Swagger.Options
         /// </summary>
         public const string Swagger = "Swagger";
 
-        /// <summary>
-        /// On/Off Authority.
-        /// </summary>
-        public bool EnableAuthority { get; set; }
+        public bool EnableImplicitFlow { get; set; }
+
+        public bool EnablePasswordFlow { get; set; }
 
         /// <summary>
         /// SwaggerKey.
@@ -41,5 +44,13 @@ namespace Gems.Swagger.Options
         /// You must also pass a validationResultType and genericErrorType into the ServiceCollectionExtensions.AddSwagger method.
         /// </summary>
         public bool EnableSchemaForErrorResponse { get; set; }
+
+        public bool EnableAnnotations { get; set; }
+
+        public bool UseOneOfForPolymorphism { get; set; }
+
+        public List<string> IncludeXmlComments { get; set; }
+
+        public Dictionary<string, OpenApiInfo> SwaggerDoc { get; set; }
     }
 }

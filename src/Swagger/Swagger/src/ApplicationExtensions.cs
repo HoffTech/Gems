@@ -24,15 +24,7 @@ namespace Gems.Swagger
 
             app.UseSwagger();
             app.UseSwaggerUI(
-                options =>
-                {
-                    if (adOptions?.EnableAuthority ?? false)
-                    {
-                        options.OAuthClientId(adOptions.SwaggerKey);
-                    }
-
-                    options.SwaggerEndpoint("v1/swagger.json", adOptions?.SwaggerName ?? string.Empty);
-                });
+                options => options.SwaggerEndpoint("v1/swagger.json", adOptions?.SwaggerName ?? string.Empty));
         }
     }
 }

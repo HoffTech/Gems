@@ -32,5 +32,9 @@ namespace Gems.Authentication.Jwt.Options
         /// CertFileName.
         /// </summary>
         public string CertFileName { get; set; }
+
+        public string AuthorizationUrl { get; set; }
+
+        public string TokenUrl { get; set; }
     }
 }

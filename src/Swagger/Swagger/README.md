@@ -15,7 +15,8 @@
 Настройки в appsettings.json
 ```json
  "Swagger": {
-    "EnableAuthority": false/true, - отключить/включить использование авторизации, в контроллерах использовать [Authorize]  
+    "EnableImplicitFlow": false/true, - сделать доступным авторизацию по ImplicitFlow. Должен быть так же определен раздел AD:AuthorizationUrl.    
+    "EnablePasswordFlow": false/true, - сделать доступным авторизацию по PasswordFlow  Должен быть так же определен раздел AD:TokenUrl.  
     "SwaggerKey": "swagger_key", - oauth2 clientId по умолчанию
     "SwaggerName": "swagger_name", - описание, которое отображается в раскрывающемся списке выбора документа.
     "SwaggerSchema": "swagger_schema", - добавляется ко всем операциям в секцию security.oauth2
