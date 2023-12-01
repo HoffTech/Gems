@@ -31,19 +31,21 @@ namespace Gems.Metrics
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    await Task
-                        .Delay(this.options.Value.ResetMillisecondsDelay, cancellationToken)
-                        .ConfigureAwait(false);
-
                     await this.metricsService.ResetMetrics().ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
                     this.logger.LogError(e, "Failed reset metrics.");
+                }
+                finally
+                {
+                    await Task
+                        .Delay(this.options.Value.ResetMillisecondsDelay, cancellationToken)
+                        .ConfigureAwait(false);
                 }
             }
         }
