@@ -2,7 +2,6 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,12 +11,12 @@ using Microsoft.AspNetCore.Http;
 
 namespace Gems.Authentication.Behaviors
 {
-    public class AuthorizationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequestAuthorization
+    public class AuthenticationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequestAuthentication
     {
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public AuthorizationBehavior(IHttpContextAccessor httpContextAccessor)
+        public AuthenticationBehavior(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
         }
@@ -32,9 +31,9 @@ namespace Gems.Authentication.Behaviors
                 throw new UnauthorizedAccessException("Не доступен HttpContext.");
             }
 
-            if (!request.GetRoles()?.Any(x => this.httpContextAccessor.HttpContext.User.IsInRole(x.ToString())) ?? true)
+            if (!this.httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
-                throw new UnauthorizedAccessException("Доступ запрещен.");
+                throw new UnauthorizedAccessException("Аутентификация не пройдена.");
             }
 
             return next();

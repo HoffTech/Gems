@@ -9,6 +9,9 @@
 * [Установка и настройка](#УстановкаИНастройка)
 * [JWT аутентификация](#JWTАутентификация)
 * [Keycloak аутентификация](#KeycloakАутентификация)
+* [Использование пайплайнов](#использование-пайплайнов)
+* [AuthenticationBehavior](#AuthenticationBehavior)
+* [AuthorizationBehavior](#AuthorizationBehavior)
 
 # Установка и настройка <a name="УстановкаИНастройка"></a>
 - Установите нугет пакет Gems.Authentication через менеджер пакетов.
@@ -71,4 +74,46 @@ services.AddKeycloakAuthentication(this.Configuration);
 ```csharp
 app.UseAuthentication();
 app.UseAuthorization();
+```
+
+# Использование пайплайнов
+Взаимен использования _UseAuthentication()_ и _UseAuthorization()_ предусмотрены пайплайны для проверки аутентификации и авторизации.
+
+Это такие пайплайны:
+- AuthenticationBehavior - для работы необходима имплементация обработчиком интерфейса IRequestAuthentication
+- AuthorizationBehavior - для работы необходима имплементация обработчиком интерфейса IRequestAuthorization 
+
+Регистрация пайплайнов:
+```csharp
+services.AddPipeline(typeof(AuthenticationBehavior<,>));
+services.AddPipeline(typeof(AuthorizationBehavior<,>));
+```
+
+# AuthenticationBehavior
+Пайплайн AuthenticationBehavior производит проверку ппользователя на подлинность.
+Если проверка не пройдена, выбрасывает UnauthorizedAccessException.
+
+Пример добавления пайплайна к обработчику:
+```csharp
+    public class GetByIdQuery : IRequest<Model>, IRequestAuthentication
+    {
+        // ...
+    }
+```
+
+# AuthorizationBehavior
+Пайплайн AuthorizationBehavior производит проверку ппользователя на соответствие одной из Роли переданной в массиве при имплементации интерфейса.
+Если проверка не пройдена, выбрасывает UnauthorizedAccessException.
+
+Пример добавления пайплайна к обработчику:
+```csharp
+    public class DoCommand : IRequest, IRequestAuthorization
+    {
+        // ...
+
+        public IEnumerable<string> GetRoles()
+        {
+            return new[] { "Admin", "Manager", "User" };
+        }
+    }
 ```
