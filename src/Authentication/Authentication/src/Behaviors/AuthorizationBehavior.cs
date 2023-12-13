@@ -1,14 +1,18 @@
 ﻿// Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
-using System;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Gems.Mvc.Filters.Exceptions;
 
 using MediatR;
 
 using Microsoft.AspNetCore.Http;
+
+using InvalidOperationException = System.InvalidOperationException;
 
 namespace Gems.Authentication.Behaviors
 {
@@ -29,12 +33,23 @@ namespace Gems.Authentication.Behaviors
         {
             if (this.httpContextAccessor.HttpContext?.User.Identity == null)
             {
-                throw new UnauthorizedAccessException("Не доступен HttpContext.");
+                throw new InvalidOperationException("Не доступен HttpContext.");
             }
 
-            if (!request.GetRoles()?.Any(x => this.httpContextAccessor.HttpContext.User.IsInRole(x.ToString())) ?? true)
+            if (!this.httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
-                throw new UnauthorizedAccessException("Доступ запрещен.");
+                throw new AuthenticationException("Аутентификация не пройдена.");
+            }
+
+            var roles = request.GetRoles();
+            if (roles == null || !roles.Any())
+            {
+                return next();
+            }
+
+            if (!request.GetRoles().Any(x => this.httpContextAccessor.HttpContext.User.IsInRole(x.ToString())))
+            {
+                throw new ForbiddenAccessException("Доступ запрещен.");
             }
 
             return next();
