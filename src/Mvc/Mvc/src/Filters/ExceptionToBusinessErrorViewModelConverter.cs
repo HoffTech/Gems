@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Authentication;
 
 using FluentValidation;
 
@@ -23,6 +24,11 @@ namespace Gems.Mvc.Filters
             switch (exception)
             {
                 case UnauthorizedAccessException e:
+                    return new BusinessErrorViewModel(e)
+                    {
+                        StatusCode = 401
+                    };
+                case AuthenticationException e:
                     return new BusinessErrorViewModel(e)
                     {
                         StatusCode = 401
