@@ -46,7 +46,7 @@ namespace Gems.Jobs.Quartz
             }
 
             configureOptions?.Invoke(jobsOptions);
-            if (jobsOptions.Triggers == null || jobsOptions.Triggers.Count == 0 || string.IsNullOrWhiteSpace(jobsOptions.ConnectionString))
+            if (jobsOptions.Triggers == null || jobsOptions.Triggers.Count == 0 || (jobsOptions.Type != QuartzDbType.InMemory && string.IsNullOrWhiteSpace(jobsOptions.ConnectionString)))
             {
                 return;
             }
@@ -59,37 +59,53 @@ namespace Gems.Jobs.Quartz
                 q.UseMicrosoftDependencyInjectionJobFactory();
                 q.UseTimeZoneConverter();
 
-                q.UsePersistentStore(x =>
+                if (jobsOptions.Type == QuartzDbType.InMemory)
                 {
-                    x.UseProperties = true;
-                    x.UseClustering(c =>
+                    q.UseInMemoryStore();
+                }
+                else
+                {
+                    q.UsePersistentStore(x =>
                     {
-                        c.CheckinMisfireThreshold = TimeSpan.FromSeconds(60);
-                        c.CheckinInterval = TimeSpan.FromSeconds(20);
+                        x.UseProperties = true;
+                        x.UseClustering(c =>
+                        {
+                            c.CheckinMisfireThreshold = TimeSpan.FromSeconds(60);
+                            c.CheckinInterval = TimeSpan.FromSeconds(20);
+                        });
+
+                        switch (jobsOptions.Type)
+                        {
+                            case QuartzDbType.PostgreSql:
+                                x.UsePostgres(postgres =>
+                                {
+                                    postgres.TablePrefix = jobsOptions.TablePrefix;
+                                    postgres.ConnectionString = jobsOptions.ConnectionString;
+                                });
+                                break;
+                            case QuartzDbType.MsSql:
+                                x.UseSqlServer(sqlServer =>
+                                {
+                                    sqlServer.TablePrefix = jobsOptions.TablePrefix;
+                                    sqlServer.ConnectionString = jobsOptions.ConnectionString;
+                                });
+                                break;
+                            default:
+                                throw new NotImplementedException($"Quartz not implemented for type: {jobsOptions.Type}");
+                        }
+
+                        x.UseJsonSerializer();
                     });
 
-                    switch (jobsOptions.Type)
+                    if (jobsOptions.EnableAdminUiPersistentJobHistory)
                     {
-                        case QuartzDbType.PostgreSql:
-                            x.UsePostgres(postgres =>
-                            {
-                                postgres.TablePrefix = jobsOptions.TablePrefix;
-                                postgres.ConnectionString = jobsOptions.ConnectionString;
-                            });
-                            break;
-                        case QuartzDbType.MsSql:
-                            x.UseSqlServer(sqlServer =>
-                            {
-                                sqlServer.TablePrefix = jobsOptions.TablePrefix;
-                                sqlServer.ConnectionString = jobsOptions.ConnectionString;
-                            });
-                            break;
-                        default:
-                            throw new NotImplementedException($"Quartz not implemented for type: {jobsOptions.Type}");
+                        q.SetProperty("quartz.plugin.recentHistory.type", "Quartzmon.Plugins.RecentHistory.PostgreSql.PostgreSqlExecutionHistoryPlugin, Quartzmon.Plugins.RecentHistory.PostgreSql");
+                        q.SetProperty("quartz.plugin.recentHistory.storeType", "Quartzmon.Plugins.RecentHistory.PostgreSql.Store.PostgreSqlExecutionHistoryStore, Quartzmon.Plugins.RecentHistory.PostgreSql");
+                        q.SetProperty("quartz.plugin.recentHistory.connectionString", jobsOptions.ConnectionString);
+                        q.SetProperty("quartz.plugin.recentHistory.entryTtlInMinutes", (jobsOptions.PersistentRecentHistoryEntryTtl ?? 60).ToString());
+                        q.SetProperty("quartz.plugin.recentHistory.tablePrefix", jobsOptions.TablePrefix);
                     }
-
-                    x.UseJsonSerializer();
-                });
+                }
 
                 q.SetProperty("quartz.threadPool.type", "Quartz.Simpl.DefaultThreadPool, Quartz");
                 q.SetProperty("quartz.threadPool.maxConcurrency", jobsOptions.MaxConcurrency?.ToString() ?? "25");
@@ -101,15 +117,6 @@ namespace Gems.Jobs.Quartz
                 if (jobsOptions.AcquireTriggersWithinLock != null)
                 {
                     q.SetProperty("quartz.jobStore.acquireTriggersWithinLock", jobsOptions.AcquireTriggersWithinLock.ToString().ToLower());
-                }
-
-                if (jobsOptions.EnableAdminUiPersistentJobHistory)
-                {
-                    q.SetProperty("quartz.plugin.recentHistory.type", "Quartzmon.Plugins.RecentHistory.PostgreSql.PostgreSqlExecutionHistoryPlugin, Quartzmon.Plugins.RecentHistory.PostgreSql");
-                    q.SetProperty("quartz.plugin.recentHistory.storeType", "Quartzmon.Plugins.RecentHistory.PostgreSql.Store.PostgreSqlExecutionHistoryStore, Quartzmon.Plugins.RecentHistory.PostgreSql");
-                    q.SetProperty("quartz.plugin.recentHistory.connectionString", jobsOptions.ConnectionString);
-                    q.SetProperty("quartz.plugin.recentHistory.entryTtlInMinutes", (jobsOptions.PersistentRecentHistoryEntryTtl ?? 60).ToString());
-                    q.SetProperty("quartz.plugin.recentHistory.tablePrefix", jobsOptions.TablePrefix);
                 }
 
                 QuartzPropertiesSetter.SetProperties(q, jobsOptions.QuartzProperties);
