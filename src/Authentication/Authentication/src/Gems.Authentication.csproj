@@ -23,6 +23,10 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Mvc\Mvc\src\Gems.Mvc.csproj" />
+  </ItemGroup>
+
 
 
 </Project>

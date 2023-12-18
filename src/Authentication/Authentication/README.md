@@ -10,7 +10,6 @@
 * [JWT аутентификация](#JWTАутентификация)
 * [Keycloak аутентификация](#KeycloakАутентификация)
 * [Использование пайплайнов](#использование-пайплайнов)
-* [AuthenticationBehavior](#AuthenticationBehavior)
 * [AuthorizationBehavior](#AuthorizationBehavior)
 
 # Установка и настройка <a name="УстановкаИНастройка"></a>
@@ -77,35 +76,32 @@ app.UseAuthorization();
 ```
 
 # Использование пайплайнов
-Взаимен использования _UseAuthentication()_ и _UseAuthorization()_ предусмотрены пайплайны для проверки аутентификации и авторизации.
+Взаимен использования _UseAuthentication()_ и _UseAuthorization()_ предусмотрен пайплайн _AuthorizationBehavior_ для проверки аутентификации и авторизации.
 
-Это такие пайплайны:
-- AuthenticationBehavior - для работы необходима имплементация обработчиком интерфейса IRequestAuthentication
-- AuthorizationBehavior - для работы необходима имплементация обработчиком интерфейса IRequestAuthorization 
 
-Регистрация пайплайнов:
+
+Регистрация пайплайна:
 ```csharp
-services.AddPipeline(typeof(AuthenticationBehavior<,>));
 services.AddPipeline(typeof(AuthorizationBehavior<,>));
 ```
 
-# AuthenticationBehavior
-Пайплайн AuthenticationBehavior производит проверку ппользователя на подлинность.
+# AuthorizationBehavior
+Пайплайн AuthorizationBehavior производит проверки пользователя, такие как:
+-  проверка пользователя на подлинность, выбрасывает _AuthenticationException_
+-  проверка пользователя на соответствие одной из Роли переданной в массиве при имплементации интерфейса, выбрасывает _ForbiddenAccessException_
+_- (если ни одной роли не указано, то производит только проверку на подлинность)._
 Если проверка не пройдена, выбрасывает UnauthorizedAccessException.
+- При некорректном использовании Behavior, вне доступа HttpContext, выбрасывает _InvalidOperationException_
 
-Пример добавления пайплайна к обработчику:
+Пример добавления пайплайна к обработчику для проверки пользователя на подлинность:
 ```csharp
-    public class GetByIdQuery : IRequest<Model>, IRequestAuthentication
+    public class DoCommand : IRequest, IRequestAuthorization
     {
         // ...
     }
 ```
 
-# AuthorizationBehavior
-Пайплайн AuthorizationBehavior производит проверку ппользователя на соответствие одной из Роли переданной в массиве при имплементации интерфейса.
-Если проверка не пройдена, выбрасывает UnauthorizedAccessException.
-
-Пример добавления пайплайна к обработчику:
+Пример добавления пайплайна к обработчику для проверки на подлинность и доступа для ролей:
 ```csharp
     public class DoCommand : IRequest, IRequestAuthorization
     {
