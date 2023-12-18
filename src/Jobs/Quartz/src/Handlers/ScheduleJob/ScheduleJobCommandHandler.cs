@@ -2,11 +2,13 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Gems.Jobs.Quartz.Configuration;
+using Gems.Jobs.Quartz.Consts;
 using Gems.Jobs.Quartz.Handlers.Consts;
 using Gems.Jobs.Quartz.Handlers.Shared;
 using Gems.Mvc.GenericControllers;
@@ -46,11 +48,36 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
                 throw new InvalidOperationException($"Такое задание уже зарегистрировано {request.JobGroup ?? JobGroups.DefaultGroup}.{request.JobName}");
             }
 
-            var cronExpression = request.CronExpression ??
-                                 this.options.Value.Triggers
-                                     .Where(r => r.Key == request.JobName)
-                                     .Select(r => r.Value)
-                                     .First();
+            string cronExpression = null;
+            Dictionary<string, object> triggerDataDict = null;
+            if (!string.IsNullOrEmpty(request.CronExpression))
+            {
+                cronExpression = request.CronExpression;
+            }
+            else
+            {
+                var triggerData = this.options.Value.Triggers
+                    .Where(r => r.Key == request.JobName)
+                    .Select(r => r.Value)
+                    .First();
+
+                if (triggerData is string triggerCronExpression)
+                {
+                    cronExpression = triggerCronExpression;
+                }
+
+                if (triggerData is TriggerOptions { Type: TriggerDataType.JobDataType } triggerOptions)
+                {
+                    cronExpression = triggerOptions.CronExpression;
+                    triggerDataDict = triggerOptions.JobData;
+                }
+
+                if (triggerData is TriggerOptions { Type: TriggerDataType.DataBaseType } triggerDbOptions && Type.GetType(triggerDbOptions.ProviderType)?.GetInterface(nameof(ITriggerDataProvider)) != null)
+                {
+                    cronExpression = await (Type.GetType(triggerDbOptions.ProviderType) as ITriggerDataProvider).GetCronExpression().ConfigureAwait(false);
+                    triggerDataDict = await (Type.GetType(triggerDbOptions.ProviderType) as ITriggerDataProvider).GetJobData().ConfigureAwait(false);
+                }
+            }
 
             var newTrigger = new CronTriggerImpl(
                 request.JobName,
@@ -59,7 +86,17 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
                 request.JobGroup ?? JobGroups.DefaultGroup,
                 cronExpression);
 
-            await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
+            if (triggerDataDict != null)
+            {
+                var jobDetail = JobBuilder.Create()
+                    .UsingJobData(new JobDataMap((IDictionary<string, object>)triggerDataDict))
+                    .Build();
+                await scheduler.ScheduleJob(jobDetail, newTrigger, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 }

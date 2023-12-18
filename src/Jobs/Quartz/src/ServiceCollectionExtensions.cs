@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 
 using Gems.Jobs.Quartz.Configuration;
+using Gems.Jobs.Quartz.Consts;
 using Gems.Jobs.Quartz.Handlers.FireJobImmediately;
 using Gems.Jobs.Quartz.Handlers.Shared;
 using Gems.Mvc.GenericControllers;
@@ -123,11 +124,36 @@ namespace Gems.Jobs.Quartz
 
                 foreach (var (jobType, jobName) in JobRegister.JobNameByJobTypeMap)
                 {
-                    var cronExpression = jobsOptions.Triggers.GetValueOrDefault(jobName);
+                    string cronExpression = null;
+                    var triggerData = jobsOptions.Triggers.GetValueOrDefault(jobName);
+                    if (triggerData is string triggerCronExpr)
+                    {
+                        cronExpression = triggerCronExpr;
+                    }
+
+                    Dictionary<string, object> triggerDataDict = null;
+                    if (triggerData is TriggerOptions { Type: TriggerDataType.JobDataType } triggerOptions)
+                    {
+                        cronExpression = triggerOptions.CronExpression;
+                        triggerDataDict = triggerOptions.JobData;
+                    }
+
+                    if (triggerData is TriggerOptions { Type: TriggerDataType.DataBaseType } triggerDbOptions && Type.GetType(triggerDbOptions.ProviderType)?.GetInterface(nameof(ITriggerDataProvider)) != null)
+                    {
+                        cronExpression = (Type.GetType(triggerDbOptions.ProviderType) as ITriggerDataProvider).GetCronExpression().Result;
+                        triggerDataDict = (Type.GetType(triggerDbOptions.ProviderType) as ITriggerDataProvider).GetJobData().Result;
+                    }
 
                     var jobKey = new JobKey(jobName);
 
-                    q.AddJob(jobType, jobKey, c => c.StoreDurably());
+                    q.AddJob(jobType, jobKey, c =>
+                    {
+                        c.StoreDurably();
+                        if (triggerDataDict != null)
+                        {
+                            c.UsingJobData(new JobDataMap((IDictionary<string, object>)triggerDataDict));
+                        }
+                    });
 
                     q.AddTrigger(tConf =>
                     {
