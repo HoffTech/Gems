@@ -14,6 +14,8 @@ namespace Gems.Swagger.Options
         /// </summary>
         public const string Swagger = "Swagger";
 
+        public bool EnableSimpleFlow { get; set; }
+
         public bool EnableImplicitFlow { get; set; }
 
         public bool EnablePasswordFlow { get; set; }

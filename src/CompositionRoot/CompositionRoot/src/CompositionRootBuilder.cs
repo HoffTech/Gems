@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 using Gems.Caching;
 using Gems.Caching.Behaviors;
@@ -67,7 +68,22 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
     private void AddControllersWithMediatR()
     {
         var hideEndpointStartWith = this.configuration.GetValue<string>("HideEndpointStartWith");
-        this.services.AddControllersWithMediatR(options => options.RegisterControllersFromAssemblyContaining<TFromAssemblyContaining>(hideEndpointStartWith));
+        var jsonDefaultIgnoreConditions = this.configuration.GetValue<string>("JsonOptions:DefaultIgnoreConditions");
+        var addStringEnumConverter = this.configuration.GetValue<bool>("JsonOptions:AddStringEnumConverter");
+        this.services.AddControllersWithMediatR(
+            options => options.RegisterControllersFromAssemblyContaining<TFromAssemblyContaining>(hideEndpointStartWith),
+            jsonOptions =>
+            {
+                if (addStringEnumConverter)
+                {
+                    jsonOptions.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                }
+
+                jsonOptions.JsonSerializerOptions.DefaultIgnoreCondition =
+                    Enum.TryParse<JsonIgnoreCondition>(jsonDefaultIgnoreConditions, out var condition)
+                        ? condition
+                        : JsonIgnoreCondition.Never;
+            });
     }
 
     private void AddPrometheus()
