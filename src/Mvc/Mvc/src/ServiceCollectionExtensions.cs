@@ -31,8 +31,12 @@ namespace Gems.Mvc
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <param name="configureOptions">An <see cref="Action{MvcOptions}"/> to configure the provided <see cref="MvcOptions"/>.</param>
+        /// <param name="jsonOptions">An <see cref="Action{jsonOptions}"/> to configure the provided <see cref="JsonOptions"/>.</param>
         /// <returns>An <see cref="IMvcBuilder"/> that can be used to further configure the MVC services.</returns>
-        public static IMvcBuilder AddControllersWithMediatR(this IServiceCollection services, Action<MvcOptions> configureOptions = null)
+        public static IMvcBuilder AddControllersWithMediatR(
+            this IServiceCollection services,
+            Action<MvcOptions> configureOptions = null,
+            Action<JsonOptions> jsonOptions = null)
         {
             services.ConfigureOptions<MultipleModelBinderSetup>();
             services.Configure<ApiBehaviorOptions>(options =>
@@ -50,6 +54,7 @@ namespace Gems.Mvc
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+                    jsonOptions?.Invoke(options);
                 })
                 .ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider()));
         }
