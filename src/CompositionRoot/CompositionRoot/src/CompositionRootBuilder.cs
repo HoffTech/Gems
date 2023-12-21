@@ -69,16 +69,10 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
     {
         var hideEndpointStartWith = this.configuration.GetValue<string>("HideEndpointStartWith");
         var jsonDefaultIgnoreConditions = this.configuration.GetValue<string>("JsonOptions:DefaultIgnoreConditions");
-        var addStringEnumConverter = this.configuration.GetValue<bool>("JsonOptions:AddStringEnumConverter");
         this.services.AddControllersWithMediatR(
             options => options.RegisterControllersFromAssemblyContaining<TFromAssemblyContaining>(hideEndpointStartWith),
             jsonOptions =>
             {
-                if (addStringEnumConverter)
-                {
-                    jsonOptions.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                }
-
                 jsonOptions.JsonSerializerOptions.DefaultIgnoreCondition =
                     Enum.TryParse<JsonIgnoreCondition>(jsonDefaultIgnoreConditions, out var condition)
                         ? condition
