@@ -69,9 +69,9 @@ namespace Gems.Swagger
                     }
                 }
 
-                if (swaggerOptions?.EnableSimpleTokenAuthorization ?? false)
+                if (swaggerOptions?.EnableApiKeyAuthorization ?? false)
                 {
-                    AddSimpleTokenAuthorization(options);
+                    EnableApiKeyAuthorization(options);
                     return;
                 }
 
@@ -93,17 +93,15 @@ namespace Gems.Swagger
             });
         }
 
-        private static void AddSimpleTokenAuthorization(SwaggerGenOptions options)
+        private static void EnableApiKeyAuthorization(SwaggerGenOptions options)
         {
-            // i know it seems awful for now
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
                 Description = "Please enter token value",
                 Name = "token",
                 Type = SecuritySchemeType.ApiKey,
-                BearerFormat = "JWT",
-                Scheme = "bearer"
+                Scheme = "Bearer"
             });
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {

@@ -14,7 +14,7 @@ namespace Gems.Swagger.Options
         /// </summary>
         public const string Swagger = "Swagger";
 
-        public bool EnableSimpleTokenAuthorization { get; set; }
+        public bool EnableApiKeyAuthorization { get; set; }
 
         public bool EnableImplicitFlow { get; set; }
 
