@@ -4,6 +4,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -31,12 +32,12 @@ namespace Gems.Mvc
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <param name="configureOptions">An <see cref="Action{MvcOptions}"/> to configure the provided <see cref="MvcOptions"/>.</param>
-        /// <param name="jsonOptions">An <see cref="Action{jsonOptions}"/> to configure the provided <see cref="JsonOptions"/>.</param>
+        /// <param name="configuration">An <see cref="Action{configuration}"/> to configure the provided <see cref="IConfiguration"/>.</param>
         /// <returns>An <see cref="IMvcBuilder"/> that can be used to further configure the MVC services.</returns>
         public static IMvcBuilder AddControllersWithMediatR(
             this IServiceCollection services,
             Action<MvcOptions> configureOptions = null,
-            Action<JsonOptions> jsonOptions = null)
+            IConfiguration configuration = null)
         {
             services.ConfigureOptions<MultipleModelBinderSetup>();
             services.Configure<ApiBehaviorOptions>(options =>
@@ -54,7 +55,11 @@ namespace Gems.Mvc
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
-                    jsonOptions?.Invoke(options);
+                    var jsonDefaultIgnoreConditions = configuration?.GetValue<string>("JsonOptions:DefaultIgnoreConditions");
+                    options.JsonSerializerOptions.DefaultIgnoreCondition =
+                            Enum.TryParse<JsonIgnoreCondition>(jsonDefaultIgnoreConditions, out var condition)
+                                ? condition
+                                : JsonIgnoreCondition.Never;
                 })
                 .ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider()));
         }
