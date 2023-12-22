@@ -69,7 +69,7 @@ namespace Gems.Patterns.SyncTables.MergeProcessor
 
             if (mergeInfo.NeedConvertDateTimeToUtc)
             {
-                externalEntities.ForEach(DateTimeUtils.SetUnspecifiedToUtcDateTime);
+                DateTimeUtils.SetUnspecifiedToUtcDateTimeEnumerable(externalEntities);
             }
 
             mergeInfo.ExternalEntities = externalEntities.Cast<ExternalChangeTrackingEntity>().ToList();
