@@ -14,18 +14,21 @@ namespace Gems.Utils
         public static void SetUnspecifiedToUtcDateTimeEnumerable<TModel>(IEnumerable<TModel> data)
             where TModel : class
         {
-            var dateTimeProerties = typeof(TModel).GetProperties()
+            var dateTimeProperties = typeof(TModel).GetProperties()
                 .Where(p => Attribute.IsDefined(p, typeof(UnspecifiedToUtcDateTimeAttribute)))
                 .ToArray();
 
             foreach (var model in data)
             {
-                foreach (var propertyInfo in dateTimeProerties)
+                foreach (var propertyInfo in dateTimeProperties)
                 {
                     if (propertyInfo.PropertyType == typeof(DateTime))
                     {
                         var dateTimeValue = propertyInfo.GetValue(model, null);
-                        propertyInfo.SetValue(model, ConvertToUtc((DateTime)dateTimeValue), null);
+                        if (dateTimeValue != null)
+                        {
+                            propertyInfo.SetValue(model, ConvertToUtc((DateTime)dateTimeValue), null);
+                        }
                     }
                     else if (propertyInfo.PropertyType == typeof(DateTime?))
                     {
