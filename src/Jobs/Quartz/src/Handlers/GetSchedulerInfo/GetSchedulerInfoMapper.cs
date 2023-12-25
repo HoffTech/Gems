@@ -3,7 +3,7 @@
 
 using AutoMapper;
 
-using Gems.Jobs.Quartz.Handlers.GetListOfJobs.Dto;
+using Gems.Jobs.Quartz.Handlers.GetSchedulerInfo.Dto;
 
 namespace Gems.Jobs.Quartz.Handlers.GetSchedulerInfo;
 

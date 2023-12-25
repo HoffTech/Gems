@@ -9,6 +9,7 @@ using System.Threading;
 using Gems.Jobs.Quartz.Configuration;
 using Gems.Jobs.Quartz.Handlers.FireJobImmediately;
 using Gems.Jobs.Quartz.Handlers.Shared;
+using Gems.Jobs.Quartz.Handlers.Shared.JobsInfoProvider;
 using Gems.Mvc.GenericControllers;
 
 using Microsoft.AspNetCore.Builder;
@@ -37,6 +38,8 @@ namespace Gems.Jobs.Quartz
         public static void AddQuartzWithJobs(this IServiceCollection services, IConfiguration configuration, Action<JobsOptions> configureOptions = null)
         {
             services.AddSingleton<SchedulerProvider>();
+            services.AddSingleton<JobsInfoProvider>();
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             services.Configure<JobsOptions>(configuration.GetSection(JobsOptions.Jobs));
             var jobsOptions = configuration.GetSection(JobsOptions.Jobs).Get<JobsOptions>();
