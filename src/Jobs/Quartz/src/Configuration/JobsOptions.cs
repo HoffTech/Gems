@@ -34,6 +34,11 @@ namespace Gems.Jobs.Quartz.Configuration
         public Dictionary<string, object> Triggers { get; set; }
 
         /// <summary>
+        /// Dictionary of triggers options, where key is trigger's name and value is list of trigger options.
+        /// </summary>
+        public Dictionary<string, List<TriggerOptions>> TriggersOptions { get; set; }
+
+        /// <summary>
         /// Префикс именования таблиц jobStore.
         /// </summary>
         public string TablePrefix { get; set; }

@@ -9,7 +9,6 @@ using Quartz;
 
 namespace Gems.Jobs.Quartz.Jobs.JobWithData;
 
-[DisallowConcurrentExecution]
 public sealed class ConcurrentQuartzJobWithData<TCommand> : QuartzJobWithDataBase<TCommand> where TCommand : class, IRequest, new()
 {
     public ConcurrentQuartzJobWithData(

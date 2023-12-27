@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Context\Context\src\Gems.Context.csproj" />
     <ProjectReference Include="..\..\..\Mvc\Mvc\src\Gems.Mvc.csproj" />
     <ProjectReference Include="..\..\Jobs\src\Gems.Jobs.csproj" />
   </ItemGroup>

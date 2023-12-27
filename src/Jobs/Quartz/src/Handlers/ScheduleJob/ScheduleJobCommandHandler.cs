@@ -11,7 +11,9 @@ using Gems.Jobs.Quartz.Configuration;
 using Gems.Jobs.Quartz.Consts;
 using Gems.Jobs.Quartz.Handlers.Consts;
 using Gems.Jobs.Quartz.Handlers.Shared;
+using Gems.Jobs.Quartz.Jobs.JobWithData;
 using Gems.Mvc.GenericControllers;
+using Gems.Text.Json;
 
 using MediatR;
 
@@ -49,52 +51,43 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
             }
 
             string cronExpression = null;
-            Dictionary<string, object> triggerDataDict = null;
-            if (!string.IsNullOrEmpty(request.CronExpression))
+            if (this.options.Value.TriggersOptions != null)
             {
-                cronExpression = request.CronExpression;
-            }
-            else
-            {
-                var triggerData = this.options.Value.Triggers
-                    .Where(r => r.Key == request.JobName)
-                    .Select(r => r.Value)
-                    .First();
-
-                if (triggerData is string triggerCronExpression)
+                foreach (var triggerOption in this.options.Value.TriggersOptions.Where(triggerOption => this.options.Value.Triggers.ContainsKey(triggerOption.Key)))
                 {
-                    cronExpression = triggerCronExpression;
+                    this.options.Value.Triggers[triggerOption.Key] = triggerOption.Value;
+                }
+            }
+
+            var triggerDataOptions = this.options.Value.Triggers
+                .Where(r => r.Key == request.JobName)
+                .Select(r => r.Value)
+                .First();
+            var triggersData = await TriggerRegister.GetTriggerData(triggerDataOptions).ConfigureAwait(false);
+            foreach (var triggerOptions in triggersData)
+            {
+                if (!string.IsNullOrEmpty(request.CronExpression))
+                {
+                    cronExpression = request.CronExpression;
                 }
 
-                if (triggerData is TriggerOptions { Type: TriggerDataType.JobDataType } triggerOptions)
+                if (!string.IsNullOrEmpty(triggerOptions.CronExpression))
                 {
                     cronExpression = triggerOptions.CronExpression;
-                    triggerDataDict = triggerOptions.JobData;
                 }
 
-                if (triggerData is TriggerOptions { Type: TriggerDataType.DataBaseType } triggerDbOptions && Type.GetType(triggerDbOptions.ProviderType)?.GetInterface(nameof(ITriggerDataProvider)) != null)
+                var newTrigger = new CronTriggerImpl(
+                    request.JobName,
+                    request.JobGroup ?? JobGroups.DefaultGroup,
+                    request.JobName,
+                    request.JobGroup ?? JobGroups.DefaultGroup,
+                    cronExpression);
+
+                if (triggerOptions.TriggerData != null)
                 {
-                    cronExpression = await (Type.GetType(triggerDbOptions.ProviderType) as ITriggerDataProvider).GetCronExpression().ConfigureAwait(false);
-                    triggerDataDict = await (Type.GetType(triggerDbOptions.ProviderType) as ITriggerDataProvider).GetJobData().ConfigureAwait(false);
+                    newTrigger.JobDataMap = new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggerOptions.TriggerData.Serialize() };
                 }
-            }
 
-            var newTrigger = new CronTriggerImpl(
-                request.JobName,
-                request.JobGroup ?? JobGroups.DefaultGroup,
-                request.JobName,
-                request.JobGroup ?? JobGroups.DefaultGroup,
-                cronExpression);
-
-            if (triggerDataDict != null)
-            {
-                var jobDetail = JobBuilder.Create()
-                    .UsingJobData(new JobDataMap((IDictionary<string, object>)triggerDataDict))
-                    .Build();
-                await scheduler.ScheduleJob(jobDetail, newTrigger, cancellationToken).ConfigureAwait(false);
-            }
-            else
-            {
                 await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
             }
         }

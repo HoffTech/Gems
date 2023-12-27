@@ -9,11 +9,13 @@ namespace Gems.Jobs.Quartz.Configuration;
 
 public class TriggerOptions
 {
-    public string Type { get; set; } = TriggerDataType.JobDataType;
+    public string TriggerName { get; set; }
+
+    public string Type { get; set; } = TriggerDataType.ConfigType;
 
     public string CronExpression { get; set; }
 
-    public Dictionary<string, object> JobData { get; set; }
+    public Dictionary<string, object> TriggerData { get; set; }
 
     public string ProviderType { get; set; }
 }

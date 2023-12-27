@@ -5,7 +5,7 @@ namespace Gems.Jobs.Quartz.Consts;
 
 public class TriggerDataType
 {
-    public const string JobDataType = "JobData";
+    public const string ConfigType = "Config";
 
     public const string DataBaseType = "DataBase";
 }

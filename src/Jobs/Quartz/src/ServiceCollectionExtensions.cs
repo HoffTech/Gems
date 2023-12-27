@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -10,12 +11,15 @@ using Gems.Jobs.Quartz.Configuration;
 using Gems.Jobs.Quartz.Consts;
 using Gems.Jobs.Quartz.Handlers.FireJobImmediately;
 using Gems.Jobs.Quartz.Handlers.Shared;
+using Gems.Jobs.Quartz.Jobs.JobWithData;
 using Gems.Mvc.GenericControllers;
+using Gems.Text.Json;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 using Quartz;
 using Quartz.Impl;
@@ -50,6 +54,14 @@ namespace Gems.Jobs.Quartz
             if (jobsOptions.Triggers == null || jobsOptions.Triggers.Count == 0 || (jobsOptions.Type != QuartzDbType.InMemory && string.IsNullOrWhiteSpace(jobsOptions.ConnectionString)))
             {
                 return;
+            }
+
+            if (jobsOptions.TriggersOptions != null)
+            {
+                foreach (var triggerOption in jobsOptions.TriggersOptions.Where(triggerOption => jobsOptions.Triggers.ContainsKey(triggerOption.Key)))
+                {
+                    jobsOptions.Triggers[triggerOption.Key] = triggerOption.Value;
+                }
             }
 
             services.AddQuartz(q =>
@@ -124,47 +136,11 @@ namespace Gems.Jobs.Quartz
 
                 foreach (var (jobType, jobName) in JobRegister.JobNameByJobTypeMap)
                 {
-                    string cronExpression = null;
-                    var triggerData = jobsOptions.Triggers.GetValueOrDefault(jobName);
-                    if (triggerData is string triggerCronExpr)
-                    {
-                        cronExpression = triggerCronExpr;
-                    }
-
-                    Dictionary<string, object> triggerDataDict = null;
-                    if (triggerData is TriggerOptions { Type: TriggerDataType.JobDataType } triggerOptions)
-                    {
-                        cronExpression = triggerOptions.CronExpression;
-                        triggerDataDict = triggerOptions.JobData;
-                    }
-
-                    if (triggerData is TriggerOptions { Type: TriggerDataType.DataBaseType } triggerDbOptions && Type.GetType(triggerDbOptions.ProviderType)?.GetInterface(nameof(ITriggerDataProvider)) != null)
-                    {
-                        cronExpression = (Type.GetType(triggerDbOptions.ProviderType) as ITriggerDataProvider).GetCronExpression().Result;
-                        triggerDataDict = (Type.GetType(triggerDbOptions.ProviderType) as ITriggerDataProvider).GetJobData().Result;
-                    }
-
                     var jobKey = new JobKey(jobName);
-
                     q.AddJob(jobType, jobKey, c =>
                     {
                         c.StoreDurably();
-                        if (triggerDataDict != null)
-                        {
-                            c.UsingJobData(new JobDataMap((IDictionary<string, object>)triggerDataDict));
-                        }
-                    });
-
-                    q.AddTrigger(tConf =>
-                    {
-                        var configuredTrigger = tConf
-                            .ForJob(jobKey)
-                            .WithIdentity(jobName)
-                            .WithDescription(jobName);
-                        if (!string.IsNullOrWhiteSpace(cronExpression))
-                        {
-                            configuredTrigger.WithCronSchedule(cronExpression);
-                        }
+                        c.DisallowConcurrentExecution();
                     });
                 }
             });
@@ -178,6 +154,7 @@ namespace Gems.Jobs.Quartz
 
             services.AddHostedService<JobRecoveryHostedService>();
             services.AddHostedService<BlockedJobsRecoveryHostedService>();
+            services.AddHostedService<JobTriggerRegisterHostedService>();
         }
 
         public static IApplicationBuilder UseQuartzAdminUI(this IApplicationBuilder app, IConfiguration configuration)

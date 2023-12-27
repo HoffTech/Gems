@@ -10,5 +10,5 @@ public interface ITriggerDataProvider
 {
    Task<string> GetCronExpression();
 
-   Task<Dictionary<string, object>> GetJobData();
+   Task<Dictionary<string, object>> GetTriggerData();
 }
