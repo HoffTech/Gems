@@ -23,7 +23,11 @@ namespace Gems.Logging.Mvc.Behaviors
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-            using (this.logger.BeginScope(new[] { new KeyValuePair<string, object>("Scope", request.GetScopeId()) }))
+            using (this.logger.BeginScope(
+                       new[]
+                       {
+                           new KeyValuePair<string, object>("Scope", request.GetScopeId() ?? typeof(TRequest).Name)
+                       }))
             {
                 return await next().ConfigureAwait(false);
             }

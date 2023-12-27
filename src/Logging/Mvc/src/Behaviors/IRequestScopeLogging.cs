@@ -4,6 +4,9 @@ namespace Gems.Logging.Mvc.Behaviors
 {
     public interface IRequestScopeLogging
     {
-        string GetScopeId();
+        string GetScopeId()
+        {
+            return null;
+        }
     }
 }
