@@ -69,6 +69,12 @@ namespace Gems.Swagger
                     }
                 }
 
+                if (swaggerOptions?.EnableApiKeyAuthorization ?? false)
+                {
+                    EnableApiKeyAuthorization(options);
+                    return;
+                }
+
                 if ((!(swaggerOptions?.EnableImplicitFlow ?? false)) &&
                     (!(swaggerOptions?.EnablePasswordFlow ?? false)))
                 {
@@ -84,6 +90,32 @@ namespace Gems.Swagger
                 AddOAuthFlows(configuration, swaggerOptions, adOptions, options);
 
                 options.OperationFilter<AuthorizeCheckOperationFilter>();
+            });
+        }
+
+        private static void EnableApiKeyAuthorization(SwaggerGenOptions options)
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please enter token value",
+                Name = "token",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new List<string>()
+                }
             });
         }
 

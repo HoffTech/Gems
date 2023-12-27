@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -25,7 +26,7 @@ namespace Gems.Data.UnitOfWork
     {
         public const string DefaultKey = "default";
 
-        private static readonly ConcurrentDictionary<string, Assembly> ScannedAssemblies = new ConcurrentDictionary<string, Assembly>();
+        private static readonly ConcurrentDictionary<string, ConcurrentBag<Assembly>> ScannedAssemblies = new ConcurrentDictionary<string, ConcurrentBag<Assembly>>();
 
         public string ConnectionString { get; set; }
 
@@ -62,16 +63,16 @@ namespace Gems.Data.UnitOfWork
                 return;
             }
 
+            var assemblies = ScannedAssemblies.GetOrAdd(this.Key, new ConcurrentBag<Assembly>());
+
             var targetAssembly = typeof(T).Assembly;
-            if (ScannedAssemblies.TryGetValue(this.Key, out var assembly) && assembly == targetAssembly)
+            if (assemblies.Any(x => x == targetAssembly))
             {
                 return;
             }
 
-            if (ScannedAssemblies.TryAdd(this.Key, targetAssembly))
-            {
-                this.RegisterMappersInternal?.Invoke(targetAssembly);
-            }
+            this.RegisterMappersInternal?.Invoke(targetAssembly);
+            assemblies.Add(targetAssembly);
         }
 
         public void RegisterMapper<T>()

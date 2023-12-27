@@ -67,7 +67,9 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
     private void AddControllersWithMediatR()
     {
         var hideEndpointStartWith = this.configuration.GetValue<string>("HideEndpointStartWith");
-        this.services.AddControllersWithMediatR(options => options.RegisterControllersFromAssemblyContaining<TFromAssemblyContaining>(hideEndpointStartWith));
+        this.services.AddControllersWithMediatR(
+            options => options.RegisterControllersFromAssemblyContaining<TFromAssemblyContaining>(hideEndpointStartWith),
+            this.configuration);
     }
 
     private void AddPrometheus()
@@ -98,6 +100,7 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
     private void AddPipelines()
     {
         this.services.AddHttpContextAccessor(); // для EndpointLoggingBehavior.
+        this.services.AddPipeline(typeof(ScopeLoggingBehavior<,>));
         this.services.AddPipeline(typeof(EndpointLoggingBehavior<,>));
         this.services.AddPipeline(typeof(NotFoundBehavior<,>));
         this.services.AddPipeline(typeof(ExceptionBehavior<,>));
