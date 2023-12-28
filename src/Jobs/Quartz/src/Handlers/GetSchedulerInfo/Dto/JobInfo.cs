@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 using Quartz;
 
-namespace Gems.Jobs.Quartz.Handlers.GetListOfJobs.Dto;
+namespace Gems.Jobs.Quartz.Handlers.GetSchedulerInfo.Dto;
 
 public class JobInfo
 {

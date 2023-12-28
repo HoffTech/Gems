@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Gems.Jobs.Quartz.Handlers.GetListOfJobs.Dto;
+using Gems.Jobs.Quartz.Handlers.GetSchedulerInfo.Dto;
 using Gems.Jobs.Quartz.Handlers.Shared;
 using Gems.Mvc.GenericControllers;
 
@@ -14,19 +14,19 @@ using MediatR;
 using Quartz;
 using Quartz.Impl.Matchers;
 
-namespace Gems.Jobs.Quartz.Handlers.GetListOfJobs;
+namespace Gems.Jobs.Quartz.Handlers.GetSchedulerInfo;
 
 [Endpoint("jobs/list", "GET", OperationGroup = "jobs", Summary = "Получить список заданий с триггерами")]
-public class GetListOfJobsCommandHandler : IRequestHandler<GetListOfJobsCommand, List<JobInfo>>
+public class GetSchedulerInfoQueryHandler : IRequestHandler<GetSchedulerInfoQuery, SchedulerInfo>
 {
     private readonly SchedulerProvider schedulerProvider;
 
-    public GetListOfJobsCommandHandler(SchedulerProvider schedulerProvider)
+    public GetSchedulerInfoQueryHandler(SchedulerProvider schedulerProvider)
     {
         this.schedulerProvider = schedulerProvider;
     }
 
-    public async Task<List<JobInfo>> Handle(GetListOfJobsCommand request, CancellationToken cancellationToken)
+    public async Task<SchedulerInfo> Handle(GetSchedulerInfoQuery request, CancellationToken cancellationToken)
     {
         var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
         var jobKeys = await scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup(), cancellationToken).ConfigureAwait(false);
@@ -57,6 +57,11 @@ public class GetListOfJobsCommandHandler : IRequestHandler<GetListOfJobsCommand,
             jobsInfo.Add(jobInfo);
         }
 
-        return jobsInfo;
+        return new SchedulerInfo
+        {
+            SchedulerName = scheduler.SchedulerName,
+            SchedulerInstanceId = scheduler.SchedulerInstanceId,
+            EnqueuedJobList = jobsInfo
+        };
     }
 }
