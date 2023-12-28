@@ -21,7 +21,7 @@ namespace Gems.Metrics.Prometheus
 
         public PrometheusThirdParty.IGauge CreateGauge(MetricInfo metricInfo)
         {
-            var caugeConfiguration = this.GetCaugeConfiguration(metricInfo);
+            var caugeConfiguration = this.GetGaugeConfiguration(metricInfo);
             var metric = PrometheusThirdParty.Metrics.CreateGauge(metricInfo.Name, metricInfo.Description, caugeConfiguration);
             if (metricInfo.LabelValues.Length == 0)
             {
@@ -141,76 +141,83 @@ namespace Gems.Metrics.Prometheus
             return this.CreateHistogram(metricInfo);
         }
 
-        private PrometheusThirdParty.GaugeConfiguration GetCaugeConfiguration(MetricInfo metricInfo)
+        private PrometheusThirdParty.GaugeConfiguration GetGaugeConfiguration(MetricInfo metricInfo)
         {
-            PrometheusThirdParty.GaugeConfiguration caugeConfiguration;
-            if (this.configuration != null && this.configuration.GaugeConfiguration.TryGetValue(metricInfo.Name, out var config))
+            PrometheusThirdParty.GaugeConfiguration gaugeConfiguration;
+            if (this.configuration.GaugeConfiguration != null
+                && this.configuration.GaugeConfiguration.TryGetValue(metricInfo.Name, out var config))
             {
-                caugeConfiguration = new PrometheusThirdParty.GaugeConfiguration
+                gaugeConfiguration = new PrometheusThirdParty.GaugeConfiguration
                 {
                     LabelNames = config.LabelNames,
-                    StaticLabels = config.StaticLabels
+                    StaticLabels = config.StaticLabels,
+                    SuppressInitialValue = config.SuppressInitialValue
                 };
             }
             else
             {
-                caugeConfiguration = new PrometheusThirdParty.GaugeConfiguration();
+                gaugeConfiguration = new PrometheusThirdParty.GaugeConfiguration();
             }
 
             if (metricInfo.LabelNames.Length > 0)
             {
-                caugeConfiguration.LabelNames = metricInfo.LabelNames;
+                gaugeConfiguration.LabelNames = metricInfo.LabelNames;
             }
 
-            return caugeConfiguration;
+            return gaugeConfiguration;
         }
 
         private PrometheusThirdParty.CounterConfiguration GetCounterConfiguration(MetricInfo metricInfo)
         {
-            PrometheusThirdParty.CounterConfiguration caugeConfiguration;
-            if (this.configuration != null && this.configuration.CounterConfiguration.TryGetValue(metricInfo.Name, out var config))
+            PrometheusThirdParty.CounterConfiguration counterConfiguration;
+            if (this.configuration?.CounterConfiguration != null
+                && this.configuration.CounterConfiguration.TryGetValue(metricInfo.Name, out var config))
             {
-                caugeConfiguration = new PrometheusThirdParty.CounterConfiguration
+                counterConfiguration = new PrometheusThirdParty.CounterConfiguration
                 {
                     LabelNames = config.LabelNames,
-                    StaticLabels = config.StaticLabels
+                    StaticLabels = config.StaticLabels,
+                    SuppressInitialValue = config.SuppressInitialValue
                 };
             }
             else
             {
-                caugeConfiguration = new PrometheusThirdParty.CounterConfiguration();
+                counterConfiguration = new PrometheusThirdParty.CounterConfiguration();
             }
 
             if (metricInfo.LabelNames.Length > 0)
             {
-                caugeConfiguration.LabelNames = metricInfo.LabelNames;
+                counterConfiguration.LabelNames = metricInfo.LabelNames;
             }
 
-            return caugeConfiguration;
+            return counterConfiguration;
         }
 
         private PrometheusThirdParty.HistogramConfiguration GetHistogramConfiguration(MetricInfo metricInfo)
         {
-            PrometheusThirdParty.HistogramConfiguration caugeConfiguration;
-            if (this.configuration != null && this.configuration.CounterConfiguration.TryGetValue(metricInfo.Name, out var config))
+            PrometheusThirdParty.HistogramConfiguration histogramConfiguration;
+            if (this.configuration?.HistogramConfiguration != null
+                && this.configuration.HistogramConfiguration.TryGetValue(metricInfo.Name, out var config))
             {
-                caugeConfiguration = new PrometheusThirdParty.HistogramConfiguration
+                histogramConfiguration = new PrometheusThirdParty.HistogramConfiguration
                 {
                     LabelNames = config.LabelNames,
-                    StaticLabels = config.StaticLabels
+                    StaticLabels = config.StaticLabels,
+                    SuppressInitialValue = config.SuppressInitialValue,
+                    Buckets = config.Buckets
                 };
             }
             else
             {
-                caugeConfiguration = new PrometheusThirdParty.HistogramConfiguration();
+                histogramConfiguration = new PrometheusThirdParty.HistogramConfiguration();
             }
 
             if (metricInfo.LabelNames.Length > 0)
             {
-                caugeConfiguration.LabelNames = metricInfo.LabelNames;
+                histogramConfiguration.LabelNames = metricInfo.LabelNames;
             }
 
-            return caugeConfiguration;
+            return histogramConfiguration;
         }
     }
 }
