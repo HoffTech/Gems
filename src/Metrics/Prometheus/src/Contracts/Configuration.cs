@@ -13,7 +13,7 @@ namespace Gems.Metrics.Prometheus.Contracts
         /// <summary>
         /// Gets or sets конфигурацию для Гистограммы.
         /// </summary>
-        public Dictionary<string, MetricConfiguration> HistogramConfiguration { get; set; }
+        public Dictionary<string, HistogramConfiguration> HistogramConfiguration { get; set; }
 
         /// <summary>
         /// Gets or sets конфигурации для Измерений.
