@@ -105,6 +105,10 @@ public class JobTriggerFromDbRegisterHostedService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// Метод для удаления триггеров из базы, которые отсутствуют в конфигурации.
+    /// Триггеры ищутся по имени джоба, к которому они привязаны.
+    /// </summary>
     private async Task UnscheduleJobs(CancellationToken cancellationToken)
     {
         var jobsOptions = this.configuration.GetSection(JobsOptions.Jobs).Get<JobsOptions>();
