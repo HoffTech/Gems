@@ -31,12 +31,17 @@ namespace Gems.Jobs.Quartz.Configuration
         /// <summary>
         /// Dictionary of triggers, where key is trigger's name and value is trigger's cron expression.
         /// </summary>
-        public Dictionary<string, object> Triggers { get; set; }
+        public Dictionary<string, string> Triggers { get; set; }
 
         /// <summary>
-        /// Dictionary of triggers options, where key is trigger's name and value is list of trigger options.
+        /// Dictionary of triggers options, where key is trigger's name and value is list of trigger data.
         /// </summary>
-        public Dictionary<string, List<TriggerOptions>> TriggersOptions { get; set; }
+        public Dictionary<string, List<TriggersWithDataOptions>> TriggersWithData { get; set; }
+
+        /// <summary>
+        /// Dictionary of triggers options, where key is trigger's name and value is list of triggers from db options.
+        /// </summary>
+        public Dictionary<string, List<TriggersFromDbOptions>> TriggersFromDb { get; set; }
 
         /// <summary>
         /// Префикс именования таблиц jobStore.

@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Gems.Jobs.Quartz.Configuration;
-using Gems.Jobs.Quartz.Consts;
 using Gems.Jobs.Quartz.Handlers.Consts;
 using Gems.Jobs.Quartz.Handlers.Shared;
 using Gems.Jobs.Quartz.Jobs.JobWithData;
@@ -50,46 +49,77 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
                 throw new InvalidOperationException($"Такое задание уже зарегистрировано {request.JobGroup ?? JobGroups.DefaultGroup}.{request.JobName}");
             }
 
-            string cronExpression = null;
-            if (this.options.Value.TriggersOptions != null)
+            if (this.options.Value.Triggers.ContainsKey(request.JobName))
             {
-                foreach (var triggerOption in this.options.Value.TriggersOptions.Where(triggerOption => this.options.Value.Triggers.ContainsKey(triggerOption.Key)))
-                {
-                    this.options.Value.Triggers[triggerOption.Key] = triggerOption.Value;
-                }
-            }
+                var cronExpression = this.options.Value.Triggers
+                    .Where(r => r.Key == request.JobName)
+                    .Select(r => r.Value)
+                    .First();
 
-            var triggerDataOptions = this.options.Value.Triggers
-                .Where(r => r.Key == request.JobName)
-                .Select(r => r.Value)
-                .First();
-            var triggersData = await TriggerRegister.GetTriggerData(triggerDataOptions).ConfigureAwait(false);
-            foreach (var triggerOptions in triggersData)
-            {
-                if (!string.IsNullOrEmpty(request.CronExpression))
-                {
-                    cronExpression = request.CronExpression;
-                }
-
-                if (!string.IsNullOrEmpty(triggerOptions.CronExpression))
-                {
-                    cronExpression = triggerOptions.CronExpression;
-                }
-
-                var newTrigger = new CronTriggerImpl(
+                var newTrigger = CreateCronTrigger(
                     request.JobName,
                     request.JobGroup ?? JobGroups.DefaultGroup,
                     request.JobName,
                     request.JobGroup ?? JobGroups.DefaultGroup,
-                    cronExpression);
-
-                if (triggerOptions.TriggerData != null)
-                {
-                    newTrigger.JobDataMap = new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggerOptions.TriggerData.Serialize() };
-                }
+                    cronExpression ?? request.CronExpression,
+                    null);
 
                 await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
+                return;
             }
+
+            if (this.options.Value.TriggersWithData.ContainsKey(request.JobName))
+            {
+                foreach (var newTrigger in this.options.Value.TriggersWithData.GetValueOrDefault(request.JobName)
+                             .Select(
+                                 triggerWithData => CreateCronTrigger(
+                                     triggerWithData.TriggerName ?? request.JobName,
+                                     request.JobGroup ?? JobGroups.DefaultGroup,
+                                     request.JobName,
+                                     request.JobGroup ?? JobGroups.DefaultGroup,
+                                     triggerWithData.CronExpression ?? request.CronExpression,
+                                     triggerWithData.TriggerData)))
+                {
+                    await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
+                }
+
+                return;
+            }
+
+            if (this.options.Value.TriggersFromDb.ContainsKey(request.JobName))
+            {
+                foreach (var triggerFromDb in this.options.Value.TriggersFromDb.GetValueOrDefault(request.JobName).Where(t => Type.GetType(t.ProviderType)?.GetInterface(nameof(ITriggerDataProvider)) != null))
+                {
+                    var cronExpression = await (Type.GetType(triggerFromDb.ProviderType) as ITriggerDataProvider).GetCronExpression().ConfigureAwait(false);
+                    var triggerDataDict = await (Type.GetType(triggerFromDb.ProviderType) as ITriggerDataProvider).GetTriggerData().ConfigureAwait(false);
+                    var newTrigger = CreateCronTrigger(
+                        triggerFromDb.TriggerName ?? request.JobName,
+                        request.JobGroup ?? JobGroups.DefaultGroup,
+                        request.JobName,
+                        request.JobGroup ?? JobGroups.DefaultGroup,
+                        cronExpression ?? request.CronExpression,
+                        triggerDataDict);
+
+                    await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
+                }
+            }
+        }
+
+        private static CronTriggerImpl CreateCronTrigger(
+            string triggerName,
+            string triggerGroup,
+            string jobName,
+            string jobGroup,
+            string cronExp,
+            Dictionary<string, object> triggerData)
+        {
+            var newTrigger = new CronTriggerImpl(triggerName, triggerGroup, jobName, jobGroup, cronExp);
+            if (triggerData != null && triggerData.Any())
+            {
+                newTrigger.JobDataMap = new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggerData.Serialize() };
+            }
+
+            return newTrigger;
         }
     }
 }

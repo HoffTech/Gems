@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Gems.Jobs.Quartz.Configuration;
-using Gems.Jobs.Quartz.Consts;
 using Gems.Jobs.Quartz.Handlers.Consts;
 using Gems.Jobs.Quartz.Handlers.Shared;
 using Gems.Jobs.Quartz.Jobs.JobWithData;
@@ -22,13 +21,13 @@ using Quartz.Impl.Triggers;
 
 namespace Gems.Jobs.Quartz;
 
-public class JobTriggerRegisterHostedService : BackgroundService
+public class JobTriggerFromDbRegisterHostedService : BackgroundService
 {
     private readonly SchedulerProvider schedulerProvider;
     private readonly IHostApplicationLifetime hostApplicationLifetime;
     private readonly IConfiguration configuration;
 
-    public JobTriggerRegisterHostedService(
+    public JobTriggerFromDbRegisterHostedService(
         SchedulerProvider schedulerProvider,
         IHostApplicationLifetime hostApplicationLifetime,
         IConfiguration configuration)
@@ -68,22 +67,21 @@ public class JobTriggerRegisterHostedService : BackgroundService
         await this.UnscheduleJobs(cancellationToken).ConfigureAwait(false);
         var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
         var jobsOptions = configuration.GetSection(JobsOptions.Jobs).Get<JobsOptions>();
-        if (jobsOptions.TriggersOptions != null)
-        {
-            foreach (var triggerOption in jobsOptions.TriggersOptions.Where(triggerOption => jobsOptions.Triggers.ContainsKey(triggerOption.Key)))
-            {
-                jobsOptions.Triggers[triggerOption.Key] = triggerOption.Value;
-            }
-        }
 
         foreach (var (jobType, jobName) in JobRegister.JobNameByJobTypeMap)
         {
-            var triggersOptions = await TriggerRegister.GetTriggerData(jobsOptions.Triggers.GetValueOrDefault(jobName)).ConfigureAwait(false);
-            foreach (var triggersOption in triggersOptions)
+            if (jobsOptions.TriggersFromDb == null || !jobsOptions.TriggersFromDb.ContainsKey(jobName))
             {
+                continue;
+            }
+
+            foreach (var triggerFromDb in jobsOptions.TriggersFromDb.GetValueOrDefault(jobName).Where(t => Type.GetType(t.ProviderType)?.GetInterface(nameof(ITriggerDataProvider)) != null))
+            {
+                var cronExpression = await (Type.GetType(triggerFromDb.ProviderType) as ITriggerDataProvider).GetCronExpression().ConfigureAwait(false);
+                var triggerDataDict = await (Type.GetType(triggerFromDb.ProviderType) as ITriggerDataProvider).GetTriggerData().ConfigureAwait(false);
                 var jobKey = new JobKey(jobName);
                 var newTrigger = new CronTriggerImpl(
-                                     triggersOption.TriggerName ?? jobName,
+                                     triggerFromDb.TriggerName ?? jobName,
                                      JobGroups.DefaultGroup,
                                      jobName,
                                      JobGroups.DefaultGroup)
@@ -92,14 +90,14 @@ public class JobTriggerRegisterHostedService : BackgroundService
                     Description = jobName
                 };
 
-                if (!string.IsNullOrEmpty(triggersOption.CronExpression))
+                if (!string.IsNullOrEmpty(cronExpression))
                 {
-                    newTrigger.CronExpressionString = triggersOption.CronExpression;
+                    newTrigger.CronExpressionString = cronExpression;
                 }
 
-                if (triggersOption.TriggerData != null)
+                if (triggerDataDict != null && triggerDataDict.Any())
                 {
-                    newTrigger.JobDataMap = new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggersOption.TriggerData.Serialize() };
+                    newTrigger.JobDataMap = new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggerDataDict.Serialize() };
                 }
 
                 await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
@@ -109,15 +107,38 @@ public class JobTriggerRegisterHostedService : BackgroundService
 
     private async Task UnscheduleJobs(CancellationToken cancellationToken)
     {
+        var jobsOptions = this.configuration.GetSection(JobsOptions.Jobs).Get<JobsOptions>();
+        var triggersFromConfig = new List<string>();
+        if (jobsOptions.Triggers != null)
+        {
+            triggersFromConfig.AddRange(jobsOptions.Triggers.Select(t => t.Key));
+        }
+
+        if (jobsOptions.TriggersWithData != null)
+        {
+            foreach (var triggerWithData in jobsOptions.TriggersWithData.Values)
+            {
+                triggersFromConfig.AddRange(triggerWithData.Select(t => t.TriggerName));
+            }
+        }
+
+        if (jobsOptions.TriggersFromDb != null)
+        {
+            foreach (var triggerWithData in jobsOptions.TriggersFromDb.Values)
+            {
+                triggersFromConfig.AddRange(triggerWithData.Select(t => t.TriggerName));
+            }
+        }
+
         var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
-        var jobTriggersList = new List<ITrigger>();
+        var jobTriggersListToUnschedule = new List<ITrigger>();
         foreach (var (jobType, jobName) in JobRegister.JobNameByJobTypeMap)
         {
             var jobKey = new JobKey(jobName);
-            var jobTriggers = await scheduler.GetTriggersOfJob(jobKey, cancellationToken).ConfigureAwait(false);
-            jobTriggersList.AddRange(jobTriggers);
+            var jobTriggers = (await scheduler.GetTriggersOfJob(jobKey, cancellationToken).ConfigureAwait(false)).ToList();
+            jobTriggersListToUnschedule.AddRange(jobTriggers.Where(trigger => !triggersFromConfig.Contains(trigger.Key.Name)));
         }
 
-        await scheduler.UnscheduleJobs(jobTriggersList.Select(j => j.Key).ToList(), cancellationToken).ConfigureAwait(false);
+        await scheduler.UnscheduleJobs(jobTriggersListToUnschedule.Select(j => j.Key).ToList(), cancellationToken).ConfigureAwait(false);
     }
 }

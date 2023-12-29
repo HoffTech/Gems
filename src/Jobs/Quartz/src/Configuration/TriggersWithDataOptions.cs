@@ -3,19 +3,13 @@
 
 using System.Collections.Generic;
 
-using Gems.Jobs.Quartz.Consts;
-
 namespace Gems.Jobs.Quartz.Configuration;
 
-public class TriggerOptions
+public class TriggersWithDataOptions
 {
     public string TriggerName { get; set; }
-
-    public string Type { get; set; } = TriggerDataType.ConfigType;
 
     public string CronExpression { get; set; }
 
     public Dictionary<string, object> TriggerData { get; set; }
-
-    public string ProviderType { get; set; }
 }

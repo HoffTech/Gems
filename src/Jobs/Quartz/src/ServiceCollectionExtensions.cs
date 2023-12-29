@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Threading;
 
 using Gems.Jobs.Quartz.Configuration;
-using Gems.Jobs.Quartz.Consts;
 using Gems.Jobs.Quartz.Handlers.FireJobImmediately;
 using Gems.Jobs.Quartz.Handlers.Shared;
 using Gems.Jobs.Quartz.Jobs.JobWithData;
@@ -19,7 +18,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 using Quartz;
 using Quartz.Impl;
@@ -54,14 +52,6 @@ namespace Gems.Jobs.Quartz
             if (jobsOptions.Triggers == null || jobsOptions.Triggers.Count == 0 || (jobsOptions.Type != QuartzDbType.InMemory && string.IsNullOrWhiteSpace(jobsOptions.ConnectionString)))
             {
                 return;
-            }
-
-            if (jobsOptions.TriggersOptions != null)
-            {
-                foreach (var triggerOption in jobsOptions.TriggersOptions.Where(triggerOption => jobsOptions.Triggers.ContainsKey(triggerOption.Key)))
-                {
-                    jobsOptions.Triggers[triggerOption.Key] = triggerOption.Value;
-                }
             }
 
             services.AddQuartz(q =>
@@ -137,11 +127,50 @@ namespace Gems.Jobs.Quartz
                 foreach (var (jobType, jobName) in JobRegister.JobNameByJobTypeMap)
                 {
                     var jobKey = new JobKey(jobName);
-                    q.AddJob(jobType, jobKey, c =>
+                    q.AddJob(jobType, jobKey, c => c.StoreDurably());
+                    if (jobsOptions.Triggers.ContainsKey(jobName))
                     {
-                        c.StoreDurably();
-                        c.DisallowConcurrentExecution();
-                    });
+                        var cronExpression = jobsOptions.Triggers.GetValueOrDefault(jobName);
+                        q.AddTrigger(
+                            tConf =>
+                            {
+                                var configuredTrigger = tConf
+                                    .ForJob(jobKey)
+                                    .WithIdentity(jobName)
+                                    .WithDescription(jobName);
+                                if (!string.IsNullOrWhiteSpace(cronExpression))
+                                {
+                                    configuredTrigger.WithCronSchedule(cronExpression);
+                                }
+                            });
+                        continue;
+                    }
+
+                    if (jobsOptions.TriggersWithData.ContainsKey(jobName))
+                    {
+                        foreach (var triggerWithData in jobsOptions.TriggersWithData.GetValueOrDefault(jobName))
+                        {
+                            q.AddTrigger(
+                                tConf =>
+                                {
+                                    var configuredTrigger = tConf
+                                        .ForJob(jobKey)
+                                        .WithIdentity(triggerWithData.TriggerName ?? jobName)
+                                        .WithDescription(jobName);
+                                    if (!string.IsNullOrWhiteSpace(triggerWithData.CronExpression))
+                                    {
+                                        configuredTrigger.WithCronSchedule(triggerWithData.CronExpression);
+                                    }
+
+                                    if (triggerWithData.TriggerData.Any())
+                                    {
+                                        configuredTrigger.UsingJobData(new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggerWithData.TriggerData.Serialize() });
+                                    }
+                                });
+                        }
+
+                        continue;
+                    }
                 }
             });
 
@@ -154,7 +183,7 @@ namespace Gems.Jobs.Quartz
 
             services.AddHostedService<JobRecoveryHostedService>();
             services.AddHostedService<BlockedJobsRecoveryHostedService>();
-            services.AddHostedService<JobTriggerRegisterHostedService>();
+            services.AddHostedService<JobTriggerFromDbRegisterHostedService>();
         }
 
         public static IApplicationBuilder UseQuartzAdminUI(this IApplicationBuilder app, IConfiguration configuration)
