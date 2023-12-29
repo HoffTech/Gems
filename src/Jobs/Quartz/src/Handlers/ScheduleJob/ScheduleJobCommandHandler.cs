@@ -90,8 +90,8 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
             {
                 foreach (var triggerFromDb in this.options.Value.TriggersFromDb.GetValueOrDefault(request.JobName).Where(t => Type.GetType(t.ProviderType)?.GetInterface(nameof(ITriggerDataProvider)) != null))
                 {
-                    var cronExpression = await (Type.GetType(triggerFromDb.ProviderType) as ITriggerDataProvider).GetCronExpression().ConfigureAwait(false);
-                    var triggerDataDict = await (Type.GetType(triggerFromDb.ProviderType) as ITriggerDataProvider).GetTriggerData().ConfigureAwait(false);
+                    var cronExpression = await (Type.GetType(triggerFromDb.ProviderType) as ITriggerDataProvider).GetCronExpression(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
+                    var triggerDataDict = await (Type.GetType(triggerFromDb.ProviderType) as ITriggerDataProvider).GetTriggerData(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
                     var newTrigger = CreateCronTrigger(
                         triggerFromDb.TriggerName ?? request.JobName,
                         request.JobGroup ?? JobGroups.DefaultGroup,

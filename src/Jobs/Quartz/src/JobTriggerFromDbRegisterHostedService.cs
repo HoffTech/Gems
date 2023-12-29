@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ using Gems.Text.Json;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 using Quartz;
 using Quartz.Impl.Triggers;
@@ -26,15 +28,18 @@ public class JobTriggerFromDbRegisterHostedService : BackgroundService
     private readonly SchedulerProvider schedulerProvider;
     private readonly IHostApplicationLifetime hostApplicationLifetime;
     private readonly IConfiguration configuration;
+    private readonly ILogger<JobTriggerFromDbRegisterHostedService> logger;
 
     public JobTriggerFromDbRegisterHostedService(
         SchedulerProvider schedulerProvider,
         IHostApplicationLifetime hostApplicationLifetime,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ILogger<JobTriggerFromDbRegisterHostedService> logger)
     {
         this.schedulerProvider = schedulerProvider;
         this.hostApplicationLifetime = hostApplicationLifetime;
         this.configuration = configuration;
+        this.logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -75,10 +80,21 @@ public class JobTriggerFromDbRegisterHostedService : BackgroundService
                 continue;
             }
 
-            foreach (var triggerFromDb in jobsOptions.TriggersFromDb.GetValueOrDefault(jobName).Where(t => Type.GetType(t.ProviderType)?.GetInterface(nameof(ITriggerDataProvider)) != null))
+            foreach (var triggerFromDb in jobsOptions.TriggersFromDb.GetValueOrDefault(jobName))
             {
-                var cronExpression = await (Type.GetType(triggerFromDb.ProviderType) as ITriggerDataProvider).GetCronExpression().ConfigureAwait(false);
-                var triggerDataDict = await (Type.GetType(triggerFromDb.ProviderType) as ITriggerDataProvider).GetTriggerData().ConfigureAwait(false);
+                var triggerProviderType = Assembly.GetEntryAssembly()?.GetTypes()
+                    .Where(x => typeof(ITriggerDataProvider).IsAssignableFrom(x) && x.Name.Contains(triggerFromDb.ProviderType))
+                    .Select(Activator.CreateInstance)
+                    .Cast<ITriggerDataProvider>()
+                    .FirstOrDefault();
+                if (triggerProviderType == null)
+                {
+                    this.logger.LogWarning("Type of {triggerProviderType} was not found or not implement ITriggerDataProvider interface", triggerFromDb.ProviderType);
+                    continue;
+                }
+
+                var cronExpression = await triggerProviderType.GetCronExpression(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
+                var triggerDataDict = await triggerProviderType.GetTriggerData(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
                 var jobKey = new JobKey(jobName);
                 var newTrigger = new CronTriggerImpl(
                                      triggerFromDb.TriggerName ?? jobName,
@@ -100,7 +116,15 @@ public class JobTriggerFromDbRegisterHostedService : BackgroundService
                     newTrigger.JobDataMap = new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggerDataDict.Serialize() };
                 }
 
-                await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
+                var existedTrigger = await scheduler.GetTrigger(newTrigger.Key, cancellationToken).ConfigureAwait(false);
+                if (existedTrigger != null)
+                {
+                    await scheduler.RescheduleJob(existedTrigger.Key, newTrigger, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
+                }
             }
         }
     }
