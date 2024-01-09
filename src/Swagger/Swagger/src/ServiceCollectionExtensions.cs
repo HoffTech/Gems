@@ -61,6 +61,10 @@ namespace Gems.Swagger
                 {
                     options.CustomSchemaIds(schemaIdSelector);
                 }
+                else
+                {
+                    options.CustomSchemaIds(type => type.ToString());
+                }
 
                 options.DocumentFilter<PathPrefixInsertDocumentFilter>(swaggerOptions?.GitLabSwaggerPrefix ?? string.Empty);
                 if (swaggerOptions?.EnableSchemaForErrorResponse ?? false)
