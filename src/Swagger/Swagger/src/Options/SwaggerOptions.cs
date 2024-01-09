@@ -16,6 +16,8 @@ namespace Gems.Swagger.Options
 
         public bool EnableApiKeyAuthorization { get; set; }
 
+        public string ApiKeyAuthorizationHeaderName { get; set; }
+
         public bool EnableImplicitFlow { get; set; }
 
         public bool EnablePasswordFlow { get; set; }

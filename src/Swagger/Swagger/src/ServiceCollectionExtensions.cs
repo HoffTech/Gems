@@ -85,7 +85,7 @@ namespace Gems.Swagger
 
                 if (swaggerOptions?.EnableApiKeyAuthorization ?? false)
                 {
-                    EnableApiKeyAuthorization(options);
+                    EnableApiKeyAuthorization(options, swaggerOptions);
                     return;
                 }
 
@@ -107,13 +107,13 @@ namespace Gems.Swagger
             });
         }
 
-        private static void EnableApiKeyAuthorization(SwaggerGenOptions options)
+        private static void EnableApiKeyAuthorization(SwaggerGenOptions options, SwaggerOptions swaggerOptions)
         {
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
                 Description = "Please enter token value",
-                Name = "token",
+                Name = swaggerOptions?.ApiKeyAuthorizationHeaderName ?? "token",
                 Type = SecuritySchemeType.ApiKey,
                 Scheme = "Bearer"
             });
