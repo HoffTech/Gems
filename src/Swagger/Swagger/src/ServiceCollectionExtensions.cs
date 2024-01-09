@@ -30,7 +30,13 @@ namespace Gems.Swagger
         /// <param name="configuration">IConfiguration.</param>
         /// <param name="validationResultType">Type.</param>
         /// <param name="genericErrorType">Type.</param>
-        public static void AddSwagger(this IServiceCollection services, IConfiguration configuration, Type validationResultType = null, Type genericErrorType = null)
+        /// <param name="schemaIdSelector">Func.</param>
+        public static void AddSwagger(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            Type validationResultType = null,
+            Type genericErrorType = null,
+            Func<Type, string> schemaIdSelector = null)
         {
             var swaggerOptions = configuration.GetSection(SwaggerOptions.Swagger).Get<SwaggerOptions>();
 
@@ -51,7 +57,15 @@ namespace Gems.Swagger
                     options.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, xmlCommentPath), true);
                 }
 
-                options.CustomSchemaIds(type => type.ToString());
+                if (schemaIdSelector != null)
+                {
+                    options.CustomSchemaIds(schemaIdSelector);
+                }
+                else
+                {
+                    options.CustomSchemaIds(type => type.ToString());
+                }
+
                 options.DocumentFilter<PathPrefixInsertDocumentFilter>(swaggerOptions?.GitLabSwaggerPrefix ?? string.Empty);
                 if (swaggerOptions?.EnableSchemaForErrorResponse ?? false)
                 {
