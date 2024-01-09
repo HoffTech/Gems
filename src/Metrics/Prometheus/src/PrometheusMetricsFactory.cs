@@ -144,7 +144,7 @@ namespace Gems.Metrics.Prometheus
         private PrometheusThirdParty.GaugeConfiguration GetGaugeConfiguration(MetricInfo metricInfo)
         {
             PrometheusThirdParty.GaugeConfiguration gaugeConfiguration;
-            if (this.configuration.GaugeConfiguration != null
+            if (this.configuration?.GaugeConfiguration != null
                 && this.configuration.GaugeConfiguration.TryGetValue(metricInfo.Name, out var config))
             {
                 gaugeConfiguration = new PrometheusThirdParty.GaugeConfiguration
