@@ -18,6 +18,9 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
         [FromQuery]
         public string JobGroup { get; set; }
 
+        [FromQuery]
+        public string TriggerName { get; set; }
+
         public string CronExpression { get; set; }
     }
 }

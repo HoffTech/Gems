@@ -10,16 +10,13 @@ using System.Threading.Tasks;
 using Gems.Jobs.Quartz.Configuration;
 using Gems.Jobs.Quartz.Handlers.Consts;
 using Gems.Jobs.Quartz.Handlers.Shared;
-using Gems.Jobs.Quartz.Jobs.JobWithData;
 using Gems.Mvc.GenericControllers;
-using Gems.Text.Json;
 
 using MediatR;
 
 using Microsoft.Extensions.Options;
 
 using Quartz;
-using Quartz.Impl.Triggers;
 
 namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
 {
@@ -28,11 +25,16 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
     {
         private readonly IOptions<JobsOptions> options;
         private readonly SchedulerProvider schedulerProvider;
+        private readonly TriggerHelper triggerHelper;
 
-        public ScheduleJobCommandHandler(IOptions<JobsOptions> options, SchedulerProvider schedulerProvider)
+        public ScheduleJobCommandHandler(
+            IOptions<JobsOptions> options,
+            SchedulerProvider schedulerProvider,
+            TriggerHelper triggerHelper)
         {
             this.options = options;
             this.schedulerProvider = schedulerProvider;
+            this.triggerHelper = triggerHelper;
         }
 
         public async Task Handle(ScheduleJobCommand request, CancellationToken cancellationToken)
@@ -49,77 +51,153 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
                 throw new InvalidOperationException($"Такое задание уже зарегистрировано {request.JobGroup ?? JobGroups.DefaultGroup}.{request.JobName}");
             }
 
-            if (this.options.Value.Triggers.ContainsKey(request.JobName))
+            if (await this.ScheduleSimpleTrigger(scheduler, request.JobName, request.JobGroup, request.CronExpression, cancellationToken).ConfigureAwait(false))
             {
-                var cronExpression = this.options.Value.Triggers
-                    .Where(r => r.Key == request.JobName)
-                    .Select(r => r.Value)
-                    .First();
-
-                var newTrigger = CreateCronTrigger(
-                    request.JobName,
-                    request.JobGroup ?? JobGroups.DefaultGroup,
-                    request.JobName,
-                    request.JobGroup ?? JobGroups.DefaultGroup,
-                    cronExpression ?? request.CronExpression,
-                    null);
-
-                await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
                 return;
             }
 
-            if (this.options.Value.TriggersWithData.ContainsKey(request.JobName))
+            if (await this.ScheduleTriggerWithData(scheduler, request.JobName, request.JobGroup, request.CronExpression, request.TriggerName, cancellationToken).ConfigureAwait(false))
             {
-                foreach (var newTrigger in this.options.Value.TriggersWithData.GetValueOrDefault(request.JobName)
-                             .Select(
-                                 triggerWithData => CreateCronTrigger(
-                                     triggerWithData.TriggerName ?? request.JobName,
-                                     request.JobGroup ?? JobGroups.DefaultGroup,
-                                     request.JobName,
-                                     request.JobGroup ?? JobGroups.DefaultGroup,
-                                     triggerWithData.CronExpression ?? request.CronExpression,
-                                     triggerWithData.TriggerData)))
-                {
-                    await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
-                }
-
                 return;
             }
 
-            if (this.options.Value.TriggersFromDb.ContainsKey(request.JobName))
-            {
-                foreach (var triggerFromDb in this.options.Value.TriggersFromDb.GetValueOrDefault(request.JobName).Where(t => Type.GetType(t.ProviderType)?.GetInterface(nameof(ITriggerDataProvider)) != null))
-                {
-                    var cronExpression = await (Type.GetType(triggerFromDb.ProviderType) as ITriggerDataProvider).GetCronExpression(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
-                    var triggerDataDict = await (Type.GetType(triggerFromDb.ProviderType) as ITriggerDataProvider).GetTriggerData(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
-                    var newTrigger = CreateCronTrigger(
-                        triggerFromDb.TriggerName ?? request.JobName,
-                        request.JobGroup ?? JobGroups.DefaultGroup,
-                        request.JobName,
-                        request.JobGroup ?? JobGroups.DefaultGroup,
-                        cronExpression ?? request.CronExpression,
-                        triggerDataDict);
-
-                    await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
-                }
-            }
+            await this.ScheduleTriggerFromDb(scheduler, request.JobName, request.JobGroup, request.CronExpression, request.TriggerName, cancellationToken).ConfigureAwait(false);
         }
 
-        private static CronTriggerImpl CreateCronTrigger(
-            string triggerName,
-            string triggerGroup,
-            string jobName,
-            string jobGroup,
-            string cronExp,
-            Dictionary<string, object> triggerData)
+        private static async Task<List<string>> GetTriggersForSchedule(IScheduler scheduler, string jobName, List<string> triggersFromConfiguration, CancellationToken cancellationToken)
         {
-            var newTrigger = new CronTriggerImpl(triggerName, triggerGroup, jobName, jobGroup, cronExp);
-            if (triggerData != null && triggerData.Any())
+            var jobTriggers = (await scheduler.GetTriggersOfJob(new JobKey(jobName), cancellationToken).ConfigureAwait(false)).ToList();
+            return triggersFromConfiguration.Where(triggerName => !jobTriggers.Exists(t => t.Key.Name == triggerName)).ToList();
+        }
+
+        private async Task<bool> ScheduleSimpleTrigger(IScheduler scheduler, string jobName, string jobGroup, string cronExpression, CancellationToken cancellationToken)
+        {
+            if (this.options.Value.Triggers == null || !this.options.Value.Triggers.ContainsKey(jobName))
             {
-                newTrigger.JobDataMap = new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggerData.Serialize() };
+                return false;
             }
 
-            return newTrigger;
+            var triggerCronExpression = this.options.Value.Triggers
+                .Where(r => r.Key == jobName)
+                .Select(r => r.Value)
+                .First();
+
+            var newTrigger = this.triggerHelper.CreateCronTrigger(
+                jobName,
+                jobGroup ?? JobGroups.DefaultGroup,
+                jobName,
+                jobGroup ?? JobGroups.DefaultGroup,
+                cronExpression ?? triggerCronExpression,
+                null);
+
+            await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
+            return true;
+        }
+
+        private async Task<bool> ScheduleTriggerWithData(
+            IScheduler scheduler,
+            string jobName,
+            string jobGroup,
+            string cronExpression,
+            string triggerName,
+            CancellationToken cancellationToken)
+        {
+            if (this.options.Value.TriggersWithData == null || !this.options.Value.TriggersWithData.ContainsKey(jobName))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(triggerName))
+            {
+                return await this.ScheduleTriggersWithData(scheduler, jobName, jobGroup, cronExpression, cancellationToken).ConfigureAwait(false);
+            }
+
+            var triggerFromConf = this.options.Value.TriggersWithData
+                .GetValueOrDefault(jobName)
+                .ToList()
+                .First(t => t.TriggerName == triggerName);
+
+            var trigger = this.triggerHelper.CreateCronTrigger(
+                triggerFromConf.TriggerName ?? jobName,
+                jobGroup ?? JobGroups.DefaultGroup,
+                jobName,
+                jobGroup ?? JobGroups.DefaultGroup,
+                cronExpression ?? triggerFromConf.CronExpression,
+                triggerFromConf.TriggerData);
+            await scheduler.ScheduleJob(trigger, cancellationToken).ConfigureAwait(false);
+            return true;
+        }
+
+        private async Task<bool> ScheduleTriggersWithData(IScheduler scheduler, string jobName, string jobGroup, string cronExpression, CancellationToken cancellationToken)
+        {
+            var triggersFromConfiguration = new List<string>();
+            foreach (var triggerWithData in this.options.Value.TriggersWithData.Where(t => t.Key == jobName).Select(t => t.Value))
+            {
+                triggersFromConfiguration.AddRange(triggerWithData.Select(t => t.TriggerName));
+            }
+
+            var triggersForSchedule = await GetTriggersForSchedule(scheduler, jobName, triggersFromConfiguration, cancellationToken).ConfigureAwait(false);
+
+            foreach (var triggerNameForSchedule in triggersForSchedule)
+            {
+                await this.ScheduleTriggerWithData(scheduler, jobName, jobGroup, cronExpression, triggerNameForSchedule, cancellationToken).ConfigureAwait(false);
+            }
+
+            return true;
+        }
+
+        private async Task ScheduleTriggerFromDb(
+            IScheduler scheduler,
+            string jobName,
+            string jobGroup,
+            string cronExpression,
+            string triggerName,
+            CancellationToken cancellationToken)
+        {
+            if (this.options.Value.TriggersFromDb == null || !this.options.Value.TriggersFromDb.ContainsKey(jobName))
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(triggerName))
+            {
+                await this.ScheduleTriggersFromDb(scheduler, jobName, jobGroup, cronExpression, cancellationToken).ConfigureAwait(false);
+                return;
+            }
+
+            var triggerFromDb = this.options.Value.TriggersFromDb
+                .GetValueOrDefault(jobName)
+                .ToList()
+                .First(t => t.TriggerName == triggerName);
+
+            var triggerProviderType = this.triggerHelper.GetTriggerDbType(triggerFromDb);
+            var triggerCronExpression = await triggerProviderType.GetCronExpression(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
+            var triggerDataDict = await triggerProviderType.GetTriggerData(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
+
+            var trigger = this.triggerHelper.CreateCronTrigger(
+                triggerFromDb.TriggerName ?? jobName,
+                jobGroup ?? JobGroups.DefaultGroup,
+                jobName,
+                jobGroup ?? JobGroups.DefaultGroup,
+                cronExpression ?? triggerCronExpression,
+                triggerDataDict);
+            await scheduler.ScheduleJob(trigger, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task ScheduleTriggersFromDb(IScheduler scheduler, string jobName, string jobGroup, string cronExpression, CancellationToken cancellationToken)
+        {
+            var triggersFromConfiguration = new List<string>();
+            foreach (var triggerWithData in this.options.Value.TriggersFromDb.Where(t => t.Key == jobName).Select(t => t.Value))
+            {
+                triggersFromConfiguration.AddRange(triggerWithData.Select(t => t.TriggerName));
+            }
+
+            var triggersForSchedule = await GetTriggersForSchedule(scheduler, jobName, triggersFromConfiguration, cancellationToken).ConfigureAwait(false);
+
+            foreach (var triggerNameForSchedule in triggersForSchedule)
+            {
+                await this.ScheduleTriggerFromDb(scheduler, jobName, jobGroup, cronExpression, triggerNameForSchedule, cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 }

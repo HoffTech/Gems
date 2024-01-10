@@ -89,7 +89,10 @@ public class JobTriggerFromDbRegisterHostedService : BackgroundService
                     .FirstOrDefault();
                 if (triggerProviderType == null)
                 {
-                    this.logger.LogWarning("Type of {triggerProviderType} was not found or not implement ITriggerDataProvider interface", triggerFromDb.ProviderType);
+                    this.logger.LogWarning(
+                        "Для триггера {triggerNameFromDb}, тип {triggerProviderType} не был найден или не реализует интерфейс ITriggerDataProvider",
+                        triggerFromDb.TriggerName,
+                        triggerFromDb.ProviderType);
                     continue;
                 }
 

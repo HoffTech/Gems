@@ -17,5 +17,8 @@ namespace Gems.Jobs.Quartz.Handlers.FireJobImmediately
 
         [FromQuery]
         public string JobGroup { get; set; }
+
+        [FromQuery]
+        public string TriggerName { get; set; }
     }
 }

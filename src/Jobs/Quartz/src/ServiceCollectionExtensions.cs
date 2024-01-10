@@ -40,6 +40,7 @@ namespace Gems.Jobs.Quartz
         public static void AddQuartzWithJobs(this IServiceCollection services, IConfiguration configuration, Action<JobsOptions> configureOptions = null)
         {
             services.AddSingleton<SchedulerProvider>();
+            services.AddSingleton<TriggerHelper>();
 
             services.Configure<JobsOptions>(configuration.GetSection(JobsOptions.Jobs));
             var jobsOptions = configuration.GetSection(JobsOptions.Jobs).Get<JobsOptions>();
@@ -49,7 +50,7 @@ namespace Gems.Jobs.Quartz
             }
 
             configureOptions?.Invoke(jobsOptions);
-            if (jobsOptions.Triggers == null || jobsOptions.Triggers.Count == 0 || (jobsOptions.Type != QuartzDbType.InMemory && string.IsNullOrWhiteSpace(jobsOptions.ConnectionString)))
+            if (jobsOptions.Type != QuartzDbType.InMemory && string.IsNullOrWhiteSpace(jobsOptions.ConnectionString))
             {
                 return;
             }
@@ -128,7 +129,7 @@ namespace Gems.Jobs.Quartz
                 {
                     var jobKey = new JobKey(jobName);
                     q.AddJob(jobType, jobKey, c => c.StoreDurably());
-                    if (jobsOptions.Triggers.ContainsKey(jobName))
+                    if (jobsOptions.Triggers != null && jobsOptions.Triggers.ContainsKey(jobName))
                     {
                         var cronExpression = jobsOptions.Triggers.GetValueOrDefault(jobName);
                         q.AddTrigger(
@@ -146,7 +147,7 @@ namespace Gems.Jobs.Quartz
                         continue;
                     }
 
-                    if (jobsOptions.TriggersWithData.ContainsKey(jobName))
+                    if (jobsOptions.TriggersWithData != null && jobsOptions.TriggersWithData.ContainsKey(jobName))
                     {
                         foreach (var triggerWithData in jobsOptions.TriggersWithData.GetValueOrDefault(jobName))
                         {
@@ -168,8 +169,6 @@ namespace Gems.Jobs.Quartz
                                     }
                                 });
                         }
-
-                        continue;
                     }
                 }
             });
