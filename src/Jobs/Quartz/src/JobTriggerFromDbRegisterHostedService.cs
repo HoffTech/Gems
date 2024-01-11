@@ -14,9 +14,9 @@ using Gems.Jobs.Quartz.Handlers.Shared;
 using Gems.Jobs.Quartz.Jobs.JobWithData;
 using Gems.Text.Json;
 
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using Quartz;
 using Quartz.Impl.Triggers;
@@ -27,19 +27,19 @@ public class JobTriggerFromDbRegisterHostedService : BackgroundService
 {
     private readonly SchedulerProvider schedulerProvider;
     private readonly IHostApplicationLifetime hostApplicationLifetime;
-    private readonly IConfiguration configuration;
     private readonly ILogger<JobTriggerFromDbRegisterHostedService> logger;
+    private readonly IOptions<JobsOptions> jobsOptions;
 
     public JobTriggerFromDbRegisterHostedService(
         SchedulerProvider schedulerProvider,
         IHostApplicationLifetime hostApplicationLifetime,
-        IConfiguration configuration,
-        ILogger<JobTriggerFromDbRegisterHostedService> logger)
+        ILogger<JobTriggerFromDbRegisterHostedService> logger,
+        IOptions<JobsOptions> jobsOptions)
     {
         this.schedulerProvider = schedulerProvider;
         this.hostApplicationLifetime = hostApplicationLifetime;
-        this.configuration = configuration;
         this.logger = logger;
+        this.jobsOptions = jobsOptions;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -49,7 +49,7 @@ public class JobTriggerFromDbRegisterHostedService : BackgroundService
             return;
         }
 
-        await this.RegisterTriggersFromConfiguration(this.configuration, stoppingToken).ConfigureAwait(false);
+        await this.RegisterTriggersFromConfiguration(stoppingToken).ConfigureAwait(false);
     }
 
     private static async Task<bool> WaitForAppStartup(IHostApplicationLifetime lifetime, CancellationToken stoppingToken)
@@ -67,68 +67,71 @@ public class JobTriggerFromDbRegisterHostedService : BackgroundService
         return completedTask == startedSource.Task;
     }
 
-    private async Task RegisterTriggersFromConfiguration(IConfiguration configuration, CancellationToken cancellationToken)
+    private async Task RegisterTriggersByJobName(string jobName, CancellationToken cancellationToken)
     {
-        await this.UnscheduleJobs(cancellationToken).ConfigureAwait(false);
         var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
-        var jobsOptions = configuration.GetSection(JobsOptions.Jobs).Get<JobsOptions>();
-
-        foreach (var (jobType, jobName) in JobRegister.JobNameByJobTypeMap)
+        if (this.jobsOptions.Value.TriggersFromDb == null || !this.jobsOptions.Value.TriggersFromDb.ContainsKey(jobName))
         {
-            if (jobsOptions.TriggersFromDb == null || !jobsOptions.TriggersFromDb.ContainsKey(jobName))
+            return;
+        }
+
+        foreach (var triggerFromDb in this.jobsOptions.Value.TriggersFromDb.GetValueOrDefault(jobName))
+        {
+            var triggerProviderType = Assembly.GetEntryAssembly()?.GetTypes()
+                .Where(x => typeof(ITriggerDataProvider).IsAssignableFrom(x) && x.Name.Contains(triggerFromDb.ProviderType))
+                .Select(Activator.CreateInstance)
+                .Cast<ITriggerDataProvider>()
+                .FirstOrDefault();
+            if (triggerProviderType == null)
             {
+                this.logger.LogWarning(
+                    "Для триггера {triggerNameFromDb}, тип {triggerProviderType} не был найден или не реализует интерфейс ITriggerDataProvider",
+                    triggerFromDb.TriggerName,
+                    triggerFromDb.ProviderType);
                 continue;
             }
 
-            foreach (var triggerFromDb in jobsOptions.TriggersFromDb.GetValueOrDefault(jobName))
+            var cronExpression = await triggerProviderType.GetCronExpression(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
+            var triggerDataDict = await triggerProviderType.GetTriggerData(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
+            var jobKey = new JobKey(jobName);
+            var newTrigger = new CronTriggerImpl(
+                                 triggerFromDb.TriggerName ?? jobName,
+                                 JobGroups.DefaultGroup,
+                                 jobName,
+                                 JobGroups.DefaultGroup)
             {
-                var triggerProviderType = Assembly.GetEntryAssembly()?.GetTypes()
-                    .Where(x => typeof(ITriggerDataProvider).IsAssignableFrom(x) && x.Name.Contains(triggerFromDb.ProviderType))
-                    .Select(Activator.CreateInstance)
-                    .Cast<ITriggerDataProvider>()
-                    .FirstOrDefault();
-                if (triggerProviderType == null)
-                {
-                    this.logger.LogWarning(
-                        "Для триггера {triggerNameFromDb}, тип {triggerProviderType} не был найден или не реализует интерфейс ITriggerDataProvider",
-                        triggerFromDb.TriggerName,
-                        triggerFromDb.ProviderType);
-                    continue;
-                }
+                JobKey = jobKey,
+                Description = jobName
+            };
 
-                var cronExpression = await triggerProviderType.GetCronExpression(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
-                var triggerDataDict = await triggerProviderType.GetTriggerData(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
-                var jobKey = new JobKey(jobName);
-                var newTrigger = new CronTriggerImpl(
-                                     triggerFromDb.TriggerName ?? jobName,
-                                     JobGroups.DefaultGroup,
-                                     jobName,
-                                     JobGroups.DefaultGroup)
-                {
-                    JobKey = jobKey,
-                    Description = jobName
-                };
-
-                if (!string.IsNullOrEmpty(cronExpression))
-                {
-                    newTrigger.CronExpressionString = cronExpression;
-                }
-
-                if (triggerDataDict != null && triggerDataDict.Any())
-                {
-                    newTrigger.JobDataMap = new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggerDataDict.Serialize() };
-                }
-
-                var existedTrigger = await scheduler.GetTrigger(newTrigger.Key, cancellationToken).ConfigureAwait(false);
-                if (existedTrigger != null)
-                {
-                    await scheduler.RescheduleJob(existedTrigger.Key, newTrigger, cancellationToken).ConfigureAwait(false);
-                }
-                else
-                {
-                    await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
-                }
+            if (!string.IsNullOrEmpty(cronExpression))
+            {
+                newTrigger.CronExpressionString = cronExpression;
             }
+
+            if (triggerDataDict != null && triggerDataDict.Any())
+            {
+                newTrigger.JobDataMap = new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggerDataDict.Serialize() };
+            }
+
+            var existedTrigger = await scheduler.GetTrigger(newTrigger.Key, cancellationToken).ConfigureAwait(false);
+            if (existedTrigger != null)
+            {
+                await scheduler.RescheduleJob(existedTrigger.Key, newTrigger, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
+            }
+        }
+    }
+
+    private async Task RegisterTriggersFromConfiguration(CancellationToken cancellationToken)
+    {
+        await this.UnscheduleJobs(cancellationToken).ConfigureAwait(false);
+        foreach (var (_, jobName) in JobRegister.JobNameByJobTypeMap)
+        {
+            await this.RegisterTriggersByJobName(jobName, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -138,24 +141,23 @@ public class JobTriggerFromDbRegisterHostedService : BackgroundService
     /// </summary>
     private async Task UnscheduleJobs(CancellationToken cancellationToken)
     {
-        var jobsOptions = this.configuration.GetSection(JobsOptions.Jobs).Get<JobsOptions>();
         var triggersFromConfig = new List<string>();
-        if (jobsOptions.Triggers != null)
+        if (this.jobsOptions.Value.Triggers != null)
         {
-            triggersFromConfig.AddRange(jobsOptions.Triggers.Select(t => t.Key));
+            triggersFromConfig.AddRange(this.jobsOptions.Value.Triggers.Select(t => t.Key));
         }
 
-        if (jobsOptions.TriggersWithData != null)
+        if (this.jobsOptions.Value.TriggersWithData != null)
         {
-            foreach (var triggerWithData in jobsOptions.TriggersWithData.Values)
+            foreach (var triggerWithData in this.jobsOptions.Value.TriggersWithData.Values)
             {
                 triggersFromConfig.AddRange(triggerWithData.Select(t => t.TriggerName));
             }
         }
 
-        if (jobsOptions.TriggersFromDb != null)
+        if (this.jobsOptions.Value.TriggersFromDb != null)
         {
-            foreach (var triggerWithData in jobsOptions.TriggersFromDb.Values)
+            foreach (var triggerWithData in this.jobsOptions.Value.TriggersFromDb.Values)
             {
                 triggersFromConfig.AddRange(triggerWithData.Select(t => t.TriggerName));
             }

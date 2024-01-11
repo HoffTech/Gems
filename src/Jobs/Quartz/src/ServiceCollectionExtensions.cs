@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 using Gems.Jobs.Quartz.Configuration;
@@ -129,47 +130,8 @@ namespace Gems.Jobs.Quartz
                 {
                     var jobKey = new JobKey(jobName);
                     q.AddJob(jobType, jobKey, c => c.StoreDurably());
-                    if (jobsOptions.Triggers != null && jobsOptions.Triggers.ContainsKey(jobName))
-                    {
-                        var cronExpression = jobsOptions.Triggers.GetValueOrDefault(jobName);
-                        q.AddTrigger(
-                            tConf =>
-                            {
-                                var configuredTrigger = tConf
-                                    .ForJob(jobKey)
-                                    .WithIdentity(jobName)
-                                    .WithDescription(jobName);
-                                if (!string.IsNullOrWhiteSpace(cronExpression))
-                                {
-                                    configuredTrigger.WithCronSchedule(cronExpression);
-                                }
-                            });
-                        continue;
-                    }
-
-                    if (jobsOptions.TriggersWithData != null && jobsOptions.TriggersWithData.ContainsKey(jobName))
-                    {
-                        foreach (var triggerWithData in jobsOptions.TriggersWithData.GetValueOrDefault(jobName))
-                        {
-                            q.AddTrigger(
-                                tConf =>
-                                {
-                                    var configuredTrigger = tConf
-                                        .ForJob(jobKey)
-                                        .WithIdentity(triggerWithData.TriggerName ?? jobName)
-                                        .WithDescription(jobName);
-                                    if (!string.IsNullOrWhiteSpace(triggerWithData.CronExpression))
-                                    {
-                                        configuredTrigger.WithCronSchedule(triggerWithData.CronExpression);
-                                    }
-
-                                    if (triggerWithData.TriggerData.Any())
-                                    {
-                                        configuredTrigger.UsingJobData(new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggerWithData.TriggerData.Serialize() });
-                                    }
-                                });
-                        }
-                    }
+                    RegisterSimpleTrigger(q, jobsOptions, jobName, jobKey);
+                    RegisterTriggersWithData(q, jobsOptions, jobName, jobKey);
                 }
             });
 
@@ -183,6 +145,65 @@ namespace Gems.Jobs.Quartz
             services.AddHostedService<JobRecoveryHostedService>();
             services.AddHostedService<BlockedJobsRecoveryHostedService>();
             services.AddHostedService<JobTriggerFromDbRegisterHostedService>();
+        }
+
+        private static void RegisterSimpleTrigger(
+            IServiceCollectionQuartzConfigurator configurator,
+            JobsOptions jobsOptions,
+            string jobName,
+            JobKey jobKey)
+        {
+            if (jobsOptions.Triggers == null || !jobsOptions.Triggers.ContainsKey(jobName))
+            {
+                return;
+            }
+
+            var cronExpression = jobsOptions.Triggers.GetValueOrDefault(jobName);
+            configurator.AddTrigger(
+                tConf =>
+                {
+                    var configuredTrigger = tConf
+                        .ForJob(jobKey)
+                        .WithIdentity(jobName)
+                        .WithDescription(jobName);
+                    if (!string.IsNullOrWhiteSpace(cronExpression))
+                    {
+                        configuredTrigger.WithCronSchedule(cronExpression);
+                    }
+                });
+        }
+
+        private static void RegisterTriggersWithData(
+            IServiceCollectionQuartzConfigurator configurator,
+            JobsOptions jobsOptions,
+            string jobName,
+            JobKey jobKey)
+        {
+            if (jobsOptions.TriggersWithData == null || !jobsOptions.TriggersWithData.ContainsKey(jobName))
+            {
+                return;
+            }
+
+            foreach (var triggerWithData in jobsOptions.TriggersWithData.GetValueOrDefault(jobName))
+            {
+                configurator.AddTrigger(
+                    tConf =>
+                    {
+                        var configuredTrigger = tConf
+                            .ForJob(jobKey)
+                            .WithIdentity(triggerWithData.TriggerName ?? jobName)
+                            .WithDescription(jobName);
+                        if (!string.IsNullOrWhiteSpace(triggerWithData.CronExpression))
+                        {
+                            configuredTrigger.WithCronSchedule(triggerWithData.CronExpression);
+                        }
+
+                        if (triggerWithData.TriggerData.Any())
+                        {
+                            configuredTrigger.UsingJobData(new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggerWithData.TriggerData.Serialize() });
+                        }
+                    });
+            }
         }
 
         public static IApplicationBuilder UseQuartzAdminUI(this IApplicationBuilder app, IConfiguration configuration)
