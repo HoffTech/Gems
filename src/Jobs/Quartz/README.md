@@ -14,18 +14,42 @@
 * [Получить список активных джобов с триггерами](#получить-список-активных-джобов-с-триггерами)
 * [Добавление задачи](#добавление-задачи)
 * [Отключение задачи](#отключение-задачи)
+* [Изменение расписания задачи](#изменение-расписания-задачи)
+* [Регистрация триггера с данными](#регистрация-триггера-с-данными)
+* [Интерфейс ITriggerDataProvider](#интерфейс-itriggerdataprovider)
+* [Интерфейс IHasTriggerData](#интерфейс-ihastriggerdata)
 
 # Установка
 - Установите nuget пакет Gems.Jobs.Quartz через менеджер пакетов
 - Добавьте следующие строки в appsettings
 ```json
   "Jobs": {
-    "SchedulerName": "Service Name",            // наименование планировщика
-    "TablePrefix": "quartz.qrtz_",              // префикс таблиц, хранящих данные по элементам Quartz(Jobs, Triggers etc.)
-    "JobRecoveryDelayInMilliseconds": 600000,   // Задержка перед итерацией мониторинга и восстановления триггеров, находящихся в состоянии Error (по умолчанию 15000)
-    "Triggers": {                               // словарь триггеров
-      "UploadSelloutGoods": "0 0 0 * * ?"       // триггер, где ключ - наименование задания, значение - крон выполнения
-    },
+    "SchedulerName": "Service Name",             // наименование планировщика
+    "TablePrefix": "quartz.qrtz_",               // префикс таблиц, хранящих данные по элементам Quartz(Jobs, Triggers etc.)
+    "JobRecoveryDelayInMilliseconds": 600000,    // Задержка перед итерацией мониторинга и восстановления триггеров, находящихся в состоянии Error (по умолчанию 15000)
+    "Triggers": {                                // словарь триггеров
+      "UploadSelloutGoods": "0 0 0 * * ?"        // триггер, где ключ - наименование задания, значение - крон выполнения
+    }, 
+    "TriggersWithData": {                        // словарь джобов с описанием триггеров, для которых нужно задать дополнительные данные
+      "SomeJobHandler": [                        // название джоба
+        {              
+          "TriggerName": "TriggerTest1",         // название триггера
+          "CronExpression": "0/5 * * * * ?",     // cron-выражение
+          "TriggerData": {                       // словарь данных для триггера (JobDataMap)
+            "someData": "test data", 
+            "someData2": 42 
+          } 
+        } 
+      ] 
+    }, 
+    "TriggersFromDb": {                          // словарь джобов с описанием триггеров, для которых дополнительные данные поставляются с помощью ProviderType
+      "AnotherJobHandler":[                      // название джоба
+        { 
+          "TriggerName": "TriggerTest1",         // название триггера
+          "ProviderType": "TriggerDataProvider1" // провайдер данных для триггера TriggerTest1, должен реализовывать интерфейс ITriggerDataProvider
+        }
+      ]
+    }
     "MaxConcurrency": 25,                       // (опционально, по умолчанию 25) Количество потоков, доступных для одновременного выполнения заданий в Quartz    
     "BatchTriggerAcquisitionMaxCount": 1,       // (опционально, по умолчанию 1) Количество тригеров, доступных для получения узлов планировщика за раз
     "AcquireTriggersWithinLock": true,          // (опционально, по умолчанию false) Получение следующих тригеров, происходит с блокировкой бд. Необходимо ставить true, если BatchTriggerAcquisitionMaxCount > 1.
@@ -38,7 +62,7 @@
          "JobStore": { ... },                   // установка параметров quartz.threadPool.* (см. описание https://www.quartz-scheduler.net/documentation/quartz-3.x/configuration/reference.html#jobstoretx-ado-net)
          "DataSource": { ... }                  // установка параметров quartz.threadPool.* (см. описание https://www.quartz-scheduler.net/documentation/quartz-3.x/configuration/reference.html#datasources-ado-net-jobstores)
     }
-}
+  }
 ```
 - Добавьте регистрацию Quartz в конфигурацию сервисов в классе Startup.cs
 ```csharp
@@ -610,9 +634,13 @@ cron-выражение для джоба:
 ```json
 {
   "jobGroup": "string",
-  "cronExpression": "string"
+  "cronExpression": "string"  // по умолчанию будет использоваться для всех регистрируемых триггеров, включая TriggersWithData и TriggersFromDb
 }
 ```
+Добавлен новый параметр в запрос: TriggerName. Он используется для управления триггерами из разделов TriggersWithData и TriggersFromDb.
+Если TriggerName указан, будет добавлен триггер с соответствующим именем из раздела TriggersWithData или TriggersFromDb, в зависимости от JobName.
+Если TriggerName не указать, будут добавлены все триггеры из раздела TriggersWithData или TriggersFromDb, которые не зарегистрированы в базе данных, в зависимости от JobName.
+
 # Восстановление триггера задачи из состояния Error
 Чтобы восстановить триггер для задачи периодического выполнения, используется PUT-метод **/jobs/{JobName}/reset-from-error-state**.
 Метод производит поиск триггера задачи(джобы) с именем **JobName**. В теле запроса можно указать группу для джоба:
@@ -649,6 +677,10 @@ DEV_Jobs_Triggers_TestJob_Cron: 0/10 \* \* \? \* \*
 в поле группы подставляется **"DEFAULT"**. После выполнения метода, для указанного джоба 
 удаляется активный триггер, и джоб перестает выполняться периодически. Стоит учитывать, что 
 после деплоя сервиса, триггеры автоматически регистрируются согласно конфигурации Jobs__Triggers.
+
+Добавлен новый параметр в запрос: TriggerName. Он используется для управления триггерами из разделов TriggersWithData и TriggersFromDb.
+Если TriggerName указан, будет удален триггер с соответствующим именем из раздела TriggersWithData или TriggersFromDb, в зависимости от JobName.
+Если TriggerName не указать, будут удалены все триггеры из раздела TriggersWithData или TriggersFromDb, в зависимости от JobName.
 ```
 
 # Принудительный вызов JobHandler'a с поддержкой Commands, содержащих данные
@@ -665,6 +697,21 @@ DEV_Jobs_Triggers_TestJob_Cron: 0/10 \* \* \? \* \*
 ```
 
 Передача данных в JobHandler работает за счет сериализации команды в один из ключей [JobData](https://www.quartz-scheduler.net/documentation/quartz-3.x/tutorial/more-about-jobs.html#jobdatamap) 
+
+# Изменение расписания задачи
+Чтобы изменить расписание выполняния задачи, используется PUT-метод **/jobs/{JobName}**.
+Метод меняет cron-выражения задачи(джоб) с именем **JobName**. В теле запроса можно указать группу, cron-выражение для джоба и имя триггера:
+```json
+{
+  "jobGroup": "string",
+  "triggerName": "string",    // Опционально. Нужно указывать, если планируется изменение расписания триггера из TriggersWithData или TriggersFromDb
+  "cronExpression": "string"
+}
+```
+
+Добавлен новый параметр в запрос: TriggerName. Он используется для управления триггерами из разделов TriggersWithData и TriggersFromDb.
+Если TriggerName указан, будет изменено расписание триггера с соответствующим именем из раздела TriggersWithData или TriggersFromDb, в зависимости от JobName.
+Если TriggerName не указать, будет выброшено исключение с сообщением, в котором будут перечислены доступные триггеры для изменения(только для поиска триггеров в TriggersWithData и TriggersFromDb).
 
 # Воссстановление упавших worker'ов
 1. Существует механизм периодического поднятия worker'ов, триггеры которых находятся в состоянии ERROR. Он работает всегда, период проверки задает настройкой ```JobRecoveryDelayInMilliseconds```
@@ -761,4 +808,103 @@ DEV_Jobs_Triggers_TestJob_Cron: 0/10 \* \* \? \* \*
 	);
 	
 	GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE quartz.qrtz_execution_history_stats TO quartz_jobstore_user;
+```
+
+# Регистрация триггера с данными
+1. Добавление триггера из TriggersWithData:
+1.1. Добавить секцию TriggersWithData в раздел Jobs:
+```json
+"Jobs": {
+  ...
+  "TriggersWithData": {                        // словарь джобов с описанием триггеров, для которых нужно задать дополнительные данные
+    "SomeJobHandler": [                        // название джоба
+      {              
+        "TriggerName": "TriggerTest1",         // название триггера
+        "CronExpression": "0/5 * * * * ?",     // cron-выражение
+        "TriggerData": {                       // словарь данных для триггера (JobDataMap)
+          "someData": "test data", 
+          "someData2": 42 
+        } 
+      } 
+    ] 
+  },
+  ...
+}
+```
+В результате будет зарегистрирован джоб с именем SomeJobHandler и триггер TriggerTest1 для этого джоба.
+Раздел SomeJobHandler является массивом, соотв. можно указать несколько триггеров с разным названием и данными.
+2. Добавление триггера из TriggersFromDb:
+1.1 Добавить секцию TriggersFromDb в раздел Jobs:
+```json
+"Jobs": {
+  ...
+  "TriggersFromDb": {                          // словарь джобов с описанием триггеров, для которых дополнительные данные поставляются с помощью ProviderType
+    "AnotherJobHandler":[                      // название джоба
+      {
+        "TriggerName": "TriggerTest1",         // название триггера
+        "ProviderType": "TriggerDataProvider1" // провайдер данных для триггера TriggerTest1, должен реализовывать интерфейс ITriggerDataProvider
+      }
+    ]
+  }
+  ...
+}
+```
+В результате будет зарегистрирован джоб с именем AnotherJobHandler и триггер TriggerTest1 для этого джоба.
+Раздел SomeJobHandler является массивом, соотв. можно указать несколько триггеров с разным названием и данными.
+
+# Интерфейс ITriggerDataProvider
+Интерфейс ITriggerDataProvider содержит следующие методы:
+```csharp
+Task<string> GetCronExpression(string triggerName, CancellationToken cancellationToken);                    // возвращает cron-выражение
+Task<Dictionary<string, object>> GetTriggerData(string triggerName, CancellationToken cancellationToken);   // возвращает словарь данных для триггера
+```
+Провайдер, указанный в секции TriggersFromDb, должен реализовывать этот интерфейс:
+```csharp
+public class TestTriggerDataProvider : ITriggerDataProvider
+{
+    public Task<string> GetCronExpression(string triggerName, CancellationToken cancellationToken)
+    {
+        var cronExpr = string.Empty;
+        if (triggerName == "TestTrigger")
+        {
+            cronExpr = "0/5 * * * * ?";
+        }
+
+        return Task.FromResult(cronExpr);
+    }
+
+    public Task<Dictionary<string, object>> GetTriggerData(string triggerName, CancellationToken cancellationToken)
+    {
+        var dict = new Dictionary<string, object>();
+        if (triggerName == "TestTrigger")
+        {
+            dict.Add("testData1", "some string");
+            dict.Add("testData2", 42);
+        }
+
+        return Task.FromResult(dict);
+    }
+}
+```
+
+# Интерфейс IHasTriggerData
+Содержит поле, для доступа к данным триггера:
+```csharp
+public Dictionary<string, object> JobData { get; set; }
+```
+Указывается для команды, которая передается в обработчик, при запуске джоба:
+```csharp
+public class ImportTestDataCommand : IRequest, IHasTriggerData
+{
+    public Dictionary<string, object> JobData { get; set; }
+}
+```
+Получение данных из словаря в обработчике команды:
+```csharp
+public Task Handle(ImportTestDataCommand request, CancellationToken cancellationToken)
+{
+    Console.WriteLine(request.JobData["testData1"]);  //output: "some string"
+    Console.WriteLine(request.JobData["testData2"]);  //output: 42
+    return Task.CompletedTask;
+}
 ```

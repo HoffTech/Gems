@@ -37,7 +37,7 @@ namespace Gems.Jobs.Quartz
             var targetRequestHandlerTypeArguments = targetRequestHandlerType.GetGenericArguments();
             var requestType = targetRequestHandlerTypeArguments.FirstOrDefault();
 
-            var jobType = GetJobType(targetRequestHandlerType, targetRequestHandlerTypeArguments, isConcurrent);
+            var jobType = GetJobType(requestType, targetRequestHandlerTypeArguments, isConcurrent);
 
             if (!JobNameByJobTypeMap.TryAdd(jobType, name) || !JobNameByRequestTypeMap.TryAdd(requestType, name))
             {
