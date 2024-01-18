@@ -10,19 +10,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gems.Mvc.GenericControllers
 {
-    public class QueryController<TRequest> where TRequest : class, IRequest
+    public class QueryControllerWithResponse<TRequest, TResponse> where TRequest : class, IRequest<TResponse>
     {
         private readonly IMediator mediator;
 
-        public QueryController(IMediator mediator)
+        public QueryControllerWithResponse(IMediator mediator)
         {
             this.mediator = mediator;
         }
 
         [HttpGet]
-        public Task Get([FromQuery] TRequest request, CancellationToken cancellationToken)
+        public async Task<TResponse> Get([FromQuery] TRequest request, CancellationToken cancellationToken)
         {
-            return this.mediator.Send(request, cancellationToken);
+            return await this.mediator.Send(request, cancellationToken).ConfigureAwait(false);
         }
     }
 }

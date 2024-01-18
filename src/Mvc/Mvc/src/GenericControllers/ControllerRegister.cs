@@ -85,7 +85,7 @@ namespace Gems.Mvc.GenericControllers
         {
             return endpoint.Method.ToUpper() switch
             {
-                "GET" => typeof(QueryController<,>),
+                "GET" => typeof(QueryControllerWithResponse<,>),
                 "POST" => endpoint.IsForm || endpoint.SourceType == SourceType.FromForm ? typeof(PostFormSourceCommandWithResponseController<,>) :
                     endpoint.SourceType == SourceType.FromQuery ? typeof(PostQuerySourceCommandWithResponseController<,>)
                     : typeof(PostBodySourceCommandWithResponseController<,>),
@@ -103,6 +103,7 @@ namespace Gems.Mvc.GenericControllers
         {
             return endpoint.Method.ToUpper() switch
             {
+                "GET" => typeof(QueryController<>),
                 "POST" => endpoint.IsForm || endpoint.SourceType == SourceType.FromForm ? typeof(PostFormSourceCommandController<>)
                     : endpoint.SourceType == SourceType.FromQuery ? typeof(PostQuerySourceCommandController<>)
                     : typeof(PostBodySourceCommandController<>),

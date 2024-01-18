@@ -9,6 +9,11 @@
     <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+  
     <ItemGroup>
       <ProjectReference Include="..\..\..\Mvc\Mvc\src\Gems.Mvc.csproj" />
       <ProjectReference Include="..\..\..\Text\Json\src\Gems.Text.Json.csproj" />
