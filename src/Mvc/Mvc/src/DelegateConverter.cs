@@ -72,11 +72,6 @@ public class DelegateConverterProvider<TFrom, TTo>
         }
 
         var delegateConverter = delegateConverterFactory.CreateDelegateConverter(arg);
-        if (delegateConverter == null)
-        {
-            return null;
-        }
-
         return delegateConverter;
     }
 }
