@@ -11,6 +11,7 @@ using FluentValidation.AspNetCore;
 
 using Gems.Mvc.Filters;
 using Gems.Mvc.Filters.Errors;
+using Gems.Mvc.Filters.Exceptions;
 using Gems.Mvc.GenericControllers;
 using Gems.Mvc.MultipleModelBinding;
 using Gems.Mvc.Validation;
@@ -45,6 +46,7 @@ namespace Gems.Mvc
                 options.SuppressModelStateInvalidFilter = true;
             });
             services.AddSingleton<IConverter<Exception, BusinessErrorViewModel>, ExceptionToBusinessErrorViewModelConverter>();
+            services.AddSingleton<DelegateConverterProvider<ModelStateValidationException, Exception>>();
             return services.AddControllers(options =>
                 {
                     options.Filters.Add(typeof(ModelStateValidationFilter));
@@ -78,6 +80,7 @@ namespace Gems.Mvc
                 options.SuppressModelStateInvalidFilter = true;
             });
             services.AddSingleton<IConverter<Exception, BusinessErrorViewModel>, ExceptionToBusinessErrorViewModelConverter>();
+            services.AddSingleton<DelegateConverterProvider<ModelStateValidationException, Exception>>();
             services.AddControllersWithViews(options =>
                 {
                     options.Filters.Add(typeof(ModelStateValidationFilter));
@@ -132,6 +135,28 @@ namespace Gems.Mvc
             }
 
             services.AddFluentValidationClientsideAdapters();
+        }
+
+        public static void AddConverter<TValidationExceptionToBusinessException>(this IServiceCollection services)
+        {
+            var allInterfaces = typeof(TValidationExceptionToBusinessException).GetInterfaces();
+            foreach (var @interface in allInterfaces)
+            {
+                services.AddSingleton(@interface, typeof(TValidationExceptionToBusinessException));
+                if (@interface.Name != "IConverter`3" || @interface.GetGenericArguments().Length != 3)
+                {
+                    continue;
+                }
+
+                var delegateConverter = typeof(DelegateConverter<,,>).MakeGenericType(@interface.GetGenericArguments());
+                var baseDelegateConverter = typeof(BaseDelegateConverter<,>).MakeGenericType(@interface.GetGenericArguments()[0], @interface.GetGenericArguments()[1]);
+                services.AddSingleton(baseDelegateConverter, p =>
+                {
+                    var converter = p.GetService(@interface);
+                    var delegateConverterInstance = Activator.CreateInstance(delegateConverter, converter);
+                    return delegateConverterInstance;
+                });
+            }
         }
     }
 }
