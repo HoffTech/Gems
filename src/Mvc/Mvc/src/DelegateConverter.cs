@@ -7,62 +7,74 @@ using System.Linq;
 
 namespace Gems.Mvc;
 
-public class DelegateConverter<TFrom, TTo, TArg1> : BaseDelegateConverter<TFrom, TTo>, IConverter<TFrom, TTo, TArg1>
+public class DelegateConverter<TFrom, TTo, TArg1> : BaseDelegateConverter<TFrom, TTo>
+{
+    private readonly IConverter<TFrom, TTo, TArg1> converter;
+    private readonly TArg1 arg1;
+
+    public DelegateConverter(IConverter<TFrom, TTo, TArg1> converter, TArg1 arg1)
+    {
+        this.converter = converter;
+        this.arg1 = arg1;
+    }
+
+    public override TTo Convert(TFrom exception)
+    {
+        return this.converter.Convert(exception, this.arg1);
+    }
+}
+
+public class DelegateConverterFactory<TFrom, TTo, TArg1> : BaseDelegateConverterFactory<TFrom, TTo>
 {
     private readonly IConverter<TFrom, TTo, TArg1> converter;
 
-    public DelegateConverter(IConverter<TFrom, TTo, TArg1> converter)
+    public DelegateConverterFactory(IConverter<TFrom, TTo, TArg1> converter)
     {
         this.converter = converter;
     }
 
     internal override Type ArgType => typeof(TArg1);
 
-    public TTo Convert(TFrom exception, TArg1 arg1)
+    public override BaseDelegateConverter<TFrom, TTo> CreateDelegateConverter(object arg1)
     {
-        return this.converter.Convert(exception, arg1);
-    }
-
-    internal override TTo Convert(TFrom exception)
-    {
-        return this.Convert(exception, (TArg1)this.Arg);
+        return new DelegateConverter<TFrom, TTo, TArg1>(this.converter, (TArg1)arg1);
     }
 }
 
-public abstract class BaseDelegateConverter<TFrom, TTo> : ICloneable
+public abstract class BaseDelegateConverterFactory<TFrom, TTo>
 {
-    public object Arg { get; internal set; }
+    internal abstract Type ArgType { get; }
 
-    internal virtual Type ArgType { get; }
+    public abstract BaseDelegateConverter<TFrom, TTo> CreateDelegateConverter(object arg1);
+}
 
-    public object Clone()
-    {
-        return this.MemberwiseClone();
-    }
-
-    internal abstract TTo Convert(TFrom exception);
+public abstract class BaseDelegateConverter<TFrom, TTo>
+{
+    public abstract TTo Convert(TFrom exception);
 }
 
 public class DelegateConverterProvider<TFrom, TTo>
 {
-    private readonly IEnumerable<BaseDelegateConverter<TFrom, TTo>> converters;
+    private readonly IEnumerable<BaseDelegateConverterFactory<TFrom, TTo>> converterFactories;
 
-    public DelegateConverterProvider(IEnumerable<BaseDelegateConverter<TFrom, TTo>> converters)
+    public DelegateConverterProvider(IEnumerable<BaseDelegateConverterFactory<TFrom, TTo>> converterFactories)
     {
-        this.converters = converters;
+        this.converterFactories = converterFactories;
     }
 
     public BaseDelegateConverter<TFrom, TTo> GetConverter(object arg)
     {
-        var delegateConverter = this.converters.FirstOrDefault(x => x.ArgType == arg.GetType());
-        if (delegateConverter != null)
+        var argType = arg.GetType();
+        var delegateConverterFactory = this.converterFactories.FirstOrDefault(x => x.ArgType == argType);
+        if (delegateConverterFactory == null)
         {
-            delegateConverter = delegateConverter.Clone() as BaseDelegateConverter<TFrom, TTo>;
+            return null;
         }
 
-        if (delegateConverter != null)
+        var delegateConverter = delegateConverterFactory.CreateDelegateConverter(arg);
+        if (delegateConverter == null)
         {
-            delegateConverter.Arg = arg;
+            return null;
         }
 
         return delegateConverter;

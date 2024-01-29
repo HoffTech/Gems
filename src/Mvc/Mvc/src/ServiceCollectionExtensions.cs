@@ -148,8 +148,8 @@ namespace Gems.Mvc
                     continue;
                 }
 
-                var delegateConverter = typeof(DelegateConverter<,,>).MakeGenericType(@interface.GetGenericArguments());
-                var baseDelegateConverter = typeof(BaseDelegateConverter<,>).MakeGenericType(@interface.GetGenericArguments()[0], @interface.GetGenericArguments()[1]);
+                var delegateConverter = typeof(DelegateConverterFactory<,,>).MakeGenericType(@interface.GetGenericArguments());
+                var baseDelegateConverter = typeof(BaseDelegateConverterFactory<,>).MakeGenericType(@interface.GetGenericArguments()[0], @interface.GetGenericArguments()[1]);
                 services.AddSingleton(baseDelegateConverter, p =>
                 {
                     var converter = p.GetService(@interface);
