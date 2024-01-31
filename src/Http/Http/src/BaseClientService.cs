@@ -1378,14 +1378,14 @@ namespace Gems.Http
                 {
                     this.logger?.LogError(e, "Error");
 
-                    currentAttempts++;
-
                     if (currentAttempts > this.Attempts)
                     {
                         this.logger?.LogDebug("Limit of attempts is exceeded");
 
                         throw;
                     }
+
+                    currentAttempts++;
 
                     await Task.Delay(this.MillisecondsDelay, cancellationToken).ConfigureAwait(false);
                 }
