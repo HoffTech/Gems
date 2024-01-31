@@ -10,6 +10,7 @@
 
 * [Установка и настройка](#установка)
 * [Использование исключений](#использование-исключений)
+* [Переопределение текста и кода ошибки валидации входных данных](#переопределение-текста-и-кода-ошибки-валидации-входных-данных)
 * [Регистрация контроллеров для обработчиков MediatR](#регистрация-контроллеров-для-обработчиков-mediatr)
 * [Загрузка файлов](#загрузка-файлов)
 * [Явное указание источника данных](#явное-указание-источника-данных)
@@ -58,6 +59,47 @@ app.UseEndpoints(endpoints =>
   }
 }
 ```
+# Переопределение текста и кода ошибки валидации входных данных
+Реализуйте конвертер IValidationExceptionConverter, если нужно переопределить исключение ValidationException. Данное исключение выбрасывается при проверке валидаторами FluentValidation.       
+Пример:
+```csharp
+public class ValidationExceptionToBusinessException : IValidationExceptionConverter<GetAvailablePayMethodsQuery>
+{
+    public Exception Convert(ValidationException exception, GetAvailablePayMethodsQuery query)
+    {
+        return new BusinessException("Некорректный запрос к сервису")
+        {
+            Error = { IsBusiness = true },
+            StatusCode = 400
+        };
+    }
+}
+```
+Зарегистрируйте конвертер, как сервис:
+```csharp
+services.AddConverter<ValidationExceptionToBusinessException>();
+```
+Реализуйте конвертер IModelStateValidationExceptionConverter, если нужно переопределить исключение ModelStateValidationException. Данное исключение выбрасывается при проверке методом ModelState.IsValid.
+В генерик контроллерах это происходит перед вызовом метода контроллера. Данное исключение так же выброшено, если формат json-а на входе будет неправильный.           
+Пример:
+```csharp
+public class ModelStateValidationExceptionToBusinessException : IModelStateValidationExceptionConverter<GetAvailablePayMethodsQuery>
+{
+    public Exception Convert(ModelStateValidationException exception, GetAvailablePayMethodsQuery query)
+    {
+        return new BusinessException("Некорректный запрос к сервису")
+        {
+            Error = { IsBusiness = true },
+            StatusCode = 400
+        };
+    }
+}
+```
+Зарегистрируйте конвертер, как сервис:
+```csharp
+services.AddConverter<ModelStateValidationExceptionToBusinessException>();
+```
+
 # Регистрация контроллеров для обработчиков MediatR
 Метод AddControllersWithMediatR автоматически регистрирует контроллер для каждого обработчика, который промаркирован атрибутом **Endpoint**. Н-р:
 ```csharp
