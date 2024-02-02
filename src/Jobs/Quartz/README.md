@@ -812,7 +812,7 @@ DEV_Jobs_Triggers_TestJob_Cron: 0/10 \* \* \? \* \*
 
 # Регистрация триггера с данными
 1. Добавление триггера из TriggersWithData:
-1.1. Добавить секцию TriggersWithData в раздел Jobs:
+    1. Добавить секцию TriggersWithData в раздел Jobs:
 ```json
 "Jobs": {
   ...
@@ -833,8 +833,9 @@ DEV_Jobs_Triggers_TestJob_Cron: 0/10 \* \* \? \* \*
 ```
 В результате будет зарегистрирован джоб с именем SomeJobHandler и триггер TriggerTest1 для этого джоба.
 Раздел SomeJobHandler является массивом, соотв. можно указать несколько триггеров с разным названием и данными.
+
 2. Добавление триггера из TriggersFromDb:
-1.1 Добавить секцию TriggersFromDb в раздел Jobs:
+    1. Добавить секцию TriggersFromDb в раздел Jobs:
 ```json
 "Jobs": {
   ...
