@@ -1,3 +1,9 @@
+## 2024.6.1 (2024-02-05)
+
+### added (1 change)
+
+- [Merge branch 'feature/fix-http-client-retry-attempts-logic' into 'main'](axdev/libraries/gems@89139430257e43f1b7dcebc2db9b2e0243360268) ([merge request](axdev/libraries/gems!79))
+
 ## 2024.3.1 (2024-01-18)
 
 ### added (1 change)
