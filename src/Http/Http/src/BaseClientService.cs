@@ -1235,6 +1235,7 @@ namespace Gems.Http
             }
 
             var responseAsString = await response.Content.ReadAsStringAsync();
+            logsCollector.AddResponse(responseAsString);
             if (string.IsNullOrEmpty(responseAsString))
             {
                 return default;
@@ -1247,12 +1248,10 @@ namespace Gems.Http
                     responseAsString = responseAsString.Trim('"');
                 }
 
-                logsCollector.AddResponse(responseAsString);
                 return (TResponse)((object)responseAsString);
             }
 
             var deserializedResponse = this.DeserializeResponse<TResponse>(response, responseAsString);
-            logsCollector.AddResponse(deserializedResponse);
             if (deserializedResponse is IHasStatusCode responseWithStatusCode)
             {
                 responseWithStatusCode.StatusCode = (int)response.StatusCode;
