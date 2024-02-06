@@ -1,3 +1,9 @@
+## 2024.6.2 (2024-02-06)
+
+### added (1 change)
+
+- [Merge branch 'feature/add-structured-logging-for-quartz' into 'main'](axdev/libraries/gems@ebd47e6e1437c8ecc2a7a2d01c49706090e7e62c) ([merge request](axdev/libraries/gems!81))
+
 ## 2024.6.1 (2024-02-05)
 
 ### added (1 change)
