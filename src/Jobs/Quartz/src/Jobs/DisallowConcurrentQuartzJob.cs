@@ -26,7 +26,12 @@ namespace Gems.Jobs.Quartz.Jobs
 
         public async Task Execute(IJobExecutionContext context)
         {
-            this.logger.LogInformation($"NonConcurrent Job {typeof(T).Name} {context.FireInstanceId} executing at {DateTime.UtcNow}");
+            this.logger.LogInformation(
+                "NonConcurrent Job {JobName} {FireInstanceId} executing at {Time}",
+                typeof(T).Name,
+                context.FireInstanceId,
+                DateTime.UtcNow);
+
             try
             {
                 await this.mediator.Send(new T(), context.CancellationToken).ConfigureAwait(false);
@@ -37,7 +42,11 @@ namespace Gems.Jobs.Quartz.Jobs
             }
             finally
             {
-                this.logger.LogInformation($"NonConcurrent Job {typeof(T).Name} {context.FireInstanceId} executed at {DateTime.UtcNow}");
+                this.logger.LogInformation(
+                    "NonConcurrent Job {JobName} {FireInstanceId} executed at {Time}",
+                    typeof(T).Name,
+                    context.FireInstanceId,
+                    DateTime.UtcNow);
             }
         }
     }
