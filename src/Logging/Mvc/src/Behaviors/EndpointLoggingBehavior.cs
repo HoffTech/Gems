@@ -44,8 +44,9 @@ namespace Gems.Logging.Mvc.Behaviors
         {
             var sw = new Stopwatch();
             sw.Start();
+            var context = this.httpContextAccessor.HttpContext;
             var logsCollector = this.logsCollectorFactory.Create(this.logger);
-            this.AddEndpointLogs(logsCollector);
+            this.AddEndpointLogs(context, logsCollector);
             logsCollector.AddLogsFromPayload(request);
             logsCollector.AddRequest(request);
             try
@@ -58,26 +59,41 @@ namespace Gems.Logging.Mvc.Behaviors
 
                 logsCollector.AddLogsFromPayload(response);
                 logsCollector.AddResponse(response);
+                logsCollector.AddStatus(200);
 
                 return response;
             }
             catch (Exception exception)
             {
-                logsCollector.AddResponse(this.exceptionConverter.Convert(exception));
+                var error = this.exceptionConverter.Convert(exception);
+                logsCollector.AddResponse(error);
+                logsCollector.AddStatus(error.StatusCode ?? 499);
                 throw;
             }
             finally
             {
                 sw.Stop();
+                if (context != null)
+                {
+                    logsCollector.AddResponseHeaders(context.Response.Headers.ToDictionary(x => x.Key, y => string.Join(',', y.Value)));
+                }
+
                 logsCollector.AddRequestDuration(sw.Elapsed.Milliseconds);
                 logsCollector.WriteLogs();
             }
         }
 
-        private void AddEndpointLogs(RequestLogsCollector logsCollector)
+        private void AddEndpointLogs(HttpContext context, RequestLogsCollector logsCollector)
         {
-            var context = this.httpContextAccessor.HttpContext;
-            var controllerType = context?.GetEndpoint()?.Metadata?.GetMetadata<ControllerActionDescriptor>()?.MethodInfo.DeclaringType;
+            if (context == null)
+            {
+                return;
+            }
+
+            logsCollector.AddPath(context.Request.Path);
+            logsCollector.AddRequestHeaders(context.Request.Headers.ToDictionary(x => x.Key, y => string.Join(',', y.Value)));
+
+            var controllerType = context.GetEndpoint()?.Metadata?.GetMetadata<ControllerActionDescriptor>()?.MethodInfo.DeclaringType;
             if (controllerType == null || !ControllerRegister.ControllerInfos.TryGetValue(controllerType, out var endpoint))
             {
                 return;
@@ -87,11 +103,6 @@ namespace Gems.Logging.Mvc.Behaviors
             {
                 logsCollector.AddEndpointSummary(endpoint.Summary);
             }
-
-            logsCollector.AddPath(context.Request.Path);
-            logsCollector.AddRequestHeaders(context.Request.Headers.ToDictionary(x => x.Key, y => string.Join(',', y.Value)));
-            logsCollector.AddStatus(context.Response.StatusCode);
-            logsCollector.AddResponseHeaders(context.Response.Headers.ToDictionary(x => x.Key, y => string.Join(',', y.Value)));
         }
     }
 }
