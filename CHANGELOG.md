@@ -1,3 +1,9 @@
+## 2024.6.4 (2024-02-09)
+
+### added (1 change)
+
+- [Merge branch 'AddFeatureToggle' into 'main'](axdev/libraries/gems@ca315c4ada15beb2a420bcee14f86bcbf2864b1e) ([merge request](axdev/libraries/gems!80))
+
 ## 2024.6.3 (2024-02-07)
 
 No changes.
