@@ -426,6 +426,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project Items", "Project It
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gems.OpenTelemetry.Mvc", "src\OpenTelemetry\Mvc\src\Gems.OpenTelemetry.Mvc.csproj", "{144CFED7-053E-4C9D-9C6F-0AFB50F8E13E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.FeatureToggle", "src\FeatureToggle\FeatureToggle\src\Gems.FeatureToggle.csproj", "{D6C7712C-3A1B-4AEF-A732-B2921A78A9A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.FeatureToggle.Tests", "src\FeatureToggle\FeatureToggle\tests\Gems.FeatureToggle.Tests.csproj", "{8A9947DA-06FB-4C1C-A06E-E82808EC74E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleFeatureToggeling", "src\FeatureToggle\FeatureToggle\Samples\SampleFeatureToggeling\SampleFeatureToggeling.csproj", "{E782B2CF-C09C-4BFA-B1E4-A54248B6B77E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FeatureToggle", "FeatureToggle", "{9837F1A5-FC16-4070-A530-645E40A49497}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project items", "Project items", "{A5B4D24E-2A46-40D9-B89C-8C3032861659}"
+	ProjectSection(SolutionItems) = preProject
+		src\FeatureToggle\FeatureToggle\README.md = src\FeatureToggle\FeatureToggle\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{4368DA40-682E-45C7-93DB-3572014ABFC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -640,6 +655,18 @@ Global
 		{144CFED7-053E-4C9D-9C6F-0AFB50F8E13E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{144CFED7-053E-4C9D-9C6F-0AFB50F8E13E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{144CFED7-053E-4C9D-9C6F-0AFB50F8E13E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6C7712C-3A1B-4AEF-A732-B2921A78A9A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6C7712C-3A1B-4AEF-A732-B2921A78A9A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6C7712C-3A1B-4AEF-A732-B2921A78A9A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6C7712C-3A1B-4AEF-A732-B2921A78A9A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A9947DA-06FB-4C1C-A06E-E82808EC74E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A9947DA-06FB-4C1C-A06E-E82808EC74E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A9947DA-06FB-4C1C-A06E-E82808EC74E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A9947DA-06FB-4C1C-A06E-E82808EC74E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E782B2CF-C09C-4BFA-B1E4-A54248B6B77E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E782B2CF-C09C-4BFA-B1E4-A54248B6B77E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E782B2CF-C09C-4BFA-B1E4-A54248B6B77E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E782B2CF-C09C-4BFA-B1E4-A54248B6B77E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -764,6 +791,11 @@ Global
 		{357928D1-5C67-47CA-9976-83A7303CF00C} = {A28FB33C-339A-4EF4-AEBD-17B565C1B000}
 		{BDA14551-22EC-46E4-BD65-47EAF979A5AE} = {AE168D26-F1FF-4655-B5BA-F8CB45A00314}
 		{144CFED7-053E-4C9D-9C6F-0AFB50F8E13E} = {AE168D26-F1FF-4655-B5BA-F8CB45A00314}
+		{D6C7712C-3A1B-4AEF-A732-B2921A78A9A1} = {9837F1A5-FC16-4070-A530-645E40A49497}
+		{8A9947DA-06FB-4C1C-A06E-E82808EC74E1} = {9837F1A5-FC16-4070-A530-645E40A49497}
+		{A5B4D24E-2A46-40D9-B89C-8C3032861659} = {9837F1A5-FC16-4070-A530-645E40A49497}
+		{4368DA40-682E-45C7-93DB-3572014ABFC0} = {9837F1A5-FC16-4070-A530-645E40A49497}
+		{E782B2CF-C09C-4BFA-B1E4-A54248B6B77E} = {4368DA40-682E-45C7-93DB-3572014ABFC0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F59BAF6C-0E34-4F38-A0E7-2227592118CE}

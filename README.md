@@ -90,6 +90,7 @@
 
 # Настройки
 - [Gems.Settings.Gitlab](/src/Settings/Gitlab)
+- [Gems.FeatureToggle](/src/FeatureToggle/FeatureToggle)
 
 # Работа с задачами
 - [Gems.Tasks](/src/Tasks/Tasks)
