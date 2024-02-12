@@ -9,6 +9,7 @@
 * [Примеры](#примеры)
 * [Логирование](#логирование)
 * [Метрики](#метрики)
+* [Аутентификация/Авторизация](#аутентификацияавторизация)
 
 # Установка
 Установите nuget пакет Gems.Http через менеджер пакетов
@@ -116,6 +117,7 @@ public virtual async Task<TResponse> SendRequestAsync<TResponse, TError>(
             string requestUri,
             object requestData,
             IDictionary<string, string> headers,
+            bool isAuthenticationRequest,
             CancellationToken cancellationToken)
         where TError : class, new();
 ```
@@ -268,3 +270,37 @@ public async Task CreateSomeData(SomeData data, CancellationToken cancellationTo
 В BaseClientService можно настроить автоматическую сбор логов для исходящих запросов. Как это сделать смотрите [здесь](/src/Logging/Mvc/README.md#сбор-логов-requestlogscollector).
 # Метрики
 В BaseClientService можно настроить автоматическую запись метрик для исходящих запросов. Как работать с метриками с бд смотрите [здесь](/src/Metrics/Http/README.md#метрики-с-baseclientservice).
+
+# Аутентификация/Авторизация
+Для возможности аутентификации/авторизации предусмотрен виртуальный метод:
+```csharp
+protected virtual Task<string> GetAccessTokenAsync(CancellationToken cancellationToken)
+{
+    return Task.FromResult<string>(null);
+}
+```
+
+Внутри метода предполагается инкапуслирование функции Логина к стороннему Api, позволяющее получить AccessToken
+Например: 
+```csharp
+protected override Task<string> GetAccessTokenAsync(CancellationToken cancellationToken)
+{
+    return this
+        .SendAuthenticationRequestAsync<string>(
+            requestUri: "api/users/login",
+            requestData: new LoginRequestDto
+            {
+                UserName = options.Value.UserName,
+                Password = options.Value.Password
+            },
+            headers: null,
+            cancellationToken);
+}
+```
+
+Логика работы аутентификации посредством передачи токена:
+1) При выполнении каждого запроса вызывается _GetAccessTokenAsync_ для передачи в _Headers_ запроса, если AccessToken равен пустой строке или null.
+2) В случае если на запрос из п.1 вернулась ошибка **401** или **403**(т.е. токен утратил актуальность), AccessToken устанавливается в значение null - происходит повторная попытка п.1.
+3) Если на запрос возвращается ошибка 401 в течении 3 раз, то ошибка выбрасывается наверх.
+
+Вышеприведенная логика подразумевает обновление токена только в случае утраты актуальности.
