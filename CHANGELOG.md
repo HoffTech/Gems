@@ -1,3 +1,9 @@
+## 2024.7.2 (2024-02-12)
+
+### added (1 change)
+
+- [Merge branch 'feature/add-access-token-authorization' into 'main'](axdev/libraries/gems@6e6164c8c957a5f51fa0b92258cee273a86ddb7e) ([merge request](axdev/libraries/gems!84))
+
 ## 2024.7.1 (2024-02-12)
 
 No changes.
