@@ -160,6 +160,50 @@ namespace Gems.Http
                 cancellationToken);
         }
 
+        public virtual async Task<TResponse> SendRequestAsync<TResponse, TError>(
+            HttpMethod httpMethod,
+            string requestUri,
+            object requestData,
+            IDictionary<string, string> headers,
+            bool isAuthenticationRequest,
+            CancellationToken cancellationToken)
+        {
+            Task<TResponse> SendRequestInnerAsync() => this.SendWithHandlingExceptionsAsync<TResponse, TError>(
+                httpMethod,
+                requestUri,
+                requestData,
+                headers,
+                isAuthenticationRequest,
+                cancellationToken);
+
+            return this.Durable
+                ? await this.DurableRequestAsync<TResponse, TError>(SendRequestInnerAsync, cancellationToken).ConfigureAwait(false)
+                : await SendRequestInnerAsync().ConfigureAwait(false);
+        }
+
+        public virtual async Task<(TResponse, TError)> TrySendRequestAsync<TResponse, TError>(
+            HttpMethod httpMethod,
+            string requestUri,
+            object requestData,
+            IDictionary<string, string> headers,
+            bool isAuthenticationRequest,
+            CancellationToken cancellationToken)
+        {
+            TResponse response = default;
+            TError error = default;
+            try
+            {
+                response = await this.SendRequestAsync<TResponse, TError>(httpMethod, requestUri, requestData, headers, isAuthenticationRequest, cancellationToken);
+            }
+            catch (RequestException<TError> e)
+            {
+                this.LastException = e;
+                error = e.Error;
+            }
+
+            return (response, error);
+        }
+
         public Task<TResponse> SendAuthenticationRequestAsync<TResponse>(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
         {
             return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Post, requestUri, requestData, headers, true, cancellationToken);
@@ -990,50 +1034,6 @@ namespace Gems.Http
             return headers.Remove("Content-Type", out var mediaType)
                 ? mediaType
                 : null;
-        }
-
-        private async Task<TResponse> SendRequestAsync<TResponse, TError>(
-            HttpMethod httpMethod,
-            string requestUri,
-            object requestData,
-            IDictionary<string, string> headers,
-            bool isAuthenticationRequest,
-            CancellationToken cancellationToken)
-        {
-            Task<TResponse> SendRequestInnerAsync() => this.SendWithHandlingExceptionsAsync<TResponse, TError>(
-                httpMethod,
-                requestUri,
-                requestData,
-                headers,
-                isAuthenticationRequest,
-                cancellationToken);
-
-            return this.Durable
-                ? await this.DurableRequestAsync<TResponse, TError>(SendRequestInnerAsync, cancellationToken).ConfigureAwait(false)
-                : await SendRequestInnerAsync().ConfigureAwait(false);
-        }
-
-        private async Task<(TResponse, TError)> TrySendRequestAsync<TResponse, TError>(
-            HttpMethod httpMethod,
-            string requestUri,
-            object requestData,
-            IDictionary<string, string> headers,
-            bool isAuthenticationRequest,
-            CancellationToken cancellationToken)
-        {
-            TResponse response = default;
-            TError error = default;
-            try
-            {
-                response = await this.SendRequestAsync<TResponse, TError>(httpMethod, requestUri, requestData, headers, isAuthenticationRequest, cancellationToken);
-            }
-            catch (RequestException<TError> e)
-            {
-                this.LastException = e;
-                error = e.Error;
-            }
-
-            return (response, error);
         }
 
         private async Task<TResponse> SendWithHandlingExceptionsAsync<TResponse, TError>(
