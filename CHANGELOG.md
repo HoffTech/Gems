@@ -1,3 +1,9 @@
+## 2024.7.3 (2024-02-12)
+
+### added (1 change)
+
+- [Merge branch 'feature/sendrequest-to-virtual' into 'main'](axdev/libraries/gems@97f3b3b9f04c73a3e92898f0cd9bd987e799d7de) ([merge request](axdev/libraries/gems!85))
+
 ## 2024.7.2 (2024-02-12)
 
 ### added (1 change)
