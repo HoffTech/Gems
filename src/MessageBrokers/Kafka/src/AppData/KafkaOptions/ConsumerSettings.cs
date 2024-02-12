@@ -24,6 +24,8 @@ namespace Gems.MessageBrokers.Kafka.AppData.KafkaOptions
 
         public bool? EnableAutoOffsetStore { get; set; }
 
+        public bool? EnableRetry { get; set; }
+
         public RetryAttempts[] RetryAttempts { get; set; }
 
         /// <summary>

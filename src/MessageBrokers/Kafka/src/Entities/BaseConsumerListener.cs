@@ -147,6 +147,10 @@ namespace Gems.MessageBrokers.Kafka.Entities
                     }
 
                     currentTopicPartitionOffset = consumeResult.TopicPartitionOffset;
+                    this.logger.LogInformation(
+                        "ConsumeResult {TopicPartitionOffset} executing at {Time}",
+                        currentTopicPartitionOffset,
+                        DateTime.UtcNow);
 
                     var command = this.GetConsumerCommand(consumeResult, cancellationToken);
 
@@ -175,6 +179,13 @@ namespace Gems.MessageBrokers.Kafka.Entities
                     this.logger.LogError(exception, "Unexpected error");
                     await this.RetryConsume(currentTopicPartitionOffset).ConfigureAwait(false);
                 }
+                finally
+                {
+                    this.logger.LogInformation(
+                        "ConsumeResult {TopicPartitionOffset} executed at {Time}",
+                        currentTopicPartitionOffset,
+                        DateTime.UtcNow);
+                }
             }
         }
 
@@ -200,10 +211,16 @@ namespace Gems.MessageBrokers.Kafka.Entities
                 throw new InvalidOperationException("TopicPartitionOffset is null");
             }
 
+            var consumerSettings = this.kafkaConfiguration.Consumers[this.topic];
+            if (!(consumerSettings.EnableRetry ?? false))
+            {
+                return;
+            }
+
             this.retryAttemptDelaysQueue ??= this.CreateRetryAttemptsQueue();
             var delay = this.retryAttemptDelaysQueue.Count > 0
                 ? this.retryAttemptDelaysQueue.Dequeue()
-                : this.kafkaConfiguration.Consumers[this.topic].RetryAttempts[^1].DelayInMilliseconds;
+                : consumerSettings.RetryAttempts[^1].DelayInMilliseconds;
 
             this.consumer.Assign(currentTopicPartitionOffset);
             await Task.Delay(delay).ConfigureAwait(false);
