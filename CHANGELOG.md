@@ -1,3 +1,9 @@
+## 2024.7.4 (2024-02-13)
+
+### added (1 change)
+
+- [Merge branch 'feature/add-retry-after-behavior' into 'main'](axdev/libraries/gems@56bf346cd591124a217bfcfeffb3c318a5db748a) ([merge request](axdev/libraries/gems!86))
+
 ## 2024.7.3 (2024-02-12)
 
 ### added (1 change)
