@@ -103,6 +103,7 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
         this.services.AddPipeline(typeof(ScopeLoggingBehavior<,>));
         this.services.AddPipeline(typeof(EndpointLoggingBehavior<,>));
         this.services.AddPipeline(typeof(NotFoundBehavior<,>));
+        this.services.AddPipeline(typeof(AddRetryAfterHeaderBehavior<,>));
         this.services.AddPipeline(typeof(ExceptionBehavior<,>));
         this.services.AddPipeline(typeof(CacheBehavior<,>));
         this.services.AddPipeline(typeof(ErrorMetricsBehavior<,>));

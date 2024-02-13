@@ -16,6 +16,7 @@
 * [Явное указание источника данных](#явное-указание-источника-данных)
 * [Логирование](#логирование)
 * [Метрики](#метрики)
+* [Заголовки](#заголовки)
 
 # Установка
 
@@ -191,3 +192,24 @@ public class CreatePersonCommandHandler : IRequestHandler<CreatePersonCommand, G
 
 # Метрики
 Многие метрики пишутся автоматически при подключении пайплайнов для Mediatr (см. [здесь](/src/Metrics/Metrics/README.md#использование-пайплайнов)).
+
+# Заголовки
+### Заголовок retry-after
+Заголовок **retry-after** добавляется в Заголовки ответа сервиса при выбрасывании исключения _TooManyRequestException_ и возврата статуса 429.
+<br/>
+
+Для добавления заголовка **retry-after**:
+1) Зарегистрируйте Pipeline (по умолчанию регистрируется в Gems.CompositionRoot)
+```csharp
+    this.services.AddPipeline(typeof(ReFireJobOnFailedBehavior<,>));
+```
+2) Имплементируйте интерфейс IRequestAddRetryAfterHeader для команды/запроса
+```csharp
+    public class SomethingCommand : IRequestAddRetryAfterHeader
+    {
+        public int GetRetryAfterInterval()
+        {
+            return 60; // по умолчанию 60
+        }
+    }
+```
