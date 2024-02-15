@@ -1,3 +1,10 @@
+## 2024.7.5 (2024-02-15)
+
+### added (2 changes)
+
+- [Merge branch 'feature/fix-error-metrics-behavior' into 'main'](axdev/libraries/gems@299e4e6d2104bc0ece2150055fbe3a0680ba5a11) ([merge request](axdev/libraries/gems!88))
+- [Merge branch 'feature/add-retry-after-behavior' into 'main'](axdev/libraries/gems@58d3b6c5b8444cac3eafec7326492fcf3f22a8df) ([merge request](axdev/libraries/gems!87))
+
 ## 2024.7.4 (2024-02-13)
 
 ### added (1 change)
