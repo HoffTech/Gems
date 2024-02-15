@@ -2,7 +2,6 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -51,7 +50,11 @@ namespace Gems.Mvc.Behaviors
                     throw;
                 }
             }
-            catch (Exception ex) when (ex is BusinessException or ValidationException or InvalidDataException or InvalidOperationException)
+            catch (Exception ex) when (ex is BusinessException
+                                           or ValidationException
+                                           or InvalidDataException
+                                           or System.IO.InvalidDataException
+                                           or InvalidOperationException)
             {
                 this.logger.LogWarning(ex, ex.Message);
                 if (needThrowException(ex))

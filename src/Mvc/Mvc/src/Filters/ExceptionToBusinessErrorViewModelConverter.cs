@@ -3,7 +3,6 @@
 
 using System;
 using System.Data.SqlClient;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Authentication;
@@ -44,6 +43,11 @@ namespace Gems.Mvc.Filters
                         StatusCode = 400
                     };
                 case InvalidDataException e:
+                    return new BusinessErrorViewModel(e)
+                    {
+                        StatusCode = 400
+                    };
+                case System.IO.InvalidDataException e:
                     return new BusinessErrorViewModel(e)
                     {
                         StatusCode = 400
