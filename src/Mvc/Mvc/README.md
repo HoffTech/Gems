@@ -38,8 +38,9 @@ app.UseEndpoints(endpoints =>
 Метод AddControllersWithMediatR регистрирует фильтр для обработки ошибок **HandleErrorFilter**, который перехватывает и обрабатывает исключения:
 - Исключение **UnauthorizedAccessException** от библиотеки System после обработки возвращает StatusCodeResult со статусом 401.
 - Исключение **ValidationException** от библиотеки FluentValidation после обработки возвращает BadRequestObjectResult со статусом 400.
-- Исключение **InvalidDataException** от библиотеки System.IO после обработки возвращает BadRequestObjectResult со статусом 400.
-- Исключение **InvalidOperationException** от библиотеки System.IO после обработки возвращает UnprocessableEntityObjectResult со статусом 422.
+- Исключение **InvalidDataException** от библиотеки System.IO после обработки возвращает BadRequestObjectResult со статусом 400. [Obsolete]
+- Исключение **InvalidOperationException** от библиотеки System после обработки возвращает UnprocessableEntityObjectResult со статусом 422.
+- Исключение **InvalidDataException** от библиотеки Gems.Mvc после обработки возвращает BadRequestObjectResult со статусом 400.
 - Исключение **BusinessException** от библиотеки Gems.Mvc после обработки возвращает UnprocessableEntityObjectResult со статусом 422.
 - Исключение **NotFoundException** от библиотеки Gems.Mvc после обработки возвращает NotFoundObjectResult со статусом 404.
 - Исключение **ConflictException** от библиотеки Gems.Mvc после обработки возвращает ConflictObjectResult со статусом 409.

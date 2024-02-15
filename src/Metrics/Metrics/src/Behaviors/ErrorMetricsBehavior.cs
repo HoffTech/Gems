@@ -59,10 +59,10 @@ namespace Gems.Metrics.Behaviors
                 await this.WriteMetricsAsync("errors_counter", "mssql", this.exceptionConverter.Convert(ex).StatusCode).ConfigureAwait(false);
                 throw;
             }
-            catch (Exception ex) when (ex is ValidationException exception)
+            catch (Exception ex) when (ex is FluentValidation.ValidationException or ValidationException)
             {
-                await this.WriteMetricsAsync("feature_counters", "validation", this.exceptionConverter.Convert(exception).StatusCode).ConfigureAwait(false);
-                await this.WriteMetricsAsync("errors_counter", "validation", this.exceptionConverter.Convert(exception).StatusCode).ConfigureAwait(false);
+                await this.WriteMetricsAsync("feature_counters", "validation", this.exceptionConverter.Convert(ex).StatusCode).ConfigureAwait(false);
+                await this.WriteMetricsAsync("errors_counter", "validation", this.exceptionConverter.Convert(ex).StatusCode).ConfigureAwait(false);
                 throw;
             }
             catch (Exception ex) when (ex is BusinessException exception)
