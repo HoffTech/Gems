@@ -21,9 +21,6 @@
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.6.2" />
     <PackageReference Include="Quartz.Plugins.TimeZoneConverter" Version="3.6.2" />
     <PackageReference Include="Quartz.Serialization.Json" Version="3.6.2" />
-    <PackageReference Include="Quartzmon.Plugins.RecentHistory.PostgreSql" Version="0.1.9" />
-    <PackageReference Include="Quartzmon.Polished" Version="0.2.10" />
-    <PackageReference Include="Quartzmon.Polished.Plugins.RecentHistory" Version="0.1.0" />
   </ItemGroup>
 
   <ItemGroup>
