@@ -1,3 +1,9 @@
+## 2024.8.1 (2024-02-21)
+
+### added (1 change)
+
+- [Merge branch 'feature/add-jobs-quartzmon' into 'main'](axdev/libraries/gems@39bddc165255371265c89b0d34f97239a8cd6e96) ([merge request](axdev/libraries/gems!82))
+
 ## 2024.7.5 (2024-02-15)
 
 ### added (2 changes)
