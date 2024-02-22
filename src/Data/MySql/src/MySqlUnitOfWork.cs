@@ -59,6 +59,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -81,6 +82,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -102,6 +104,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -126,6 +129,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -150,6 +154,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -173,6 +178,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -195,6 +201,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -217,6 +224,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -238,6 +246,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -262,6 +271,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -286,6 +296,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -309,6 +320,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -331,6 +343,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -353,6 +366,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -374,6 +388,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -398,6 +413,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -422,6 +438,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -445,6 +462,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -467,6 +485,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -489,6 +508,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -513,6 +533,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -534,6 +555,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -557,6 +579,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -579,6 +602,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -603,6 +627,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -625,6 +650,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -649,6 +675,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -670,6 +697,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -693,6 +721,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -715,6 +744,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -737,6 +767,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -761,6 +792,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -782,6 +814,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -805,6 +838,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -827,6 +861,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -851,6 +886,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -873,6 +909,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -897,6 +934,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -918,6 +956,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -941,6 +980,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -963,6 +1003,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -987,6 +1028,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -1009,6 +1051,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -1033,6 +1076,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -1054,6 +1098,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -1077,6 +1122,7 @@ namespace Gems.Data.MySql
             finally
             {
                 await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
             }
         }
 
@@ -1090,21 +1136,6 @@ namespace Gems.Data.MySql
             await this.transaction.CommitAsync(this.cancellationToken).ConfigureAwait(false);
             await this.transaction.DisposeAsync().ConfigureAwait(false);
             this.transaction = null;
-        }
-
-        public async ValueTask DisposeAsync()
-        {
-            if (this.transaction != null)
-            {
-                await this.transaction.DisposeAsync().ConfigureAwait(false);
-                this.transaction = null;
-            }
-
-            if (this.connection != null)
-            {
-                await this.connection.DisposeAsync().ConfigureAwait(false);
-                this.connection = null;
-            }
         }
 
         public async Task CallStoredProcedureAsync(
@@ -1139,6 +1170,17 @@ namespace Gems.Data.MySql
                 this.cancellationToken).ConfigureAwait(false);
         }
 
+        public async ValueTask DisposeAsync()
+        {
+            if (this.transaction != null)
+            {
+                await this.transaction.DisposeAsync().ConfigureAwait(false);
+                this.transaction = null;
+            }
+
+            await this.CloseConnectionAsync().ConfigureAwait(false);
+        }
+
         private async Task OpenConnectionAsync()
         {
             SshAgent.OpenSsh(this.sshClientOptions);
@@ -1150,6 +1192,20 @@ namespace Gems.Data.MySql
 
             this.connection = new MySqlConnection(this.connectionStringProvider.Value);
             await this.connection.OpenAsync(this.cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task CloseConnectionAsync()
+        {
+            if (this.transaction != null)
+            {
+                return;
+            }
+
+            if (this.connection != null)
+            {
+                await this.connection.DisposeAsync().ConfigureAwait(false);
+                this.connection = null;
+            }
         }
 
         private async Task BeginTransactionAsync()

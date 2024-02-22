@@ -14,11 +14,7 @@ namespace Gems.Mvc.MultipleModelBinding
         public void PostConfigure(string name, MvcOptions options)
         {
             var bodyProvider = options.ModelBinderProviders.Single(provider => provider.GetType() == typeof(BodyModelBinderProvider));
-#if NETCOREAPP3_1
-            var complexProvider = options.ModelBinderProviders.Single(provider => provider.GetType() == typeof(ComplexTypeModelBinderProvider));
-#else
             var complexProvider = options.ModelBinderProviders.Single(provider => provider.GetType() == typeof(ComplexObjectModelBinderProvider));
-#endif
             var multipleModelBinderProvider = new MultipleModelBinderProvider(bodyProvider, complexProvider);
 
             options.ModelBinderProviders.Insert(0, multipleModelBinderProvider);

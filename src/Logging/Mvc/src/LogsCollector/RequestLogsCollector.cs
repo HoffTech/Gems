@@ -95,7 +95,7 @@ namespace Gems.Logging.Mvc.LogsCollector
 
         public void AddStatus(int status)
         {
-            this.AddOrUpdateValueInLogs("responseStatus", status.ToString());
+            this.AddOrUpdateValueInLogs("responseStatus", status);
         }
 
         public void AddPath(string path)
