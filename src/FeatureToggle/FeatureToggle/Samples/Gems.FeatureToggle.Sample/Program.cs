@@ -2,8 +2,7 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using Gems.FeatureToggle;
-
-using SampleFeatureToggeling;
+using Gems.FeatureToggle.Sample;
 
 var builder = WebApplication.CreateBuilder(args);
 

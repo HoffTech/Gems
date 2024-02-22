@@ -430,7 +430,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.FeatureToggle", "src\F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.FeatureToggle.Tests", "src\FeatureToggle\FeatureToggle\tests\Gems.FeatureToggle.Tests.csproj", "{8A9947DA-06FB-4C1C-A06E-E82808EC74E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleFeatureToggeling", "src\FeatureToggle\FeatureToggle\Samples\SampleFeatureToggeling\SampleFeatureToggeling.csproj", "{E782B2CF-C09C-4BFA-B1E4-A54248B6B77E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.FeatureToggle.Sample", "src\FeatureToggle\FeatureToggle\Samples\Gems.FeatureToggle.Sample\Gems.FeatureToggle.Sample.csproj", "{E782B2CF-C09C-4BFA-B1E4-A54248B6B77E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FeatureToggle", "FeatureToggle", "{9837F1A5-FC16-4070-A530-645E40A49497}"
 EndProject
