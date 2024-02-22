@@ -207,16 +207,33 @@ services.AddPipeline(typeof(TimeMetricBehavior<,>));
 
 
 # TimeMetricBehavior
-Пайплайн TimeMetricBehavior регистрирует метрику времени выполнения запроса(команды), только если запрос(команда) унаследован от IRequestTimeMetric или IRequestTimeMetricExt. Название метрики устанавливается согласно названию запроса(команды).
-Н-р: команда называется CheckPaymentCommand, то значит метрика будет называться check_payment_time.
-Интерфейс IRequestTimeMetricExt позволяет переопределить название метрики:
+Пайплайн TimeMetricBehavior регистрирует метрику времени выполнения запроса(команды). Название метрики устанавливается согласно названию запроса(команды). 
+Пример для команды ImportInventTableCommand:
+```json
+# HELP import_invent_table_time import invent table time
+# TYPE import_invent_table_time gauge
+import_invent_table_time 7243.1196
+```
+Интерфейс IRequestTimeMetric позволяет переопределить название метрики и определить метки и значения меток:
 ```csharp
 public interface IRequestTimeMetric
 {
     Enum GetTimeMetricType();
 }
 ```
-Для того чтобы передать динамические метки метрик необходимо реализовать следующий интерфейс:
+Использовать так:
+```csharp
+public class ImportInventTableCommand : IRequest, IRequestTimeMetric
+{
+    [JsonIgnore]
+    public Enum GetTimeMetricType()
+    {
+        return MetricsType.MyCoolMetric;
+     }
+}
+```
+
+Для того чтобы передать динамические метки, необходимо реализовать следующий интерфейс:
 ```csharp
 public interface ILabelsProvider<in TRequest> : ILabelsProvider
     where TRequest : IBaseRequest

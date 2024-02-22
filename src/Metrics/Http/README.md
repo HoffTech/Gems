@@ -38,7 +38,7 @@ sales_return_claim_status_code_request_time{requestUri="v1/some_uri" }
 ```
 Если нужно переопределить название метрики для одного исходящих запросов, то запрос должен реализовывать интерфейс **IStatusCodeMetricAvailable**, а в поле **StatusCodeMetricType**, добавляемом интерфейсом, нужно передать тип метрики. Чтобы тип метрики не попал в запрос, ему нужно назначить аттрибут **JsonIgnoreAttribute**. Пример:
 ```csharp
-public class MessageRequest : IStatusCodeMetricAvailable
+public class MessageRequestDto : IStatusCodeMetricAvailable
 {
     public string Id { get; set; }
 

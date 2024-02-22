@@ -31,9 +31,9 @@ services.AddPostgresqlUnitOfWork(
     "default", 
     options =>
     {
-        //...
         options.DbQueryMetricType = DbQueryMetricType.SalesReturnClaimDbQueryTime; // ваше перечисление
-        //...
+        // или
+        options.DbQueryMetricInfo = new MetricInfo { Name = "sales_return_claim_db_query_time", Description = "Sales Return Claim Db Query Time" };     
     });
 
 // Само перечисление:
@@ -41,16 +41,6 @@ public enum DbQueryMetricType
 {
     SalesReturnClaimDbQueryTime
 }
-
-// ---------------------------------------------- ДОПОЛНИТЕЛЬНО: ------------------------------------------------------ 
-// Вместо конфигурации опции DbQueryMetricInfo:
-// options.DbQueryMetricInfo = DbQueryMetricType.SalesReturnClaimDbQueryTime;
-
-// Можно указать:
-// options.DbQueryMetricInfo = new MetricInfo { Name = "sales_return_claim_db_query_time", Description = "Sales Return Claim Db Query Time" };
-
-// Или можно не указыаать данную опцию, тогда по умолчанию будет такая метрика
-// options.DbQueryMetricInfo = new MetricInfo { Name = "db_query_time", Description = "Db Query Time" };
 ```
 Для функции с названием public.get_last_return_claim_log будет писаться такая метрика sales_return_claim_db_query_time с меткой functionName
 ```json
