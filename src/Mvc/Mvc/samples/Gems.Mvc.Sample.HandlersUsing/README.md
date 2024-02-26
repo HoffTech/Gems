@@ -4,7 +4,7 @@
 
 # Регистрация обработчика HTTP запроса
 
-##Зарегистрируйте контроллер для каждого обработчика, который промаркирован атрибутом **Endpoint**. 
+## Зарегистрируйте контроллер для каждого обработчика, который промаркирован атрибутом **Endpoint**. 
 
 Это можно сделать двумя способами:
 1. В файле Startup.cs добавьте следующий код
@@ -37,7 +37,7 @@ public void ConfigureServices(IServiceCollection services)
             });
     }
 ```
-##Опишите класс запроса и его обработчик
+## Опишите класс запроса и его обработчик
 ```csharp
 // запрос
 public class CreatePersonCommand : IRequest<Guid>, IRequestUnitOfWork
@@ -65,7 +65,7 @@ public class CreatePersonCommandHandler : IRequestHandler<CreatePersonCommand, G
 
 # Переопределение текста и кода ошибки валидации входных данных
 
-##Реализуйте конвертер IValidationExceptionConverter, если нужно переопределить исключение ValidationException. Данное исключение выбрасывается при проверке валидаторами FluentValidation. 
+## Реализуйте конвертер IValidationExceptionConverter, если нужно переопределить исключение ValidationException. Данное исключение выбрасывается при проверке валидаторами FluentValidation. 
 Данное исключение выбрасывается при проверке методом ModelState.IsValid.
 В генерик контроллерах это происходит перед вызовом метода контроллера. Данное исключение так же выброшено, если формат json-а на входе будет неправильный. 
 
@@ -83,7 +83,7 @@ public class ValidationExceptionToBusinessException : IValidationExceptionConver
 }
 
 ```
-##Зарегистрируйте конвертер, как сервис
+## Зарегистрируйте конвертер, как сервис
 ```csharp
 services.AddConverter<ValidationExceptionToBusinessException>();
 ```
