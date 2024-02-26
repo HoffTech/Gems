@@ -110,7 +110,7 @@ public class FeatureToggleService : IFeatureToggleService
             HttpClientFactory = this.featureToggleOptions.Value.CustomHttpClientBuilder != null
                 ? new FeatureToggleHttpClientFactory(this.featureToggleOptions.Value.CustomHttpClientBuilder)
                 : new DefaultHttpClientFactory(),
-            BootstrapOverride = this.featureToggleOptions.Value.EnableBootstrapLoading,
+            BootstrapOverride = this.featureToggleOptions.Value.EnableBootstrapLoading
         };
 
         this.contextProvider = settings.UnleashContextProvider;

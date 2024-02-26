@@ -16,7 +16,7 @@ namespace Gems.OpenTelemetry.Configuration
             "/liveness",
             "/readiness",
             "/dashboard",
-            "/quatz",
+            "/quatz"
         };
 
         public static List<string> RequestOutUrlExclude { get; set; } = new List<string>();

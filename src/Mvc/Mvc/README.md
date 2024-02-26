@@ -62,6 +62,7 @@ app.UseEndpoints(endpoints =>
 }
 ```
 # Переопределение текста и кода ошибки валидации входных данных
+[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.HandlersUsing)
 Реализуйте конвертер IValidationExceptionConverter, если нужно переопределить исключение ValidationException. Данное исключение выбрасывается при проверке валидаторами FluentValidation.       
 Пример:
 ```csharp
@@ -77,7 +78,7 @@ public class ValidationExceptionToBusinessException : IValidationExceptionConver
     }
 }
 ```
-Зарегистрируйте конвертер, как сервис:
+Зарегистрируйте конвертер, как сервис:[README.md](..%2F..%2F..%2FREADME.md)
 ```csharp
 services.AddConverter<ValidationExceptionToBusinessException>();
 ```
