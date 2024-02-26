@@ -65,7 +65,7 @@ public class CreatePersonCommandHandler : IRequestHandler<CreatePersonCommand, G
 
 # Переопределение текста и кода ошибки валидации входных данных
 
-## Реализуйте конвертер IValidationExceptionConverter, если нужно переопределить исключение ValidationException. Данное исключение выбрасывается при проверке валидаторами FluentValidation. 
+** Реализуйте конвертер IValidationExceptionConverter, если нужно переопределить исключение ValidationException. Данное исключение выбрасывается при проверке валидаторами FluentValidation. **
 Данное исключение выбрасывается при проверке методом ModelState.IsValid.
 В генерик контроллерах это происходит перед вызовом метода контроллера. Данное исключение так же выброшено, если формат json-а на входе будет неправильный. 
 
