@@ -42,6 +42,7 @@ public class EfUnitOfWork : IEfUnitOfWork
     {
         if (this.transaction == null)
         {
+            await this.CloseConnectionAsync().ConfigureAwait(false);
             return;
         }
 
@@ -52,23 +53,12 @@ public class EfUnitOfWork : IEfUnitOfWork
 
         await this.dbContext.SaveChangesAsync(this.cancellationToken).ConfigureAwait(false);
         await this.transaction.CommitAsync(this.cancellationToken).ConfigureAwait(false);
-        await this.transaction.DisposeAsync().ConfigureAwait(false);
-        this.transaction = null;
+        await this.EndTransactionAsync().ConfigureAwait(false);
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (this.transaction != null)
-        {
-            await this.transaction.DisposeAsync().ConfigureAwait(false);
-            this.transaction = null;
-        }
-
-        if (this.dbContext != null)
-        {
-            await this.dbContext.DisposeAsync().ConfigureAwait(false);
-            this.dbContext = null;
-        }
+        await this.EndTransactionAsync().ConfigureAwait(false);
     }
 
     private async Task OpenConnectionAsync()
@@ -86,6 +76,20 @@ public class EfUnitOfWork : IEfUnitOfWork
         this.dbContext = await this.DbContextFactory(this.cancellationToken);
     }
 
+    private async Task CloseConnectionAsync()
+    {
+        if (this.transaction != null)
+        {
+            return;
+        }
+
+        if (this.dbContext != null)
+        {
+            await this.dbContext.DisposeAsync().ConfigureAwait(false);
+            this.dbContext = null;
+        }
+    }
+
     private async Task BeginTransactionAsync()
     {
         await this.OpenConnectionAsync();
@@ -96,5 +100,16 @@ public class EfUnitOfWork : IEfUnitOfWork
         }
 
         this.transaction = await this.dbContext.Database.BeginTransactionAsync(this.cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task EndTransactionAsync()
+    {
+        if (this.transaction != null)
+        {
+            await this.transaction.DisposeAsync().ConfigureAwait(false);
+            this.transaction = null;
+        }
+
+        await this.CloseConnectionAsync().ConfigureAwait(false);
     }
 }

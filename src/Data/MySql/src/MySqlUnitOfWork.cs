@@ -1126,32 +1126,29 @@ namespace Gems.Data.MySql
             }
         }
 
-        public async Task CommitAsync()
-        {
-            if (this.transaction == null)
-            {
-                return;
-            }
-
-            await this.transaction.CommitAsync(this.cancellationToken).ConfigureAwait(false);
-            await this.transaction.DisposeAsync().ConfigureAwait(false);
-            this.transaction = null;
-        }
-
         public async Task CallStoredProcedureAsync(
             string storeProcedureName,
             int commandTimeout,
             DynamicParameters parameters,
             Enum timeMetricType = null)
         {
-            await this.BeginTransactionAsync().ConfigureAwait(false);
-            await MySqlDapperHelper.CallStoredProcedureAsync(
-                this.connection,
-                this.transaction,
-                storeProcedureName,
-                new DynamicParameters(),
-                commandTimeout,
-                this.cancellationToken).ConfigureAwait(false);
+            var timeMetric = this.timeMetricProvider.GetTimeMetric(timeMetricType, null);
+            try
+            {
+                await this.BeginTransactionAsync().ConfigureAwait(false);
+                await MySqlDapperHelper.CallStoredProcedureAsync(
+                    this.connection,
+                    this.transaction,
+                    storeProcedureName,
+                    new DynamicParameters(),
+                    commandTimeout,
+                    this.cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
+            }
         }
 
         public async Task<T> CallStoredProcedureFirstOrDefaultAsync<T>(
@@ -1160,25 +1157,40 @@ namespace Gems.Data.MySql
             DynamicParameters parameters,
             Enum timeMetricType = null)
         {
-            await this.BeginTransactionAsync().ConfigureAwait(false);
-            return await MySqlDapperHelper.CallStoredProcedureFirstOrDefaultAsync<T>(
-                this.connection,
-                this.transaction,
-                storeProcedureName,
-                parameters,
-                commandTimeout,
-                this.cancellationToken).ConfigureAwait(false);
+            var timeMetric = this.timeMetricProvider.GetTimeMetric(timeMetricType, null);
+            try
+            {
+                await this.BeginTransactionAsync().ConfigureAwait(false);
+                return await MySqlDapperHelper.CallStoredProcedureFirstOrDefaultAsync<T>(
+                    this.connection,
+                    this.transaction,
+                    storeProcedureName,
+                    parameters,
+                    commandTimeout,
+                    this.cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
+            }
+        }
+
+        public async Task CommitAsync()
+        {
+            if (this.transaction == null)
+            {
+                await this.CloseConnectionAsync().ConfigureAwait(false);
+                return;
+            }
+
+            await this.transaction.CommitAsync(this.cancellationToken).ConfigureAwait(false);
+            await this.EndTransactionAsync().ConfigureAwait(false);
         }
 
         public async ValueTask DisposeAsync()
         {
-            if (this.transaction != null)
-            {
-                await this.transaction.DisposeAsync().ConfigureAwait(false);
-                this.transaction = null;
-            }
-
-            await this.CloseConnectionAsync().ConfigureAwait(false);
+            await this.EndTransactionAsync().ConfigureAwait(false);
         }
 
         private async Task OpenConnectionAsync()
@@ -1218,6 +1230,17 @@ namespace Gems.Data.MySql
             }
 
             this.transaction = await this.connection.BeginTransactionAsync(this.cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task EndTransactionAsync()
+        {
+            if (this.transaction != null)
+            {
+                await this.transaction.DisposeAsync().ConfigureAwait(false);
+                this.transaction = null;
+            }
+
+            await this.CloseConnectionAsync().ConfigureAwait(false);
         }
     }
 }

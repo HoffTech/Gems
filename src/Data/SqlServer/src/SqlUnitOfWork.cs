@@ -1146,46 +1146,49 @@ namespace Gems.Data.SqlServer
             }
         }
 
-        public async Task CommitAsync()
-        {
-            if (this.transaction == null)
-            {
-                return;
-            }
-
-            await this.transaction.CommitAsync(this.cancellationToken).ConfigureAwait(false);
-            await this.transaction.DisposeAsync().ConfigureAwait(false);
-            this.transaction = null;
-        }
-
         public async Task<T> CallStoredProcedureFirstOrDefaultAsync<T>(
             string storeProcedureName,
             int commandTimeout,
             DynamicParameters parameters,
             Enum timeMetricType = null)
         {
-            await this.BeginTransactionAsync().ConfigureAwait(false);
-            return await SqlDapperHelper.CallStoredProcedureFirstOrDefaultAsync<T>(
-                this.connection,
-                this.transaction,
-                storeProcedureName,
-                parameters,
-                commandTimeout,
-                this.cancellationToken).ConfigureAwait(false);
+            var timeMetric = this.timeMetricProvider.GetTimeMetric(timeMetricType, null);
+            try
+            {
+                await this.BeginTransactionAsync().ConfigureAwait(false);
+                return await SqlDapperHelper.CallStoredProcedureFirstOrDefaultAsync<T>(
+                    this.connection,
+                    this.transaction,
+                    storeProcedureName,
+                    parameters,
+                    commandTimeout,
+                    this.cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
+            }
+        }
+
+        public async Task CommitAsync()
+        {
+            if (this.transaction == null)
+            {
+                await this.CloseConnectionAsync().ConfigureAwait(false);
+                return;
+            }
+
+            await this.transaction.CommitAsync(this.cancellationToken).ConfigureAwait(false);
+            await this.EndTransactionAsync().ConfigureAwait(false);
         }
 
         public async ValueTask DisposeAsync()
         {
-            if (this.transaction != null)
-            {
-                await this.transaction.DisposeAsync().ConfigureAwait(false);
-                this.transaction = null;
-            }
-
-            await this.CloseConnectionAsync().ConfigureAwait(false);
+            await this.EndTransactionAsync().ConfigureAwait(false);
         }
 
-        public async Task OpenConnectionAsync()
+        private async Task OpenConnectionAsync()
         {
             if (this.connection != null)
             {
@@ -1221,6 +1224,17 @@ namespace Gems.Data.SqlServer
 
             this.transaction =
                 await this.connection.BeginTransactionAsync(this.cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task EndTransactionAsync()
+        {
+            if (this.transaction != null)
+            {
+                await this.transaction.DisposeAsync().ConfigureAwait(false);
+                this.transaction = null;
+            }
+
+            await this.CloseConnectionAsync().ConfigureAwait(false);
         }
     }
 }
