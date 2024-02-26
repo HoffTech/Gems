@@ -63,6 +63,7 @@ app.UseEndpoints(endpoints =>
 ```
 # Переопределение текста и кода ошибки валидации входных данных
 [Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.HandlersUsing)
+
 Реализуйте конвертер IValidationExceptionConverter, если нужно переопределить исключение ValidationException. Данное исключение выбрасывается при проверке валидаторами FluentValidation.       
 Пример:
 ```csharp
