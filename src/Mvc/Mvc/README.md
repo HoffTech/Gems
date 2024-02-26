@@ -106,6 +106,7 @@ services.AddConverter<ModelStateValidationExceptionToBusinessException>();
 
 # Регистрация контроллеров для обработчиков MediatR
 **[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.HandlersUsing)**
+
 Метод AddControllersWithMediatR автоматически регистрирует контроллер для каждого обработчика, который промаркирован атрибутом **Endpoint**. Н-р:
 ```csharp
 // запрос 
