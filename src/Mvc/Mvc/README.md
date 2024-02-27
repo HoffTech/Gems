@@ -86,24 +86,8 @@ app.UseEndpoints(endpoints =>
 **[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.LoadFile)**
 
 # Явное указание источника данных
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.SourceType)**
 Для того чтобы явно указать источник данных (FromBody, FromQuery, FromForm) нужно использовать SourceType, н-р:
-```csharp
-public class CreatePersonCommand : IRequest<Guid>, IRequestTransaction
-{
-	public string FirstName { get; set; }
-
-	public string LastName { get; set; }
-}
-
-[Endpoint("api/v1/persons", "POST", OperationGroup = "Persons", SourceType = SourceType.FromQuery)]
-public class CreatePersonCommandHandler : IRequestHandler<CreatePersonCommand, Guid>
-{
-	public async Task<Guid> Handle(CreatePersonCommand command, CancellationToken cancellationToken)
-	{		
-		// other code
-	}
-}
-```
 Данная возможность присутствует для Patch, Post и Put запросов. По умолчанию используется FromBody.
 Также, аттрибут IsForm имеет более высокий приоритет.
 
