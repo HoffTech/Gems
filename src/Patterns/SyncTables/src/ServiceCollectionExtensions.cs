@@ -11,16 +11,20 @@ namespace Gems.Patterns.SyncTables
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddTableSyncer(this IServiceCollection services, IConfigurationSection section)
+        public static void AddTableSyncer(this IServiceCollection services, IConfigurationSection section = null)
         {
-            services.Configure<ChangeTrackingSyncOptions>(section);
+            if (section is not null)
+            {
+                services.Configure<ChangeTrackingSyncOptions>(section);
+
+                services.AddSingleton<RowVersionProvider>();
+                services.AddSingleton<RowVersionUpdater>();
+
+                services.AddSingleton<ChangeTrackingMergeProcessorFactory>();
+            }
 
             services.AddSingleton<EntitiesUpdater>();
             services.AddSingleton<ExternalEntitiesProvider>();
-            services.AddSingleton<ExternalEntitiesProvider>();
-            services.AddSingleton<RowVersionProvider>();
-            services.AddSingleton<RowVersionUpdater>();
-            services.AddSingleton<ChangeTrackingMergeProcessorFactory>();
             services.AddSingleton<MergeProcessorFactory>();
         }
     }
