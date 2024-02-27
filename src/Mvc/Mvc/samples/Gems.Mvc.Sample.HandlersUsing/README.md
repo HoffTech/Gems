@@ -1,6 +1,11 @@
-# Простейший обработчик HTTP запроса, а также пример переопределения текста и кода ошибки валидации входных данных
+# Простейший обработчик HTTP запроса
 
-Этот пример демонстрирует как зарегистрировать обработчик HTTP запроса, а также переопределить текст и код ошибки валидации входных данных
+Этот пример демонстрирует как зарегистрировать обработчик HTTP запроса, а также основные базовые операции, такие как валидация входных данных и тд
+
+# Содержание
+* [Регистрация обработчика HTTP запроса](#регистрация-обработчика-http-запроса)
+* [Валидация входных данных](#валидация-входных-данных)
+* [Переопределение текста и кода ошибки валидации входных данных](#переопределение-текста-и-кода-ошибки-валидации-входных-данных)
 
 # Регистрация обработчика HTTP запроса
 
@@ -60,7 +65,32 @@ public class CreatePersonCommandHandler : IRequestHandler<CreatePersonCommand, G
         throw new NotImplementedException();
     }
 }
+```
+# Валидация входных данных
+Для валидации входных данных используется функционал FluentValidation.
+Для добавления валидации:
+1. Зарегистрируйте Pipeline (по умолчанию регистрируется в Gems.CompositionRoot)
+```csharp
+    this.services.AddPipeline(typeof(ValidatorBehavior<,>));
+```
+2. Реализуйте валидатор команды или запроса:
+```csharp
+public class CreatePersonCommandValidator : AbstractValidator<CreatePersonCommand>
+{
+    public CreatePersonCommandValidator()
+    {
+        this.RuleFor(m => m.FirstName)
+            .NotEmpty()
+            .MaximumLength(20);
 
+        this.RuleFor(m => m.LastName)
+            .NotEmpty()
+            .MaximumLength(20);
+
+        this.RuleFor(m => m.Age)
+            .GreaterThanOrEqualTo(0);
+    }
+}
 ```
 
 # Переопределение текста и кода ошибки валидации входных данных
