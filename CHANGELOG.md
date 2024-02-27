@@ -1,3 +1,9 @@
+## 2024.9.2 (2024-02-27)
+
+### added (1 change)
+
+- [Merge branch 'feature/remake-sync-tables-configuration' into 'main'](axdev/libraries/gems@300c88d1237dd937f0ab103434a7fe0c6c395aa8) ([merge request](axdev/libraries/gems!90))
+
 ## 2024.9.1 (2024-02-26)
 
 No changes.
