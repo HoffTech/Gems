@@ -9,9 +9,9 @@
 # Содержание
 
 * [Установка и настройка](#установка)
-* [Использование исключений](#использование-исключений)
-* [Переопределение текста и кода ошибки валидации входных данных](#переопределение-текста-и-кода-ошибки-валидации-входных-данных)
 * [Регистрация контроллеров для обработчиков MediatR](#регистрация-контроллеров-для-обработчиков-mediatr)
+* [Переопределение текста и кода ошибки валидации входных данных](#переопределение-текста-и-кода-ошибки-валидации-входных-данных)
+* [Использование исключений](#использование-исключений)
 * [Загрузка файлов](#загрузка-файлов)
 * [Явное указание источника данных](#явное-указание-источника-данных)
 * [Логирование](#логирование)
@@ -33,6 +33,26 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 ```
+
+# Регистрация контроллеров для обработчиков MediatR
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.HandlersUsing)**
+
+Поддерживаются такие типы обработчиков:
+С возвращаемым параметром:
+- IRequestHandler<SomeQuery,SomeDto>    => [Endpoint("api/v1", "GET")]
+- IRequestHandler<SomeCommand, SomeDto> => [Endpoint("api/v1", "POST")]
+- IRequestHandler<SomeCommand, SomeDto> => [Endpoint("api/v1", "PUT")]
+- IRequestHandler<SomeCommand, SomeDto> => [Endpoint("api/v1", "PATCH")]
+
+Без возвращаемого параметра:
+- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "DELETE")]
+- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "POST")]
+- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "PUT")]
+- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "PATCH")]
+
+
+# Переопределение текста и кода ошибки валидации входных данных
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.HandlersUsing)**
 
 # Использование исключений
 Метод AddControllersWithMediatR регистрирует фильтр для обработки ошибок **HandleErrorFilter**, который перехватывает и обрабатывает исключения:
@@ -61,115 +81,10 @@ app.UseEndpoints(endpoints =>
   }
 }
 ```
-# Переопределение текста и кода ошибки валидации входных данных
-**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.HandlersUsing)**
-
-Реализуйте конвертер IValidationExceptionConverter, если нужно переопределить исключение ValidationException. Данное исключение выбрасывается при проверке валидаторами FluentValidation.       
-Пример:
-```csharp
-public class ValidationExceptionToBusinessException : IValidationExceptionConverter<GetAvailablePayMethodsQuery>
-{
-    public Exception Convert(ValidationException exception, GetAvailablePayMethodsQuery query)
-    {
-        return new BusinessException("Некорректный запрос к сервису")
-        {
-            Error = { IsBusiness = true },
-            StatusCode = 400
-        };
-    }
-}
-```
-Зарегистрируйте конвертер, как сервис:[README.md](..%2F..%2F..%2FREADME.md)
-```csharp
-services.AddConverter<ValidationExceptionToBusinessException>();
-```
-Реализуйте конвертер IModelStateValidationExceptionConverter, если нужно переопределить исключение ModelStateValidationException. Данное исключение выбрасывается при проверке методом ModelState.IsValid.
-В генерик контроллерах это происходит перед вызовом метода контроллера. Данное исключение так же выброшено, если формат json-а на входе будет неправильный.           
-Пример:
-```csharp
-public class ModelStateValidationExceptionToBusinessException : IModelStateValidationExceptionConverter<GetAvailablePayMethodsQuery>
-{
-    public Exception Convert(ModelStateValidationException exception, GetAvailablePayMethodsQuery query)
-    {
-        return new BusinessException("Некорректный запрос к сервису")
-        {
-            Error = { IsBusiness = true },
-            StatusCode = 400
-        };
-    }
-}
-```
-Зарегистрируйте конвертер, как сервис:
-```csharp
-services.AddConverter<ModelStateValidationExceptionToBusinessException>();
-```
-
-# Регистрация контроллеров для обработчиков MediatR
-**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.HandlersUsing)**
-
-Метод AddControllersWithMediatR автоматически регистрирует контроллер для каждого обработчика, который промаркирован атрибутом **Endpoint**. Н-р:
-```csharp
-// запрос 
-public class GetPersonQuery : IRequest<Dto.Person>
-{
-    [FromRoute]
-    public Guid PersonId { get; set; }
-}
-// обработчик
-[Endpoint("api/v1/persons/{PersonId}", "GET", OperationGroup = "Persons", Summary = "Получение информации о пользователе")]
-public class GetPersonQueryHandler : IRequestHandler<GetPersonQuery, Dto.Person>
-{
-    public Task<Dto.Person> Handle(GetPersonQuery query, CancellationToken cancellationToken)
-    {
-        // Some code
-    }
-}
-// где OperationGroup - группирует эндпоинты в сваггере. Summary - добавляет краткое описание эндпоинта в сваггере.
-
-```
-Поддерживаются такие типы обработчиков:
-С возвращаемым параметром:
-- IRequestHandler<SomeQuery,SomeDto>    => [Endpoint("api/v1", "GET")]
-- IRequestHandler<SomeCommand, SomeDto> => [Endpoint("api/v1", "POST")]
-- IRequestHandler<SomeCommand, SomeDto> => [Endpoint("api/v1", "PUT")]
-- IRequestHandler<SomeCommand, SomeDto> => [Endpoint("api/v1", "PATCH")]
-
-Без возвращаемого параметра:
-- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "DELETE")]
-- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "POST")]
-- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "PUT")]
-- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "PATCH")]
 
 # Загрузка файлов
-Для того чтобы загрузить файл необходимо указать чтение данных из формы, н-р:
-```csharp
-public class CreatePersonCommand : IRequest<Guid>, IRequestTransaction
-{
-	public string FirstName { get; set; }
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.LoadFile)**
 
-	public string LastName { get; set; }
-
-	public int Age { get; set; }
-
-	public Gender Gender { get; set; }
-
-	public IFormFile SomeFile { get; set; }
-}
-
-[Endpoint("api/v1/persons", "POST", OperationGroup = "Persons", IsForm = true)]
-public class CreatePersonCommandHandler : IRequestHandler<CreatePersonCommand, Guid>
-{
-	public async Task<Guid> Handle(CreatePersonCommand command, CancellationToken cancellationToken)
-	{
-		using (var fileStream = new FileStream("c:\\temp\\SomeFile.txt", FileMode.Create))
-		{
-			await command.SomeFile.CopyToAsync(fileStream);
-		}
-
-		// other code
-	}
-}
-```
 # Явное указание источника данных
 Для того чтобы явно указать источник данных (FromBody, FromQuery, FromForm) нужно использовать SourceType, н-р:
 ```csharp

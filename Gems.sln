@@ -445,6 +445,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{15A5
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Mvc.Sample.HandlersUsing", "src\Mvc\Mvc\samples\Gems.Mvc.Sample.HandlersUsing\Gems.Mvc.Sample.HandlersUsing.csproj", "{56E52835-CDDC-43C9-91C7-B9397123A626}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Mvc.Sample.LoadFile", "src\Mvc\Mvc\samples\Gems.Mvc.Sample.LoadFile\Gems.Mvc.Sample.LoadFile.csproj", "{A41743B4-8E20-41C0-A54F-D0FAE181D262}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -683,6 +685,10 @@ Global
 		{56E52835-CDDC-43C9-91C7-B9397123A626}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56E52835-CDDC-43C9-91C7-B9397123A626}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56E52835-CDDC-43C9-91C7-B9397123A626}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A41743B4-8E20-41C0-A54F-D0FAE181D262}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A41743B4-8E20-41C0-A54F-D0FAE181D262}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A41743B4-8E20-41C0-A54F-D0FAE181D262}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A41743B4-8E20-41C0-A54F-D0FAE181D262}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -814,6 +820,7 @@ Global
 		{E782B2CF-C09C-4BFA-B1E4-A54248B6B77E} = {4368DA40-682E-45C7-93DB-3572014ABFC0}
 		{15A56B31-7CF2-4849-94A4-76F6FD55C218} = {5A744E79-A532-4DF0-9507-141E544CA1F3}
 		{56E52835-CDDC-43C9-91C7-B9397123A626} = {15A56B31-7CF2-4849-94A4-76F6FD55C218}
+		{A41743B4-8E20-41C0-A54F-D0FAE181D262} = {15A56B31-7CF2-4849-94A4-76F6FD55C218}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F59BAF6C-0E34-4F38-A0E7-2227592118CE}
