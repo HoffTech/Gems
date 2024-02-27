@@ -87,7 +87,8 @@ app.UseEndpoints(endpoints =>
 
 # Явное указание источника данных
 **[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.SourceType)**
-Для того чтобы явно указать источник данных (FromBody, FromQuery, FromForm) нужно использовать SourceType, н-р:
+
+Для того чтобы явно указать источник данных (FromBody, FromQuery, FromForm) нужно использовать SourceType, например:
 Данная возможность присутствует для Patch, Post и Put запросов. По умолчанию используется FromBody.
 Также, аттрибут IsForm имеет более высокий приоритет.
 
@@ -99,21 +100,4 @@ app.UseEndpoints(endpoints =>
 
 # Заголовки
 ### Заголовок retry-after
-Заголовок **retry-after** добавляется в Заголовки ответа сервиса при выбрасывании исключения _TooManyRequestException_ и возврата статуса 429.
-<br/>
-
-Для добавления заголовка **retry-after**:
-1) Зарегистрируйте Pipeline (по умолчанию регистрируется в Gems.CompositionRoot)
-```csharp
-    this.services.AddPipeline(typeof(AddRetryAfterHeaderBehavior<,>));
-```
-2) Имплементируйте интерфейс IRequestAddRetryAfterHeader для команды/запроса
-```csharp
-    public class SomethingCommand : IRequestAddRetryAfterHeader
-    {
-        public int GetRetryAfterInterval()
-        {
-            return 60; // по умолчанию 60
-        }
-    }
-```
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.AddRetryAfterHeader)**
