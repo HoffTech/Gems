@@ -16,7 +16,7 @@ namespace Gems.Mvc
 
     public interface IConverter<in TFrom, out TTo, in TArg1>
     {
-        TTo Convert(TFrom obj, TArg1 arg1);
+        TTo Convert(TFrom obj, TArg1 command);
     }
 
     public interface IConverter<in TFrom, out TTo, in TArg1, in TArg2>

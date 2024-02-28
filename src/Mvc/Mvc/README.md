@@ -9,14 +9,17 @@
 # Содержание
 
 * [Установка и настройка](#установка)
-* [Использование исключений](#использование-исключений)
-* [Переопределение текста и кода ошибки валидации входных данных](#переопределение-текста-и-кода-ошибки-валидации-входных-данных)
 * [Регистрация контроллеров для обработчиков MediatR](#регистрация-контроллеров-для-обработчиков-mediatr)
+* [Валидация входных данных](#валидация-входных-данных)
+* [Переопределение текста и кода ошибки валидации входных данных](#переопределение-текста-и-кода-ошибки-валидации-входных-данных)
+* [Использование исключений](#использование-исключений)
 * [Загрузка файлов](#загрузка-файлов)
 * [Явное указание источника данных](#явное-указание-источника-данных)
 * [Логирование](#логирование)
 * [Метрики](#метрики)
 * [Заголовки](#заголовки)
+* [Возможности для 404 ответа](#возможности-для-404-ответа)
+* [Проброс исключений для доменных обработчиков](#проброс-исключений-для-доменных-обработчиков)
 
 # Установка
 
@@ -33,6 +36,28 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 ```
+
+# Регистрация контроллеров для обработчиков MediatR
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.HandlersUsing)**
+
+Поддерживаются такие типы обработчиков:
+С возвращаемым параметром:
+- IRequestHandler<SomeQuery,SomeDto>    => [Endpoint("api/v1", "GET")]
+- IRequestHandler<SomeCommand, SomeDto> => [Endpoint("api/v1", "POST")]
+- IRequestHandler<SomeCommand, SomeDto> => [Endpoint("api/v1", "PUT")]
+- IRequestHandler<SomeCommand, SomeDto> => [Endpoint("api/v1", "PATCH")]
+
+Без возвращаемого параметра:
+- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "DELETE")]
+- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "POST")]
+- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "PUT")]
+- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "PATCH")]
+
+# Валидация входных данных
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.HandlersUsing)**
+
+# Переопределение текста и кода ошибки валидации входных данных
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.HandlersUsing)**
 
 # Использование исключений
 Метод AddControllersWithMediatR регистрирует фильтр для обработки ошибок **HandleErrorFilter**, который перехватывает и обрабатывает исключения:
@@ -61,130 +86,14 @@ app.UseEndpoints(endpoints =>
   }
 }
 ```
-# Переопределение текста и кода ошибки валидации входных данных
-Реализуйте конвертер IValidationExceptionConverter, если нужно переопределить исключение ValidationException. Данное исключение выбрасывается при проверке валидаторами FluentValidation.       
-Пример:
-```csharp
-public class ValidationExceptionToBusinessException : IValidationExceptionConverter<GetAvailablePayMethodsQuery>
-{
-    public Exception Convert(ValidationException exception, GetAvailablePayMethodsQuery query)
-    {
-        return new BusinessException("Некорректный запрос к сервису")
-        {
-            Error = { IsBusiness = true },
-            StatusCode = 400
-        };
-    }
-}
-```
-Зарегистрируйте конвертер, как сервис:
-```csharp
-services.AddConverter<ValidationExceptionToBusinessException>();
-```
-Реализуйте конвертер IModelStateValidationExceptionConverter, если нужно переопределить исключение ModelStateValidationException. Данное исключение выбрасывается при проверке методом ModelState.IsValid.
-В генерик контроллерах это происходит перед вызовом метода контроллера. Данное исключение так же выброшено, если формат json-а на входе будет неправильный.           
-Пример:
-```csharp
-public class ModelStateValidationExceptionToBusinessException : IModelStateValidationExceptionConverter<GetAvailablePayMethodsQuery>
-{
-    public Exception Convert(ModelStateValidationException exception, GetAvailablePayMethodsQuery query)
-    {
-        return new BusinessException("Некорректный запрос к сервису")
-        {
-            Error = { IsBusiness = true },
-            StatusCode = 400
-        };
-    }
-}
-```
-Зарегистрируйте конвертер, как сервис:
-```csharp
-services.AddConverter<ModelStateValidationExceptionToBusinessException>();
-```
-
-# Регистрация контроллеров для обработчиков MediatR
-Метод AddControllersWithMediatR автоматически регистрирует контроллер для каждого обработчика, который промаркирован атрибутом **Endpoint**. Н-р:
-```csharp
-// запрос 
-public class GetPersonQuery : IRequest<Dto.Person>
-{
-    [FromRoute]
-    public Guid PersonId { get; set; }
-}
-// обработчик
-[Endpoint("api/v1/persons/{PersonId}", "GET", OperationGroup = "Persons", Summary = "Получение информации о пользователе")]
-public class GetPersonQueryHandler : IRequestHandler<GetPersonQuery, Dto.Person>
-{
-    public Task<Dto.Person> Handle(GetPersonQuery query, CancellationToken cancellationToken)
-    {
-        // Some code
-    }
-}
-// где OperationGroup - группирует эндпоинты в сваггере. Summary - добавляет краткое описание эндпоинта в сваггере.
-
-```
-Поддерживаются такие типы обработчиков:
-С возвращаемым параметром:
-- IRequestHandler<SomeQuery,SomeDto>    => [Endpoint("api/v1", "GET")]
-- IRequestHandler<SomeCommand, SomeDto> => [Endpoint("api/v1", "POST")]
-- IRequestHandler<SomeCommand, SomeDto> => [Endpoint("api/v1", "PUT")]
-- IRequestHandler<SomeCommand, SomeDto> => [Endpoint("api/v1", "PATCH")]
-
-Без возвращаемого параметра:
-- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "DELETE")]
-- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "POST")]
-- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "PUT")]
-- IRequestHandler<SomeCommand> => [Endpoint("api/v1", "PATCH")]
 
 # Загрузка файлов
-Для того чтобы загрузить файл необходимо указать чтение данных из формы, н-р:
-```csharp
-public class CreatePersonCommand : IRequest<Guid>, IRequestTransaction
-{
-	public string FirstName { get; set; }
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.LoadFile)**
 
-	public string LastName { get; set; }
-
-	public int Age { get; set; }
-
-	public Gender Gender { get; set; }
-
-	public IFormFile SomeFile { get; set; }
-}
-
-[Endpoint("api/v1/persons", "POST", OperationGroup = "Persons", IsForm = true)]
-public class CreatePersonCommandHandler : IRequestHandler<CreatePersonCommand, Guid>
-{
-	public async Task<Guid> Handle(CreatePersonCommand command, CancellationToken cancellationToken)
-	{
-		using (var fileStream = new FileStream("c:\\temp\\SomeFile.txt", FileMode.Create))
-		{
-			await command.SomeFile.CopyToAsync(fileStream);
-		}
-
-		// other code
-	}
-}
-```
 # Явное указание источника данных
-Для того чтобы явно указать источник данных (FromBody, FromQuery, FromForm) нужно использовать SourceType, н-р:
-```csharp
-public class CreatePersonCommand : IRequest<Guid>, IRequestTransaction
-{
-	public string FirstName { get; set; }
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.Sample.SourceType)**
 
-	public string LastName { get; set; }
-}
-
-[Endpoint("api/v1/persons", "POST", OperationGroup = "Persons", SourceType = SourceType.FromQuery)]
-public class CreatePersonCommandHandler : IRequestHandler<CreatePersonCommand, Guid>
-{
-	public async Task<Guid> Handle(CreatePersonCommand command, CancellationToken cancellationToken)
-	{		
-		// other code
-	}
-}
-```
+Для того чтобы явно указать источник данных (FromBody, FromQuery, FromForm) нужно использовать SourceType, например:
 Данная возможность присутствует для Patch, Post и Put запросов. По умолчанию используется FromBody.
 Также, аттрибут IsForm имеет более высокий приоритет.
 
@@ -196,21 +105,15 @@ public class CreatePersonCommandHandler : IRequestHandler<CreatePersonCommand, G
 
 # Заголовки
 ### Заголовок retry-after
-Заголовок **retry-after** добавляется в Заголовки ответа сервиса при выбрасывании исключения _TooManyRequestException_ и возврата статуса 429.
-<br/>
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.AddRetryAfterHeader)**
 
-Для добавления заголовка **retry-after**:
-1) Зарегистрируйте Pipeline (по умолчанию регистрируется в Gems.CompositionRoot)
-```csharp
-    this.services.AddPipeline(typeof(AddRetryAfterHeaderBehavior<,>));
-```
-2) Имплементируйте интерфейс IRequestAddRetryAfterHeader для команды/запроса
-```csharp
-    public class SomethingCommand : IRequestAddRetryAfterHeader
-    {
-        public int GetRetryAfterInterval()
-        {
-            return 60; // по умолчанию 60
-        }
-    }
-```
+# Возможности для 404 ответа
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.NotFound)**
+
+В Gems.Mvc есть возможность проверять ответ сервиса на null и автоматически возвращать 404 статус
+
+# Проброс исключений для доменных обработчиков
+**[Пример кода](/src/Mvc/Mvc/samples/Gems.Mvc.RequestException)**
+
+При обработке запроса обычно исключения логируются и пробрасываются далее, но иногда бывает так, что надо пробрасывать исключение только при выполнении определённых условий. 
+Например, если вы работаете с коллекций объектов и вам нужно не прерывать обработку, даже если произошла ошибка при обработке одного из них.
