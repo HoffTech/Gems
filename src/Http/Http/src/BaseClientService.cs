@@ -1059,15 +1059,15 @@ namespace Gems.Http
                         logsCollector.AddLogsFromPayload(requestData);
                         requestUri += requestUri.IndexOf("?", StringComparison.Ordinal) > 0 ? "&" : "?";
                         requestUri += await this.SerializeObjectToQueryString(requestData);
-                        requestData = null;
                     }
 
+                    logsCollector.AddPath(requestUri.Split('?')[0]);
+                    requestUri = this.ReplaceRequestUriArgsIfNeed<TError>(requestUri, requestData);
                     var request = new HttpRequestMessage(httpMethod, requestUri);
-                    logsCollector.AddPath(requestUri);
 
                     var mediaType = ExtractMediaTypeFromHeaders(headers);
                     await this.AddHeadersAsync(request, headers, isAuthenticationRequest, cancellationToken);
-                    if (requestData != null)
+                    if (requestData is not null && (httpMethod == HttpMethod.Post || httpMethod == HttpMethod.Put || httpMethod == HttpMethod.Patch))
                     {
                         var httpContent = await this.CreateHttpContent(requestData, mediaType ?? this.MediaType, logsCollector);
                         request.Content = httpContent;
@@ -1148,6 +1148,38 @@ namespace Gems.Http
                     await timeMetric.DisposeAsync().ConfigureAwait(false);
                 }
             }
+        }
+
+        private string ReplaceRequestUriArgsIfNeed<TError>(string requestUri, object requestData)
+        {
+            var requestUriParts = requestUri.Split('?');
+            if (requestUriParts[0].IndexOf("{", StringComparison.InvariantCulture) == -1)
+            {
+                return string.Join(',', requestUriParts);
+            }
+
+            if (requestData is not IHasRequestUriArgs hasRequestUriArgs)
+            {
+                throw new RequestException<TError>($"Необходимо реализовать интерфейс {nameof(IHasRequestUriArgs)}", HttpStatusCode.BadRequest);
+            }
+
+            var requestUriArgs = hasRequestUriArgs.RequestUriArgs;
+            if (requestUriArgs == null || requestUriArgs.Count == 0)
+            {
+                throw new RequestException<TError>($"Метод {nameof(IHasRequestUriArgs)}.{nameof(IHasRequestUriArgs.RequestUriArgs)}", HttpStatusCode.BadRequest);
+            }
+
+            foreach (var (requestUriArgName, requestUriArgValue) in requestUriArgs)
+            {
+                requestUriParts[0] = requestUriParts[0].Replace($"{{{requestUriArgName}}}", requestUriArgValue);
+            }
+
+            if (requestUriParts[0].IndexOf("{", StringComparison.InvariantCulture) >= 0)
+            {
+                throw new RequestException<TError>($"Метод {nameof(IHasRequestUriArgs)}.{nameof(IHasRequestUriArgs.RequestUriArgs)} возвращает не все аргументы, необходимые для замены requestUri: {requestUriParts[0]}", HttpStatusCode.BadRequest);
+            }
+
+            return string.Join('?', requestUriParts);
         }
 
         private async Task<HttpClient> CreateHttpClientAsync<TError>()

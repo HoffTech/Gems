@@ -269,7 +269,7 @@ public async Task CreateSomeData(SomeData data, CancellationToken cancellationTo
 # Логирование
 В BaseClientService можно настроить автоматическую сбор логов для исходящих запросов. Как это сделать смотрите [здесь](/src/Logging/Mvc/README.md#сбор-логов-requestlogscollector).
 # Метрики
-В BaseClientService можно настроить автоматическую запись метрик для исходящих запросов. Как работать с метриками с бд смотрите [здесь](/src/Metrics/Http/README.md#метрики-с-baseclientservice).
+В BaseClientService можно настроить автоматическую запись метрик для исходящих запросов. Как работать с метриками смотрите [здесь](/src/Metrics/Http/README.md#метрики-с-baseclientservice).
 
 # Аутентификация/Авторизация
 Для возможности аутентификации/авторизации предусмотрен виртуальный метод:
