@@ -1,0 +1,22 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Error",
+      "Microsoft.Hosting.Lifetime": "Error"
+    }
+  },
+  "AllowedHosts": "*",
+  "UnitOfWorkProviderOptions": {
+    "UseContext": true
+  },
+  "Jobs": {
+    "SchedulerName": "Sales Scheduler",
+    "TablePrefix": "quartz.qrtz_",
+    "Triggers": {
+      "LoadGoods": "0 0 0 * * ?",
+      "LoadGoodsAttributes": "0 45 0 * * ?",
+      "LoadSales": "0 0 1 * * ?"
+    }
+  }
+}

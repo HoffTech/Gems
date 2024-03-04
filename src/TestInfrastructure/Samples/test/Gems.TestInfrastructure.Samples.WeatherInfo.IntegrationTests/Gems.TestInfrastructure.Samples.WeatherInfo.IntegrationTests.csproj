@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CaseExtensions" Version="1.1.0" />
+    <PackageReference Include="FluentAssertions" Version="7.0.0-alpha.3" />
+    <PackageReference Include="FluentAssertions.Json" Version="6.1.0" />
+    <PackageReference Include="FluentHttpClient" Version="3.0.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
+    <PackageReference Include="NUnit.Analyzers" Version="3.6.1" />
+    <PackageReference Include="coverlet.collector" Version="3.2.0" />
+    <PackageReference Include="Testcontainers" Version="3.7.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="3.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Postgres\src\Gems.TestInfrastructure.Postgres\Gems.TestInfrastructure.Postgres.csproj" />
+    <ProjectReference Include="..\..\..\TestInfrastructure\src\Gems.TestInfrastructure\Gems.TestInfrastructure.csproj" />
+    <ProjectReference Include="..\..\..\WireMock\src\Gems.TestInfrastructure.WireMock\Gems.TestInfrastructure.WireMock.csproj" />
+    <ProjectReference Include="..\..\src\Gems.TestInfrastructure.Samples.WeatherInfo\Gems.TestInfrastructure.Samples.WeatherInfo.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\Csv\precipitations.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Sql\data.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Sql\migration.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
