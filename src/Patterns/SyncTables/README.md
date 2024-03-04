@@ -7,7 +7,6 @@
 * [Установка](#установка)
 * [Пример с Change Tracking](#пример-с-change-tracking)
 * [Пример без Change Tracking](#пример-без-change-tracking)
-* [Примеры](#примеры)
 
 # Установка
 Установите nuget пакет Gems.Patterns.SyncTables через менеджер пакетов
