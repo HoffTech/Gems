@@ -137,7 +137,7 @@ namespace Gems.Http
         {
             return this.TrySendRequestAsync<TResponse, TError>(
                 httpMethod,
-                requestUri,
+                requestUri.ToTemplateUri(),
                 requestData,
                 headers,
                 false,
@@ -153,7 +153,73 @@ namespace Gems.Http
         {
             return this.SendRequestAsync<TResponse, TError>(
                 httpMethod,
-                requestUri,
+                requestUri.ToTemplateUri(),
+                requestData,
+                headers,
+                false,
+                cancellationToken);
+        }
+
+        public virtual Task<TResponse> SendRequestAsync<TResponse, TError>(
+            HttpMethod httpMethod,
+            string requestUri,
+            object requestData,
+            IDictionary<string, string> headers,
+            bool isAuthenticationRequest,
+            CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(
+                httpMethod,
+                requestUri.ToTemplateUri(),
+                requestData,
+                headers,
+                isAuthenticationRequest,
+                cancellationToken);
+        }
+
+        public virtual Task<(TResponse, TError)> TrySendRequestAsync<TResponse, TError>(
+            HttpMethod httpMethod,
+            string requestUri,
+            object requestData,
+            IDictionary<string, string> headers,
+            bool isAuthenticationRequest,
+            CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(
+                httpMethod,
+                requestUri.ToTemplateUri(),
+                requestData,
+                headers,
+                isAuthenticationRequest,
+                cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TrySendRequestAsync<TResponse, TError>(
+            HttpMethod httpMethod,
+            TemplateUri templateUri,
+            object requestData,
+            IDictionary<string, string> headers,
+            CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(
+                httpMethod,
+                templateUri,
+                requestData,
+                headers,
+                false,
+                cancellationToken);
+        }
+
+        public virtual Task<TResponse> SendRequestAsync<TResponse, TError>(
+            HttpMethod httpMethod,
+            TemplateUri templateUri,
+            object requestData,
+            IDictionary<string, string> headers,
+            CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(
+                httpMethod,
+                templateUri,
                 requestData,
                 headers,
                 false,
@@ -162,7 +228,7 @@ namespace Gems.Http
 
         public virtual async Task<TResponse> SendRequestAsync<TResponse, TError>(
             HttpMethod httpMethod,
-            string requestUri,
+            TemplateUri templateUri,
             object requestData,
             IDictionary<string, string> headers,
             bool isAuthenticationRequest,
@@ -170,7 +236,7 @@ namespace Gems.Http
         {
             Task<TResponse> SendRequestInnerAsync() => this.SendWithHandlingExceptionsAsync<TResponse, TError>(
                 httpMethod,
-                requestUri,
+                templateUri,
                 requestData,
                 headers,
                 isAuthenticationRequest,
@@ -183,7 +249,7 @@ namespace Gems.Http
 
         public virtual async Task<(TResponse, TError)> TrySendRequestAsync<TResponse, TError>(
             HttpMethod httpMethod,
-            string requestUri,
+            TemplateUri templateUri,
             object requestData,
             IDictionary<string, string> headers,
             bool isAuthenticationRequest,
@@ -193,7 +259,7 @@ namespace Gems.Http
             TError error = default;
             try
             {
-                response = await this.SendRequestAsync<TResponse, TError>(httpMethod, requestUri, requestData, headers, isAuthenticationRequest, cancellationToken);
+                response = await this.SendRequestAsync<TResponse, TError>(httpMethod, templateUri, requestData, headers, isAuthenticationRequest, cancellationToken);
             }
             catch (RequestException<TError> e)
             {
@@ -1009,6 +1075,811 @@ namespace Gems.Http
             return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Post, requestUri, requestData, null, false, cancellationToken);
         }
 
+        public Task<TResponse> SendAuthenticationRequestAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Post, templateUri, requestData, headers, true, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TrySendAuthenticationRequestAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Post, templateUri, requestData, headers, true, cancellationToken);
+        }
+
+        public Task<TResponse> GetWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> GetWithCustomErrorAsync<TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<string> GetStringWithCustomErrorAsync<TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<string, TError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<Stream> GetStreamWithCustomErrorAsync<TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Stream, TError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<byte[]> GetByteArrayWithCustomErrorAsync<TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<byte[], TError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> GetWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> GetWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<string> GetStringWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<string, TError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<Stream> GetStreamWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Stream, TError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<byte[]> GetByteArrayWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<byte[], TError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> DeleteWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Delete, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> DeleteWithCustomErrorAsync<TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Delete, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> DeleteWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Delete, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> DeleteWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Delete, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> PostWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Post, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> PostWithCustomErrorAsync<TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Post, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> PutWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Put, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> PutWithCustomErrorAsync<TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Put, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> PatchWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Patch, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> PatchWithCustomErrorAsync<TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Post, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> GetWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<Unit> GetWithCustomErrorAsync<TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<string> GetStringWithCustomErrorAsync<TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<string, TError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<Stream> GetStreamWithCustomErrorAsync<TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Stream, TError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<byte[]> GetByteArrayWithCustomErrorAsync<TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<byte[], TError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> GetWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<Unit> GetWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<string> GetStringWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<string, TError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<Stream> GetStreamWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Stream, TError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<byte[]> GetByteArrayWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<byte[], TError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> DeleteWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Delete, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<Unit> DeleteWithCustomErrorAsync<TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Delete, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> DeleteWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Delete, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<Unit> DeleteWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Delete, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> PostWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Post, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<Unit> PostWithCustomErrorAsync<TError>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Post, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> PutWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Put, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<Unit> PutWithCustomErrorAsync<TError>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Put, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> PatchWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TError>(HttpMethod.Patch, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<Unit> PatchWithCustomErrorAsync<TError>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TError>(HttpMethod.Post, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> GetAsync<TResponse>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> GetAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<string> GetStringAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<string, TDefaultError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<Stream> GetStreamAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Stream, TDefaultError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<byte[]> GetByteArrayAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<byte[], TDefaultError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> GetAsync<TResponse>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> GetAsync(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<string> GetStringAsync(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<string, TDefaultError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<Stream> GetStreamAsync(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Stream, TDefaultError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<byte[]> GetByteArrayAsync(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<byte[], TDefaultError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> DeleteAsync<TResponse>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Delete, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> DeleteAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Delete, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> DeleteAsync<TResponse>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Delete, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> DeleteAsync(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Delete, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> PostAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Post, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> PostAsync(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Post, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> PutAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Put, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> PutAsync(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Put, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> PatchAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Patch, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<Unit> PatchAsync(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Post, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<TResponse> GetAsync<TResponse>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<Unit> GetAsync(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<string> GetStringAsync(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<string, TDefaultError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<Stream> GetStreamAsync(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Stream, TDefaultError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<byte[]> GetByteArrayAsync(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<byte[], TDefaultError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> GetAsync<TResponse>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<Unit> GetAsync(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<string> GetStringAsync(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<string, TDefaultError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<Stream> GetStreamAsync(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Stream, TDefaultError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<byte[]> GetByteArrayAsync(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<byte[], TDefaultError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> DeleteAsync<TResponse>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Delete, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<Unit> DeleteAsync(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Delete, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> DeleteAsync<TResponse>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Delete, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<Unit> DeleteAsync(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Delete, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> PostAsync<TResponse>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Post, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<Unit> PostAsync(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Post, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> PutAsync<TResponse>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Put, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<Unit> PutAsync(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Put, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<TResponse> PatchAsync<TResponse>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<TResponse, TDefaultError>(HttpMethod.Patch, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<Unit> PatchAsync(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.SendRequestAsync<Unit, TDefaultError>(HttpMethod.Post, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryGetWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryGetWithCustomErrorAsync<TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(string, TError)> TryGetStringWithCustomErrorAsync<TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<string, TError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(Stream, TError)> TryGetStreamWithCustomErrorAsync<TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Stream, TError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(byte[], TError)> TryGetByteArrayWithCustomErrorAsync<TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<byte[], TError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryGetWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(string, TError)> TryGetStringWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<string, TError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(Stream, TError)> TryGetStreamWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Stream, TError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(byte[], TError)> TryGetByteArrayWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<byte[], TError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryDeleteWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Delete, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryDeleteWithCustomErrorAsync<TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Delete, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryDeleteWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Delete, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryDeleteWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Delete, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryPostWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Post, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryPostWithCustomErrorAsync<TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Post, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryPutWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Put, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryPutWithCustomErrorAsync<TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Put, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryPatchWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Patch, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryPatchWithCustomErrorAsync<TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Post, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryGetWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryGetWithCustomErrorAsync<TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(string, TError)> TryGetStringWithCustomErrorAsync<TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<string, TError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(Stream, TError)> TryGetStreamWithCustomErrorAsync<TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Stream, TError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(byte[], TError)> TryGetByteArrayWithCustomErrorAsync<TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<byte[], TError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryGetWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryGetWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(string, TError)> TryGetStringWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<string, TError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(Stream, TError)> TryGetStreamWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Stream, TError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(byte[], TError)> TryGetByteArrayWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<byte[], TError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryDeleteWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Delete, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryDeleteWithCustomErrorAsync<TError>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Delete, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryDeleteWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Delete, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryDeleteWithCustomErrorAsync<TError>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Delete, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryPostWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Post, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryPostWithCustomErrorAsync<TError>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Post, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryPutWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Put, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryPutWithCustomErrorAsync<TError>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Put, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TError)> TryPatchWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TError>(HttpMethod.Patch, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TError)> TryPatchWithCustomErrorAsync<TError>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TError>(HttpMethod.Post, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryGetAsync<TResponse>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryGetAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(string, TDefaultError)> TryGetStringAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<string, TDefaultError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(Stream, TDefaultError)> TryGetStreamAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Stream, TDefaultError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(byte[], TDefaultError)> TryGetByteArrayAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<byte[], TDefaultError>(HttpMethod.Get, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryGetAsync<TResponse>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryGetAsync(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(string, TDefaultError)> TryGetStringAsync(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<string, TDefaultError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(Stream, TDefaultError)> TryGetStreamAsync(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Stream, TDefaultError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(byte[], TDefaultError)> TryGetByteArrayAsync(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<byte[], TDefaultError>(HttpMethod.Get, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryDeleteAsync<TResponse>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Delete, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryDeleteAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Delete, templateUri, null, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryDeleteAsync<TResponse>(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Delete, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryDeleteAsync(TemplateUri templateUri, object queryString, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Delete, templateUri, queryString, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryPostAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Post, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryPostAsync(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Post, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryPutAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Put, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryPutAsync(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Put, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryPatchAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Patch, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryPatchAsync(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Post, templateUri, requestData, headers, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryGetAsync<TResponse>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryGetAsync(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(string, TDefaultError)> TryGetStringAsync(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<string, TDefaultError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(Stream, TDefaultError)> TryGetStreamAsync(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Stream, TDefaultError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(byte[], TDefaultError)> TryGetByteArrayAsync(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<byte[], TDefaultError>(HttpMethod.Get, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryGetAsync<TResponse>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryGetAsync(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(string, TDefaultError)> TryGetStringAsync(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<string, TDefaultError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(Stream, TDefaultError)> TryGetStreamAsync(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Stream, TDefaultError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(byte[], TDefaultError)> TryGetByteArrayAsync(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<byte[], TDefaultError>(HttpMethod.Get, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryDeleteAsync<TResponse>(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Delete, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryDeleteAsync(TemplateUri templateUri, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Delete, templateUri, null, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryDeleteAsync<TResponse>(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Delete, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryDeleteAsync(TemplateUri templateUri, object queryString, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Delete, templateUri, queryString, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryPostAsync<TResponse>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Post, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryPostAsync(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Post, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryPutAsync<TResponse>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Put, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryPutAsync(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Put, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<(TResponse, TDefaultError)> TryPatchAsync<TResponse>(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<TResponse, TDefaultError>(HttpMethod.Patch, templateUri, requestData, null, false, cancellationToken);
+        }
+
+        public Task<(Unit, TDefaultError)> TryPatchAsync(TemplateUri templateUri, object requestData, CancellationToken cancellationToken)
+        {
+            return this.TrySendRequestAsync<Unit, TDefaultError>(HttpMethod.Post, templateUri, requestData, null, false, cancellationToken);
+        }
+
         /// <summary>
         /// Получает токен доступа, который отправляется с Bearer.
         /// </summary>
@@ -1038,13 +1909,13 @@ namespace Gems.Http
 
         private async Task<TResponse> SendWithHandlingExceptionsAsync<TResponse, TError>(
             HttpMethod httpMethod,
-            string requestUri,
+            TemplateUri templateUri,
             object requestData,
             IDictionary<string, string> headers,
             bool isAuthenticationRequest,
             CancellationToken cancellationToken)
         {
-            var metricWriter = new RequestMetricWriter(this.metricsService, requestData, requestUri);
+            var metricWriter = new RequestMetricWriter(this.metricsService, requestData, templateUri.GetTemplateUri());
             var logsCollector = this.logsCollectorFactoryMethod(this.logger);
             var timeMetric = metricWriter.GetTimeMetric();
             var sw = new Stopwatch();
@@ -1053,7 +1924,7 @@ namespace Gems.Http
             {
                 try
                 {
-                    requestUri = this.GetRequestUrl<TResponse, TError>(requestUri);
+                    var requestUri = this.GetRequestUrl<TResponse, TError>(templateUri);
                     if (requestData is not null && (httpMethod == HttpMethod.Get || httpMethod == HttpMethod.Delete))
                     {
                         logsCollector.AddLogsFromPayload(requestData);
@@ -1062,7 +1933,6 @@ namespace Gems.Http
                     }
 
                     logsCollector.AddPath(requestUri.Split('?')[0]);
-                    requestUri = this.ReplaceRequestUriArgsIfNeed<TError>(requestUri, requestData);
                     var request = new HttpRequestMessage(httpMethod, requestUri);
 
                     var mediaType = ExtractMediaTypeFromHeaders(headers);
@@ -1150,38 +2020,6 @@ namespace Gems.Http
             }
         }
 
-        private string ReplaceRequestUriArgsIfNeed<TError>(string requestUri, object requestData)
-        {
-            var requestUriParts = requestUri.Split('?');
-            if (requestUriParts[0].IndexOf("{", StringComparison.InvariantCulture) == -1)
-            {
-                return string.Join(',', requestUriParts);
-            }
-
-            if (requestData is not IHasRequestUriArgs hasRequestUriArgs)
-            {
-                throw new RequestException<TError>($"Необходимо реализовать интерфейс {nameof(IHasRequestUriArgs)}", HttpStatusCode.BadRequest);
-            }
-
-            var requestUriArgs = hasRequestUriArgs.RequestUriArgs;
-            if (requestUriArgs == null || requestUriArgs.Count == 0)
-            {
-                throw new RequestException<TError>($"Метод {nameof(IHasRequestUriArgs)}.{nameof(IHasRequestUriArgs.RequestUriArgs)}", HttpStatusCode.BadRequest);
-            }
-
-            foreach (var (requestUriArgName, requestUriArgValue) in requestUriArgs)
-            {
-                requestUriParts[0] = requestUriParts[0].Replace($"{{{requestUriArgName}}}", requestUriArgValue);
-            }
-
-            if (requestUriParts[0].IndexOf("{", StringComparison.InvariantCulture) >= 0)
-            {
-                throw new RequestException<TError>($"Метод {nameof(IHasRequestUriArgs)}.{nameof(IHasRequestUriArgs.RequestUriArgs)} возвращает не все аргументы, необходимые для замены requestUri: {requestUriParts[0]}", HttpStatusCode.BadRequest);
-            }
-
-            return string.Join('?', requestUriParts);
-        }
-
         private async Task<HttpClient> CreateHttpClientAsync<TError>()
         {
             if (this.httpClientFactory != null)
@@ -1218,8 +2056,9 @@ namespace Gems.Http
             return new X509Certificate2(sslStream.RemoteCertificate!);
         }
 
-        private string GetRequestUrl<TResponse, TError>(string requestUri)
+        private string GetRequestUrl<TResponse, TError>(TemplateUri templateUri)
         {
+            var requestUri = templateUri.GetUri();
             requestUri = requestUri?.IndexOf("http://") == 0 || requestUri?.IndexOf("https://") == 0
                 ? requestUri
                 : $"{this.BaseUrl}{requestUri}";
