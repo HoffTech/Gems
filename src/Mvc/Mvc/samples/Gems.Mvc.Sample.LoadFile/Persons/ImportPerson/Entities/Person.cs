@@ -5,7 +5,7 @@ using Gems.Data.Npgsql;
 
 using NpgsqlTypes;
 
-namespace Gems.Mvc.Sample.HandlersUsing.Persons.Shared.Entities;
+namespace Gems.Mvc.Sample.LoadFile.Persons.ImportPerson.Entities;
 
 [PgType("public.person_type")]
 public class Person

@@ -5,7 +5,7 @@ using Gems.Data.Npgsql;
 
 using NpgsqlTypes;
 
-namespace Gems.Patterns.SyncTables.Sample.SyncTables.Persons.Shared.Entities;
+namespace Gems.Patterns.SyncTables.Sample.SyncTables.Persons.SyncPersons.EntitiesViews;
 
 [PgType("public.person_type")]
 public class Person

@@ -5,7 +5,7 @@ using Gems.Data.Npgsql;
 
 using NpgsqlTypes;
 
-namespace Gems.Patterns.ProducerConsumer.SampleUsing.Persons.Shared.Entities;
+namespace Gems.Patterns.ProducerConsumer.SampleUsing.Persons.SyncPersons.EntitiesViews;
 
 [PgType("public.person_type")]
 public class Person

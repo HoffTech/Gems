@@ -5,7 +5,7 @@ using Gems.Data.Npgsql;
 
 using NpgsqlTypes;
 
-namespace Gems.Mvc.AddRetryAfterHeader.Persons.Shared.Entities;
+namespace Gems.Mvc.RequestException.Persons.ImportPersons.Entities;
 
 [PgType("public.person_type")]
 public class Person

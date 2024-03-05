@@ -2,7 +2,6 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using Gems.Patterns.SyncTables.EntitiesViews;
-using Gems.Patterns.SyncTables.Sample.SyncTables.Persons.Shared.Entities;
 
 namespace Gems.Patterns.SyncTables.Sample.SyncTables.Persons.SyncPersons.EntitiesViews;
 

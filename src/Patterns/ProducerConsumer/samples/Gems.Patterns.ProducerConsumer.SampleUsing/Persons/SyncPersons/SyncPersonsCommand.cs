@@ -2,7 +2,7 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using Gems.Data.Behaviors;
-using Gems.Patterns.ProducerConsumer.SampleUsing.Persons.Shared.Entities;
+using Gems.Patterns.ProducerConsumer.SampleUsing.Persons.SyncPersons.EntitiesViews;
 
 using MediatR;
 

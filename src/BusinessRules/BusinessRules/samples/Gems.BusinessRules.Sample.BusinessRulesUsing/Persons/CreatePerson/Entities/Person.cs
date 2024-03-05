@@ -5,7 +5,7 @@ using Gems.Data.Npgsql;
 
 using NpgsqlTypes;
 
-namespace Gems.Mvc.NotFound.Persons.Shared.Entities;
+namespace Gems.BusinessRules.Sample.BusinessRulesUsing.Persons.CreatePerson.Entities;
 
 [PgType("public.person_type")]
 public class Person

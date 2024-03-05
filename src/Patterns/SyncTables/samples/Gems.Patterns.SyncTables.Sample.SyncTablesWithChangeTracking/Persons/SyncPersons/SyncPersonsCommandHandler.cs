@@ -4,7 +4,6 @@
 using Gems.Mvc.GenericControllers;
 using Gems.Patterns.SyncTables.MergeProcessor;
 using Gems.Patterns.SyncTables.MergeProcessor.MergeInfos;
-using Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking.Persons.Shared.Entities;
 using Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking.Persons.SyncPersons.EntitiesViews;
 using Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking.Persons.SyncPersons.Options;
 

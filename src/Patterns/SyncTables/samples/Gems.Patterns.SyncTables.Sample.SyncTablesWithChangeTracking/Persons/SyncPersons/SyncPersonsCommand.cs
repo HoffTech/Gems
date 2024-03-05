@@ -2,7 +2,6 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using Gems.Data.Behaviors;
-using Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking.Persons.Shared.Entities;
 using Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking.Persons.SyncPersons.EntitiesViews;
 
 using MediatR;

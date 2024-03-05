@@ -2,8 +2,8 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using Gems.Mvc.GenericControllers;
+using Gems.Mvc.RequestException.Persons.ImportPersons.Entities;
 using Gems.Mvc.RequestException.Persons.ImportPersons.ImportPerson;
-using Gems.Mvc.RequestException.Persons.Shared.Entities;
 
 using MediatR;
 
