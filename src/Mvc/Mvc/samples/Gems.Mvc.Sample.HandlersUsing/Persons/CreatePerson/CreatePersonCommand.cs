@@ -2,7 +2,7 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using Gems.Data.Behaviors;
-using Gems.Mvc.Sample.HandlersUsing.Persons.Shared.Entities;
+using Gems.Mvc.Sample.HandlersUsing.Persons.CreatePerson.Entities;
 
 using MediatR;
 

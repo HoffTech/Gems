@@ -5,12 +5,13 @@ using Gems.CompositionRoot;
 using Gems.HealthChecks;
 using Gems.Logging.Mvc.Behaviors;
 using Gems.Metrics.Behaviors;
+using Gems.Mvc;
 using Gems.Mvc.Behaviors;
 using Gems.Swagger;
 
 using Prometheus;
 
-namespace Gems.Mvc.AddRetryAfterHeader;
+namespace Gems.Patterns.ProducerConsumer.SampleUsing;
 
 public class Startup(IConfiguration configuration)
 {
@@ -20,7 +21,6 @@ public class Startup(IConfiguration configuration)
             configuration,
             opt =>
             {
-                opt.AddUnitOfWorks = () => { };
                 opt.AddPipelines = () =>
                 {
                     services.AddHttpContextAccessor();
@@ -31,7 +31,6 @@ public class Startup(IConfiguration configuration)
                     services.AddPipeline(typeof(ErrorMetricsBehavior<,>));
                     services.AddPipeline(typeof(TimeMetricBehavior<,>));
                     services.AddPipeline(typeof(ValidatorBehavior<,>));
-                    services.AddPipeline(typeof(AddRetryAfterHeaderBehavior<,>));
                 };
             });
     }
