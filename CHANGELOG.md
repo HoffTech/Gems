@@ -1,3 +1,9 @@
+## 2024.10.3 (2024-03-06)
+
+### added (1 change)
+
+- [Merge branch 'feature/gems-samples' into 'main'](axdev/libraries/gems@d97e93664ebe2e8138e9757076a57528728e4e92) ([merge request](axdev/libraries/gems!95))
+
 ## 2024.10.2 (2024-03-04)
 
 ### added (1 change)
