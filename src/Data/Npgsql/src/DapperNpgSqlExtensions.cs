@@ -1802,22 +1802,60 @@ namespace Gems.Data.Npgsql
             {
                 if (parameter.Value == null)
                 {
-                    dynamicParameters.Add(parameter.Key, parameter.Value);
+                    AddDynamicParameter(dynamicParameters, parameter);
                     continue;
                 }
 
                 var t = parameter.Value.GetType();
                 if (t.IsValueType || t == typeof(string) || t == typeof(Guid))
                 {
-                    dynamicParameters.Add(parameter.Key, parameter.Value);
+                    AddDynamicParameter(dynamicParameters, parameter);
                 }
                 else
                 {
-                    dynamicParameters.Add(parameter.Key, parameter.Value, DbType.Object);
+                    AddDynamicParameter(dynamicParameters, parameter, DbType.Object);
                 }
             }
 
             return dynamicParameters;
+        }
+
+        private static void AddDynamicParameter(DynamicParameters dynamicParameters, KeyValuePair<string, object> parameter)
+        {
+            var keyParts = parameter.Key.Split(":");
+            if (keyParts.Length == 2)
+            {
+                dynamicParameters.Add(keyParts[0], parameter.Value, direction: MapToDirection(keyParts[1]));
+            }
+            else
+            {
+                dynamicParameters.Add(parameter.Key, parameter.Value);
+            }
+        }
+
+        private static void AddDynamicParameter(DynamicParameters dynamicParameters, KeyValuePair<string, object> parameter, DbType dbType)
+        {
+            var keyParts = parameter.Key.Split(":");
+            if (keyParts.Length == 2)
+            {
+                dynamicParameters.Add(keyParts[0], parameter.Value, dbType, MapToDirection(keyParts[1]));
+            }
+            else
+            {
+                dynamicParameters.Add(parameter.Key, parameter.Value, dbType);
+            }
+        }
+
+        private static ParameterDirection? MapToDirection(string direction)
+        {
+            return direction.ToUpper() switch
+            {
+                "IN" => ParameterDirection.Input,
+                "OUT" => ParameterDirection.Output,
+                "INOUT" => ParameterDirection.InputOutput,
+                "RETURN" => ParameterDirection.ReturnValue,
+                _ => ParameterDirection.Input
+            };
         }
     }
 }
