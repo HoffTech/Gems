@@ -114,7 +114,7 @@ protected virtual Task<string> GetAccessTokenAsync(CancellationToken cancellatio
 ```csharp
 public virtual async Task<TResponse> SendRequestAsync<TResponse, TError>(
             HttpMethod httpMethod,
-            string requestUri,
+            TemplateUri templateUri,
             object requestData,
             IDictionary<string, string> headers,
             bool isAuthenticationRequest,
@@ -135,53 +135,53 @@ public Exception LastException { get; private set; }
 
 - Методы, которые не имеют префикса Try - бросают исключение RequestException&lt;TDefaultError&gt;. Где TDefaultError это выше описанная модель ошибки, которая является генериком класса.  
 ```csharp
-Task<TResponse> PostAsync<TResponse>(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<TResponse> PutAsync<TResponse>(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<TResponse> PatchAsync<TResponse>(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<TResponse> DeleteAsync<TResponse>(string requestUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<TResponse> GetAsync<TResponse>(string requestUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<TResponse> PostAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<TResponse> PutAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<TResponse> PatchAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<TResponse> DeleteAsync<TResponse>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<TResponse> GetAsync<TResponse>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
 
 // есть так же перегрузки, которые не имеют параметр headers.
 ```
 
 - Методы, которые имеют префикс Try - не бросают исключение RequestException&lt;TDefaultError&gt;, а возвращают ошибку вместе с результатом.  
 ```csharp
-Task<(TResponse, TDefaultError)> TryPostAsync<TResponse>(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<(TResponse, TDefaultError)> TryPutAsync<TResponse>(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<(TResponse, TDefaultError)> TryPatchAsync<TResponse>(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<(TResponse, TDefaultError)> TryDeleteAsync<TResponse>(string requestUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<(TResponse, TDefaultError)> TryGetAsync<TResponse>(string requestUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<(TResponse, TDefaultError)> TryPostAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<(TResponse, TDefaultError)> TryPutAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<(TResponse, TDefaultError)> TryPatchAsync<TResponse>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<(TResponse, TDefaultError)> TryDeleteAsync<TResponse>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<(TResponse, TDefaultError)> TryGetAsync<TResponse>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
 
 // есть так же перегрузки, которые не имеют параметр headers.
 ```
 
 - Методы, которые не имеют генерик тип - не читают тело ответа, а возвращают значение Unit (пустая структура).
 ```csharp
-Task<Unit> PostAsync(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<Unit> PutAsync(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<Unit> PatchAsync(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<Unit> DeleteAsync(string requestUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<Unit> GetAsync(string requestUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<Unit> PostAsync(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<Unit> PutAsync(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<Unit> PatchAsync(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<Unit> DeleteAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<Unit> GetAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
 
 // есть так же перегрузки, которые не имеют параметр headers и перегрузки с префиксом Try.
 ```
 
 - Методы, которые имеют постфикс WithCustomErrorAsync - позволяют переопределить модель ошибки TDefaultError своей кастомной моделью.
 ```csharp
-Task<TResponse> PostWithCustomErrorAsync<TResponse, TError>(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<TResponse> PutWithCustomErrorAsync<TResponse, TError>(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<TResponse> PatchWithCustomErrorAsync<TResponse, TError>(string requestUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<TResponse> DeletetWithCustomErrorAsync<TResponse, TError>(string requestUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
-Task<TResponse> GettWithCustomErrorAsync<TResponse, TError>(string requestUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<TResponse> PostWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<TResponse> PutWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<TResponse> PatchWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, object requestData, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<TResponse> DeletetWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
+Task<TResponse> GettWithCustomErrorAsync<TResponse, TError>(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken);
 
 // есть так же перегрузки, которые не имеют параметр headers, перегрузки с префиксом Try и перегрузки, возвращающие Unit.
 ```
 
 Есть перегрузки методов для get запросов, которые не имеют генерик типа для ответа:
 ```csharp
-Task<string> GetStringAsync(string requestUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
-Task<Stream> GetStreamAsync(string requestUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
-Task<byte[]> GetByteArrayAsync(string requestUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+Task<string> GetStringAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+Task<Stream> GetStreamAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
+Task<byte[]> GetByteArrayAsync(TemplateUri templateUri, IDictionary<string, string> headers, CancellationToken cancellationToken)
 
 // есть так же перегрузки, которые не имеют параметр headers, перегрузки с префиксом Try, перегрузки с постфиксом WithCustomErrorAsync и перегрузки, возвращающие Unit.
 ```
@@ -201,7 +201,7 @@ public async Task<SomeResponse> GetSomeResponse(int id, CancellationToken cancel
     try 
     {
         return await this.defaultClientService.GetAsync<SomeResponse>(
-                                $"https://your_service_host/api/items/{id}",        // url для выполнения запроса
+                                $"https://your_service_host/api/items/{id}".ToTemplateUri("123"),        // url для выполнения запроса
                                 cancellationToken)
                             .ConfigureAwait(false);
     }
@@ -219,7 +219,7 @@ public async Task CreateSomeData(SomeData data, CancellationToken cancellationTo
     try 
     {
         await this.defaultClientService.PostAsync(
-                            "https://your_service_host/api/items",          // url для выполнения запроса
+                            "https://your_service_host/api/items".ToTemplateUri(),          // url для выполнения запроса
                             data,                                           // тело запроса
                             cancellationToken)
                             .ConfigureAwait(false);
@@ -236,7 +236,7 @@ public async Task CreateSomeData(SomeData data, CancellationToken cancellationTo
 public async Task<SomeResponse> GetSomeResponse(int id, CancellationToken cancellationToken)
 {
     var (response, error) = await this.defaultClientService.TryGetAsync<SomeResponse>(
-                                $"https://your_service_host/api/items/{id}",        // url для выполнения запроса
+                                $"https://your_service_host/api/items/{id}".ToTemplateUri("123"),        // url для выполнения запроса
                                 cancellationToken)
                             .ConfigureAwait(false); 
     if (error == null)
@@ -253,7 +253,7 @@ public async Task<SomeResponse> GetSomeResponse(int id, CancellationToken cancel
 public async Task CreateSomeData(SomeData data, CancellationToken cancellationToken)
 {
     var (_, error) = this.defaultClientService.TryPostAsync(
-                            "https://your_service_host/api/items",          // url для выполнения запроса
+                            "https://your_service_host/api/items".ToTemplateUri(),          // url для выполнения запроса
                             data,                                           // тело запроса  
                             cancellationToken)
                             .ConfigureAwait(false);
@@ -287,7 +287,7 @@ protected override Task<string> GetAccessTokenAsync(CancellationToken cancellati
 {
     return this
         .SendAuthenticationRequestAsync<string>(
-            requestUri: "api/users/login",
+            requestUri: "api/users/login".ToTemplateUri(),
             requestData: new LoginRequestDto
             {
                 UserName = options.Value.UserName,

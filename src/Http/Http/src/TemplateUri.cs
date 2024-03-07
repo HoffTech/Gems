@@ -8,10 +8,13 @@ namespace Gems.Http;
 
 public class TemplateUri
 {
+    public const string TemplateArgsArgumentErrorMessage = $"Пустой массив {nameof(templateArgs)}";
+    public const string IncorrectPlaceholderErrorMessage = $"Не корректный плейсходер в {nameof(templateUri)}: {{0}}";
+    public const string TemplateArgsContainsNotAllPlaceholdersErrorMessage = $"Массив {nameof(templateArgs)}: {{0}} содержит не все аргументы, необходимые для замены плейсхолдеров в {nameof(templateUri)}: {{1}}";
     private readonly string templateUri;
     private readonly string[] templateArgs;
 
-    public TemplateUri(string templateUri, string[] templateArgs)
+    public TemplateUri(string templateUri, params string[] templateArgs)
     {
         this.templateUri = templateUri;
         this.templateArgs = templateArgs;
@@ -39,13 +42,13 @@ public class TemplateUri
 
         if (this.templateArgs == null || this.templateArgs.Length == 0)
         {
-            throw new ArgumentNullException($"Пустой массив {nameof(this.templateArgs)}");
+            throw new ArgumentException(TemplateArgsArgumentErrorMessage);
         }
 
         var placeholdersMatches = Regex.Matches(templateUriWithoutQueryString, "{[^}]*}");
         if (placeholdersMatches.Count == 0)
         {
-            throw new ArgumentNullException($"Не найдены плейсходеры в {nameof(this.templateUri)}: {templateUriWithoutQueryString}");
+            throw new ArgumentException(string.Format(IncorrectPlaceholderErrorMessage, templateUriWithoutQueryString));
         }
 
         var templateUriWithPositionPlaceholders = templateUriWithoutQueryString;
@@ -61,7 +64,7 @@ public class TemplateUri
 
         if (templateUriWithPositionPlaceholders.IndexOf("{", StringComparison.InvariantCulture) >= 0)
         {
-            throw new ArgumentNullException($"Массив {nameof(this.templateArgs)}: {string.Join(",", this.templateArgs)} возвращает не все аргументы, необходимые для замены параметров в {nameof(this.templateUri)}: {templateUriWithoutQueryString}");
+            throw new ArgumentException(string.Format(TemplateArgsContainsNotAllPlaceholdersErrorMessage, string.Join(',', this.templateArgs), templateUriWithoutQueryString));
         }
 
         templateUriParts[0] = templateUriWithPositionPlaceholders;
