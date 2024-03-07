@@ -8,8 +8,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\..\CompositionRoot\CompositionRoot\src\Gems.CompositionRoot.csproj" />
+      <ProjectReference Include="..\..\..\SyncTables\src\Gems.Patterns.SyncTables.csproj" />
       <ProjectReference Include="..\..\src\Gems.Patterns.ProducerConsumer.csproj" />
-      <ProjectReference Include="..\..\src\Gems.Patterns.SyncTables.csproj" />
     </ItemGroup>
 
 </Project>

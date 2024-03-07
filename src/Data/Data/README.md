@@ -10,59 +10,19 @@
 * .NET 6.0
 
 # Содержание
-
+* [Unit of work](#unit-of-work)
+* [UnitOfWorkBehavior](#unitofworkbehavior)
 * [Cкалярная функция](#скалярная-функция)
 * [Табличная функция](#табличная-функция)
 * [Хранимая процедура](#хранимая-процедура)
 * [Sql выражение](#sql-выражение)
-* [Unit of work](#unit-of-work)
-* [UnitOfWorkBehavior](#unitofworkbehavior)
 * [Использование Linked Token](#использование-linked-token)
 * [Использование локального контекста](#использование-локального-контекста)
 * [Метрики](#метрики)
 * [Работа с EF](#работа-с-ef)
 
-# Cкалярная функция
-```csharp
-var result = await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
-    .CallScalarFunctionAsync<T>(
-        string functionName,
-        int commandTimeout,
-        DynamicParameters parameters).ConfigureAwait(false);
-
-// в библиотеке присутсвуют множество перегруженных версий для данного метода
-```
-# Табличная функция
-```csharp
-var result = await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
-    .CallTableFunctionAsync<T>(
-        string functionName,
-        int commandTimeout,
-        DynamicParameters parameters).ConfigureAwait(false);
-
-// в библиотеке присутсвуют множество перегруженных версий для данного метода
-```
-# Хранимая процедура
-```csharp
-await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
-    .CallStoredProcedureAsync(
-        string storeProcedureName,
-        int commandTimeout,
-        DynamicParameters parameters).ConfigureAwait(false);
-
-// в библиотеке присутсвуют множество перегруженных версий для данного метода
-```
-# Sql выражение
-```csharp
-var result = await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
-    .QueryAsync<T>(
-        string storeProcedureName,
-        int commandTimeout,
-        DynamicParameters parameters).ConfigureAwait(false);
-
-// в библиотеке присутсвуют множество перегруженных версий для данного метода
-```
 # Unit of work
+**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.UnitOfWork)**
 ```csharp
 // объект unit of work получается из провайдера, в котором создается один раз и закрепляется за определенным cancellationToken.
 // провайдер необходимо передать в конструктор, вызываемого класса: IUnitOfWorkProvider unitOfWorkProvider
@@ -117,6 +77,48 @@ await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken).CallSt
     }).ConfigureAwait(false);
 ```
 По умолчанию пайплайн UnitOfWorkBehavior может создать только один объект unit of work. Доменные обработчики (внутренние обработчики) не создают объект unit of work (даже если их команда или запрос наследуется от интерфейса IRequestUnitOfWork), а использует тот, который создался командой веб запроса или воркера. Смотрите разделы ниже "Использование Linked Token" и "Использование контекста" для того чтобы дать возможность доменному обработчику создавать свой объект unit of work.
+
+# Cкалярная функция
+```csharp
+var result = await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
+    .CallScalarFunctionAsync<T>(
+        string functionName,
+        int commandTimeout,
+        DynamicParameters parameters).ConfigureAwait(false);
+
+// в библиотеке присутсвуют множество перегруженных версий для данного метода
+```
+# Табличная функция
+```csharp
+var result = await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
+    .CallTableFunctionAsync<T>(
+        string functionName,
+        int commandTimeout,
+        DynamicParameters parameters).ConfigureAwait(false);
+
+// в библиотеке присутсвуют множество перегруженных версий для данного метода
+```
+# Хранимая процедура
+```csharp
+await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
+    .CallStoredProcedureAsync(
+        string storeProcedureName,
+        int commandTimeout,
+        DynamicParameters parameters).ConfigureAwait(false);
+
+// в библиотеке присутсвуют множество перегруженных версий для данного метода
+```
+# Sql выражение
+```csharp
+var result = await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
+    .QueryAsync<T>(
+        string storeProcedureName,
+        int commandTimeout,
+        DynamicParameters parameters).ConfigureAwait(false);
+
+// в библиотеке присутсвуют множество перегруженных версий для данного метода
+```
+
 # Использование Linked Token
 Связанные токены позволяют доменным обработчикам создать собственные объекты unit of work.
 ```csharp
