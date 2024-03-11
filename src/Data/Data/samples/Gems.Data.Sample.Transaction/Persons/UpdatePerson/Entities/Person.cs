@@ -7,23 +7,23 @@ using Gems.Data.Npgsql;
 
 using NpgsqlTypes;
 
-namespace Gems.Data.Sample.UnitOfWork.Persons.CreatePerson.Entities;
+namespace Gems.Data.Sample.Transaction.Persons.UpdatePerson.Entities;
 
 [PgType("public.person_type")]
 public class Person
 {
     [PgName("person_id")]
-    public Guid PersonId { get; set; }
+    public Guid PersonId { get; init; }
 
     [PgName("first_name")]
-    public string FirstName { get; set; }
+    public string FirstName { get; init; }
 
     [PgName("last_name")]
-    public string LastName { get; set; }
+    public string LastName { get; init; }
 
     [PgName("age")]
-    public int Age { get; set; }
+    public int Age { get; init; }
 
     [PgName("gender")]
-    public int Gender { get; set; }
+    public int Gender { get; init; }
 }

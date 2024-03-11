@@ -12,6 +12,7 @@
 # Содержание
 * [Unit of work](#unit-of-work)
 * [UnitOfWorkBehavior](#unitofworkbehavior)
+* [Транзакция](#транзакция)
 * [Cкалярная функция](#скалярная-функция)
 * [Табличная функция](#табличная-функция)
 * [Хранимая процедура](#хранимая-процедура)
@@ -77,6 +78,23 @@ await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken).CallSt
     }).ConfigureAwait(false);
 ```
 По умолчанию пайплайн UnitOfWorkBehavior может создать только один объект unit of work. Доменные обработчики (внутренние обработчики) не создают объект unit of work (даже если их команда или запрос наследуется от интерфейса IRequestUnitOfWork), а использует тот, который создался командой веб запроса или воркера. Смотрите разделы ниже "Использование Linked Token" и "Использование контекста" для того чтобы дать возможность доменному обработчику создавать свой объект unit of work.
+
+# Транзакция
+**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.Transaction)**
+
+Возможность работы с транзакциями предоставляет интерфейс _IRequestUnitOfWork_
+
+Пример регистрации
+```csharp
+    public class UpdatePersonCommand : IRequest, IRequestUnitOfWork
+    {
+        public string UpdatedBy { get; init; }
+
+        public PersonDto Person { get; init; }
+    }
+```
+
+Имплементировав данный интрфейс в команде/запросе операции в БД рассматриваются, как единое целое и в случае ошибки в ходе выполнения методов Обработчика операции в БД будут возвращены к исходному состоянию
 
 # Cкалярная функция
 ```csharp
