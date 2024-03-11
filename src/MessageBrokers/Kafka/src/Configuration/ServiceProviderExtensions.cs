@@ -32,7 +32,8 @@ namespace Gems.MessageBrokers.Kafka.Configuration
         /// <param name="configuration">configuration.</param>
         public static void AddConsumers(this IServiceCollection services, IConfiguration configuration)
         {
-            if (!configuration.GetSection(nameof(KafkaConfiguration)).Exists())
+            var kafkaConfiguration = configuration.GetSection(nameof(KafkaConfiguration)).Get<KafkaConfiguration>();
+            if (kafkaConfiguration == null || kafkaConfiguration.Consumers == null || kafkaConfiguration.Consumers.Count == 0)
             {
                 return;
             }
@@ -45,6 +46,10 @@ namespace Gems.MessageBrokers.Kafka.Configuration
             foreach (var type in types)
             {
                 var listenerProperty = type.GetCustomAttributes<ConsumerListenerPropertyAttribute>().First();
+                if (!kafkaConfiguration.Consumers.TryGetValue(listenerProperty.TopicName, out var consumerSettings))
+                {
+                    continue;
+                }
 
                 var handlerCommandType = type
                     .GetInterfaces()
