@@ -11,10 +11,10 @@ public class PersonAgeBusinessRule : IBusinessRule<int>
         {
             errorMessage = "Человек не достиг 18 лет.";
 
-            return false;
+            return true;
         }
 
         errorMessage = string.Empty;
-        return true;
+        return false;
     }
 }
