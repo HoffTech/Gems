@@ -522,6 +522,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Sample.UnitOfWork
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Sample.Transaction", "src\Data\Data\samples\Gems.Data.Sample.Transaction\Gems.Data.Sample.Transaction.csproj", "{558E7B57-853B-4887-8478-86C629E1CEEB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Sample.Operations", "src\Data\Data\samples\Gems.Data.Sample.Operations\Gems.Data.Sample.Operations.csproj", "{06344C7E-E3A0-4FB6-8CDE-A4BC5B555ED3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -840,6 +842,10 @@ Global
 		{558E7B57-853B-4887-8478-86C629E1CEEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{558E7B57-853B-4887-8478-86C629E1CEEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{558E7B57-853B-4887-8478-86C629E1CEEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06344C7E-E3A0-4FB6-8CDE-A4BC5B555ED3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06344C7E-E3A0-4FB6-8CDE-A4BC5B555ED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06344C7E-E3A0-4FB6-8CDE-A4BC5B555ED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06344C7E-E3A0-4FB6-8CDE-A4BC5B555ED3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1004,6 +1010,7 @@ Global
 		{F582B5DC-9907-4C08-924E-5E41A15BD90E} = {5900D8A8-135A-4ABA-9BA9-7977458DEF96}
 		{E900EEFC-C25A-4AA4-8A1B-8C05E8653642} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
 		{558E7B57-853B-4887-8478-86C629E1CEEB} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
+		{06344C7E-E3A0-4FB6-8CDE-A4BC5B555ED3} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F59BAF6C-0E34-4F38-A0E7-2227592118CE}

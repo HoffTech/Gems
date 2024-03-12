@@ -25,7 +25,7 @@
     }
 ```
 
-3) Получите объект **UnitOfWork** из провайдера **IUnitOfWorkProvider** и вызовите одну из доступных операций. В примере ниже вызываетяся процедура создания объекта **Person** с случайными х-ками
+3) Получите объект **UnitOfWork** из провайдера **IUnitOfWorkProvider** и вызовите одну из доступных операций. В примере ниже вызываетяся процедура создания объекта **Person** с случайными характеристиками
 ```csharp
     public Task Handle(CreatePersonCommand command, CancellationToken cancellationToken)
     {

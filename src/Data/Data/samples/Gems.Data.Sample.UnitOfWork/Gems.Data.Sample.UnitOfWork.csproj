@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-      <TargetFramework>net8.0</TargetFramework>
-      <OutputType>Exe</OutputType>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\CompositionRoot\CompositionRoot\src\Gems.CompositionRoot.csproj" />
+    <ProjectReference Include="..\..\..\..\CompositionRoot\CompositionRoot\src\Gems.CompositionRoot.csproj"/>
   </ItemGroup>
 
   <ItemGroup>

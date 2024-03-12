@@ -94,47 +94,72 @@ await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken).CallSt
     }
 ```
 
-Имплементировав данный интрфейс в команде/запросе операции в БД рассматриваются, как единое целое и в случае ошибки в ходе выполнения методов Обработчика операции в БД будут возвращены к исходному состоянию
+Имплементировав данный интрфейс в команде/запросе операции в БД рассматриваются, как единое целое и в случае ошибки в ходе выполнения методов Обработчика данные в БД будут возвращены к исходному состоянию
 
-# Cкалярная функция
+# Операции
+**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.Operations)**
+
+### Доступные параметры
+1. `string functionName/storeProcedureName` - наименование функции/процедуры в БД
+2. `commandTimeout` - таймаут на выполнение функции/процедуры в секундах
+3. `DynamicParameters` или `Dictionary<string, object> parameters` - входящие параметры функции/процедуры
+4. `Enum timeMetricType` - перечисление типа метрики (регистрируется по умолчанию в _Gems.CompositionRoot_ , но если требуется можно переопределить)
+
+### Примеры
+1. Табличная функция получения первого элемента выборки
 ```csharp
-var result = await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
-    .CallScalarFunctionAsync<T>(
-        string functionName,
-        int commandTimeout,
-        DynamicParameters parameters).ConfigureAwait(false);
-
-// в библиотеке присутсвуют множество перегруженных версий для данного метода
+    var person = await this.unitOfWorkProvider
+        .GetUnitOfWork(cancellationToken)
+        .CallTableFunctionFirstAsync<Person>(
+            "public.person_get_person_by_id",
+            new Dictionary<string, object>
+            {
+                ["p_person_id"] = query.PersonId
+            });
 ```
-# Табличная функция
+2. Табличная функция получения полного списка элементов выборки
 ```csharp
-var result = await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
-    .CallTableFunctionAsync<T>(
-        string functionName,
-        int commandTimeout,
-        DynamicParameters parameters).ConfigureAwait(false);
-
-// в библиотеке присутсвуют множество перегруженных версий для данного метода
+    var persons = await this.unitOfWorkProvider
+        .GetUnitOfWork(cancellationToken)
+        .CallTableFunctionAsync<Person>(
+            "public.person_get_persons",
+            new Dictionary<string, object>
+            {
+                ["p_skip"] = query.Skip ?? default,
+                ["p_take"] = query.Take ?? 100
+            });
 ```
-# Хранимая процедура
-```csharp
-await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
-    .CallStoredProcedureAsync(
-        string storeProcedureName,
-        int commandTimeout,
-        DynamicParameters parameters).ConfigureAwait(false);
 
-// в библиотеке присутсвуют множество перегруженных версий для данного метода
+3. Скалярная функция
+```csharp
+    var age = this.unitOfWorkProvider
+        .GetUnitOfWork(cancellationToken)
+        .CallScalarFunctionAsync<int>(
+            "public.person_get_age_by_id",
+            new Dictionary<string, object>
+            {
+                ["p_person_id"] = query.PersonId
+            });
 ```
-# Sql выражение
-```csharp
-var result = await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
-    .QueryAsync<T>(
-        string storeProcedureName,
-        int commandTimeout,
-        DynamicParameters parameters).ConfigureAwait(false);
 
-// в библиотеке присутсвуют множество перегруженных версий для данного метода
+4. Хранимая процедура
+```csharp
+    this.unitOfWorkProvider
+        .GetUnitOfWork(cancellationToken)
+        .CallStoredProcedureAsync(
+            "public.person_create",
+            new Dictionary<string, object>
+            {
+                ["p_person"] = this.mapper.Map<Person>(command.Person)
+            });
+
+```
+
+5. Sql выражение
+```csharp
+    var persons = await this.unitOfWorkProvider
+        .GetUnitOfWork(cancellationToken)
+        .QueryFirstOrDefaultAsync<Person>("SELECT * FROM public.person LIMIT @Skip OFFSET @Take", parameters);
 ```
 
 # Использование Linked Token
