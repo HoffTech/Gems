@@ -1,3 +1,9 @@
+## 2024.11.2 (2024-03-13)
+
+### added (1 change)
+
+- [Merge branch 'feature/TemplateUri' into 'main'](axdev/libraries/gems@aa2d977901cea305f783b883201e244a0325cd37) ([merge request](axdev/libraries/gems!96))
+
 ## 2024.11.1 (2024-03-11)
 
 No changes.
