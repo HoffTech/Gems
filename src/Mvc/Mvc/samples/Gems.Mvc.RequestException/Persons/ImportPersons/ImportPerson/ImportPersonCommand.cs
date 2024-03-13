@@ -4,7 +4,7 @@
 using Gems.Data.Behaviors;
 using Gems.Mvc.Behaviors;
 using Gems.Mvc.Filters.Exceptions;
-using Gems.Mvc.RequestException.Persons.Shared.Entities;
+using Gems.Mvc.RequestException.Persons.ImportPersons.Entities;
 
 using MediatR;
 

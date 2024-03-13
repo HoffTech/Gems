@@ -20,9 +20,9 @@
 - [Кэширование](#кэширование)
 - [Проверка доступности сервиса](#проверка-доступности-сервиса)
 - [Настройки](#настройки)
-- [Работа с задачами](#работа-с-задачами-1)
 - [OpenTelemetry](#opentelemetry)
 - [Утилитарные библиотеки](#утилитарные-библиотеки)
+- [Инфраструктура тестирования](#инфраструктура-тестирования)
 - [Управление версиями gems библиотек](#управление-версиями-gems-библиотек)
 
 # Введение
@@ -101,6 +101,9 @@
 - [Gems.Linq](/src/Linq/Linq)
 - [Gems.IO](/src/IO/IO)
 - [Gems.Extensions.DependencyInjection](/src/Extensions/DependencyInjection)
+
+# Инфраструктура тестирования
+- [Gems.TestInfrastructure](/src/TestInfrastructure/TestInfrastructure/README.md)
 
 # Управление версиями gems библиотек
 Управление версиями gems библиотек описано в [документе](docs/VersioningRules.md)

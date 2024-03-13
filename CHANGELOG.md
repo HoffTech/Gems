@@ -1,3 +1,25 @@
+## 2024.11.1 (2024-03-11)
+
+No changes.
+
+## 2024.10.3 (2024-03-06)
+
+### added (1 change)
+
+- [Merge branch 'feature/gems-samples' into 'main'](axdev/libraries/gems@d97e93664ebe2e8138e9757076a57528728e4e92) ([merge request](axdev/libraries/gems!95))
+
+## 2024.10.2 (2024-03-04)
+
+### added (1 change)
+
+- [Merge branch 'feature/gems-test' into 'main'](axdev/libraries/gems@4889ca44619763bb21072bca6744824b82bc3669) ([merge request](axdev/libraries/gems!89))
+
+## 2024.10.1 (2024-03-04)
+
+### added (1 change)
+
+- [Merge branch 'gems-samples' into 'main'](axdev/libraries/gems@d4a05747f1880a76f90a5b4d10e2d584b2e1691d) ([merge request](axdev/libraries/gems!92))
+
 ## 2024.9.3 (2024-02-28)
 
 ### added (1 change)

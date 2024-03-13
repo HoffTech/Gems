@@ -31,6 +31,7 @@ public class Startup(IConfiguration configuration)
                     services.AddPipeline(typeof(ErrorMetricsBehavior<,>));
                     services.AddPipeline(typeof(TimeMetricBehavior<,>));
                     services.AddPipeline(typeof(ValidatorBehavior<,>));
+                    services.AddPipeline(typeof(AddRetryAfterHeaderBehavior<,>));
                 };
             });
     }

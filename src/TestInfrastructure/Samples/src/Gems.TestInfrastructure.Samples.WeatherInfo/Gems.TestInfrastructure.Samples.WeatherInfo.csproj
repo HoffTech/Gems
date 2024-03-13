@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+        <PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\..\Authentication\Authentication\src\Gems.Authentication.csproj" />
+      <ProjectReference Include="..\..\..\..\BusinessRules\BusinessRules\src\Gems.BusinessRules.csproj" />
+      <ProjectReference Include="..\..\..\..\Caching\Caching\src\Gems.Caching.csproj" />
+      <ProjectReference Include="..\..\..\..\Data\Npgsql\src\Gems.Data.Npgsql.csproj" />
+      <ProjectReference Include="..\..\..\..\DomainEvents\DomainEvents\src\Gems.DomainEvents.csproj" />
+      <ProjectReference Include="..\..\..\..\HealthChecks\HealthChecks\src\Gems.HealthChecks.csproj" />
+      <ProjectReference Include="..\..\..\..\Http\Http\src\Gems.Http.csproj" />
+      <ProjectReference Include="..\..\..\..\Linq\Linq\src\Gems.Linq.csproj" />
+      <ProjectReference Include="..\..\..\..\Metrics\Prometheus\src\Gems.Metrics.Prometheus.csproj" />
+      <ProjectReference Include="..\..\..\..\Mvc\Mvc\src\Gems.Mvc.csproj" />
+      <ProjectReference Include="..\..\..\..\Swagger\Swagger\src\Gems.Swagger.csproj" />
+      <ProjectReference Include="..\..\..\..\Tasks\Tasks\src\Gems.Tasks.csproj" />
+      <ProjectReference Include="..\..\..\..\Text\Json\src\Gems.Text.Json.csproj" />
+    </ItemGroup>
+</Project>
