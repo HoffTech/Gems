@@ -190,16 +190,20 @@ services.AddPipeline(typeof(TimeMetricBehavior<,>));
 ```
 # ErrorMetricsBehavior
 Пайплайн ErrorMetricsBehavior отлавливает все исключения и регистрирует метрики. Пример для команды ImportInventTableCommand:
-- errors_counter{feature_name="import_invent_table",error_type="business"} - Бизнесовые ошибки
-- errors_counter{feature_name="import_invent_table",error_type="npgsql"} - Ошибки в бд 
-- errors_counter{feature_name="import_invent_table",error_type="mssql"} - Ошибки в бд 
-- errors_counter{feature_name="import_invent_table",error_type="validation"} - Ошибки валидации
-- errors_counter{feature_name="import_invent_table",error_type="other"} - Другие ошибки
+- feature_counter{feature_name="import_invent_table",error_type="business","status_code"="4xx", "custom_code": "none"} - Бизнесовые ошибки
+- feature_counter{feature_name="import_invent_table",error_type="npgsql","status_code"="4xx", "custom_code": "none"} - Ошибки в бд 
+- feature_counter{feature_name="import_invent_table",error_type="mssql","status_code"="4xx", "custom_code": "none"} - Ошибки в бд 
+- feature_counter{feature_name="import_invent_table",error_type="validation","status_code"="4xx", "custom_code": "none"} - Ошибки валидации
+- feature_counter{feature_name="import_invent_table",error_type="other","status_code"="5xx", "custom_code": "none"} - Другие ошибки
 
-- feature_counters{feature_name="import_invent_table","status_code"="4xx"} - Ошибки 4xx (метка status_code >= 400 и <= 499)
-- feature_counters{feature_name="import_invent_table","status_code"="5xx"} - Ошибки 5xx (метка status_code > 499)
-- feature_counters{feature_name="import_invent_table",error_type="none","status_code"="200"} - Успешные
+- feature_counters{feature_name="import_invent_table",error_type="none","status_code"="200", "custom_code": "none"} - Успешные
 
+Где:
+- "status_code"="4xx" - Ошибки 4xx (метка status_code >= 400 и <= 499)
+- "status_code"="5xx" - Ошибки 5xx (метка status_code > 499)
+- "custom_code": "none" - Код из модели BusinessErrorViewModel: ["custom_code"] => BusinessErrorViewModel.Error.Code ?? "none";
+
+Устаревшие метрики:
 - import_invent_table_counter					- Все запуски
 - import_invent_table_success_counter			- Успешные запуски
 
