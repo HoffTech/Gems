@@ -1,24 +1,40 @@
-# Простейший обработчик HTTP запроса который показывает как загрузить файл
+# Пример http сервиса на базе BaseClientService
 
-Для того, чтобы загрузить файл необходимо сделать следующее:
+Для того, чтобы отправить http запрос необходимо сделать следующее:
 
-**У команды указать поле типа Microsoft.AspNetCore.Http.IFormFile в которым будет содержаться данные загружаемого файла**
+**Унаследоваться от класса BaseClientService<TDefaultError> с указанием типа ошибки по умолчанию TDefaultError**
 ```csharp
-public class ImportPersonCommand : IRequest, IRequestUnitOfWork
+public class PongService : BaseClientService<string>
 {
-    public IFormFile CsvFile { get; set; }
+    private readonly IConfiguration configuration;
+
+    public PongService(IConfiguration configuration, IOptions<HttpClientServiceOptions> options, BaseClientServiceHelper helper) : base(options, helper)
+    {
+        this.configuration = configuration;
+    }
+    // ...
 }
 ```
-
-**У обработчика указать чтение данных из формы IsForm = true**. 
+**Переопределить свойство, отвечающее за базовый url**
 ```csharp
-[Endpoint("api/v1/persons/import", "POST", OperationGroup = "Persons", IsForm = true)]
-public class ImportPersonCommandHandler : IRequestHandler<ImportPersonCommand>
+public class PongService : BaseClientService<string>
 {
-    public Task Handle(ImportPersonCommand command, CancellationToken cancellationToken)
+    // ...
+    protected override string BaseUrl => this.configuration?.GetConnectionString("PongApiUrl") ?? throw new InvalidOperationException();
+    // ...
+}
+```
+**Создать метод, отвечающий за отправку http запроса**
+```csharp
+public class PongService : BaseClientService<string>
+{
+    // ...
+    public Task<string> GetPong(CancellationToken cancellationToken)
     {
-        // Что-то делаем с command.CsvFile...
-        throw new NotImplementedException();
+        return this.GetAsync<string>("v1/Samples/UseTemplateUri/{secret}/pong".ToTemplateUri("ping"), cancellationToken);
     }
 }
 ```
+Метод GetAsync определяет обобщенный тип выходных данных, как строка.  
+Метод GetAsync принимает аргумент TemplateUri, отвечающий за эндпоинт, на который делается http запрос. Для этого у строки, определяющий uri, необходимо вызвать метод расширения ToTemplateUri и передать нужные аргументы для замены плейсхолдеров в uri.
+

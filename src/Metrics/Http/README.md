@@ -55,3 +55,18 @@ my_cool_metric{statusGroup="success",statusSubGroup="success_200",statusCode="20
 // время выполнения запроса
 my_cool_metric{requestUri="v1/some_uri" }
 ```
+Если в uri присустсвуют динамические данные, например идентификаторы, то uri можно привести к шаблону.  
+Например запрос пишет такие метрики:
+```csharp
+status_code_request{statusGroup="success",statusSubGroup="success_200",statusCode="201",requestUri="v1/orders/3fa85f64-5717-4562-b3fc-2c963f66afa6" }
+status_code_request{statusGroup="success",statusSubGroup="success_200",statusCode="201",requestUri="v1/orders/52c3202d-2d34-40cd-b421-4295e4998a14" }
+```
+То необходимо uri привести к шаблону: **v1/orders/{orderId}**:
+```csharp
+var yourrUriAsTemplate = "v1/orders/{orderId}".ToTemplateUri("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+```
+Метрика в таком случае будет писаться такая:
+```csharp
+status_code_request{statusGroup="success",statusSubGroup="success_200",statusCode="201",requestUri="v1/orders/{orderId}" }
+```
+Пример кода**[Пример кода](/src/Http/Http/samples/Gems.Http.Samples.UseTemplateUri)**
