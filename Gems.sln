@@ -509,6 +509,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{69E68420-16AC-4947-A851-DDC9B0CF648E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Http.Samples.UseTemplateUri", "src\Http\Http\samples\Gems.Http.Samples.UseTemplateUri\Gems.Http.Samples.UseTemplateUri.csproj", "{A84B7280-4461-4DBA-B8AE-53F17AFFEEB9}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{C16F53D5-1CA1-46EE-BF9F-611E8D30F31C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking", "src\Patterns\SyncTables\samples\Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking\Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking.csproj", "{627904D9-8AB4-47DF-9014-F30623EF1D1C}"
@@ -526,6 +527,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Sample.Transaction", "src\Data\Data\samples\Gems.Data.Sample.Transaction\Gems.Data.Sample.Transaction.csproj", "{558E7B57-853B-4887-8478-86C629E1CEEB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Sample.Operations", "src\Data\Data\samples\Gems.Data.Sample.Operations\Gems.Data.Sample.Operations.csproj", "{06344C7E-E3A0-4FB6-8CDE-A4BC5B555ED3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Sample.Context", "src\Data\Data\samples\Gems.Data.Sample.Context\Gems.Data.Sample.Context.csproj", "{A4944471-1844-46C8-964A-767D23018B39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -853,6 +856,10 @@ Global
 		{06344C7E-E3A0-4FB6-8CDE-A4BC5B555ED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06344C7E-E3A0-4FB6-8CDE-A4BC5B555ED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06344C7E-E3A0-4FB6-8CDE-A4BC5B555ED3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4944471-1844-46C8-964A-767D23018B39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4944471-1844-46C8-964A-767D23018B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4944471-1844-46C8-964A-767D23018B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4944471-1844-46C8-964A-767D23018B39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1020,6 +1027,7 @@ Global
 		{E900EEFC-C25A-4AA4-8A1B-8C05E8653642} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
 		{558E7B57-853B-4887-8478-86C629E1CEEB} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
 		{06344C7E-E3A0-4FB6-8CDE-A4BC5B555ED3} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
+		{A4944471-1844-46C8-964A-767D23018B39} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F59BAF6C-0E34-4F38-A0E7-2227592118CE}

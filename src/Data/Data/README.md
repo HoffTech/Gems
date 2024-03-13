@@ -171,6 +171,9 @@ await this.mediator.Send(new SomeInnerCommand(), linkedTokenSource.Token);
 Связанные токены является obsolete. Смотрите раздел "Использование контекста".
 
 # Использование локального контекста
+
+**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.Context)**
+
 Провадер Unit of Work (UnitOfWorkProvider) можно сконфигурировать на работу с локальным контекстом. 
 Тем самым делегировать источник хранения объектов Unit of Work на локальный контекст вместо собственного словаря (в UnitOfWorkProvider).
 ```json
