@@ -104,11 +104,11 @@
 ```
 5. _QueryAsync_
 ```csharp
-        public async Task<List<PersonDto>> Handle(GetPersonByFilterQuery query, CancellationToken cancellationToken)
+        public async Task<List<PersonDto>> Handle(GetPersonsByFilterQuery query, CancellationToken cancellationToken)
         {
             var person = await this.unitOfWorkProvider
                 .GetUnitOfWork(cancellationToken)
-                .QueryFirstOrDefaultAsync<Person>(CreateQuery(query, out var parameters), parameters);
+                .QueryAsync<Person>(CreateQuery(query, out var parameters), parameters);
 
             return this.mapper.Map<List<PersonDto>>(person);
         }

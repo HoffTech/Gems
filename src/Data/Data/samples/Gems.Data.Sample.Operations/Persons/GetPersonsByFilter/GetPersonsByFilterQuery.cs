@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gems.Data.Sample.Operations.Persons.GetPersonsByFilter
 {
-    public class GetPersonByFilterQuery : IRequest<List<PersonDto>>
+    public class GetPersonsByFilterQuery : IRequest<List<PersonDto>>
     {
         [FromQuery]
         public string FirstName { get; set; }

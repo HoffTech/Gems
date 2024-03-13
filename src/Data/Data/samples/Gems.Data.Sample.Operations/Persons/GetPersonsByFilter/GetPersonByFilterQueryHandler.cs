@@ -18,7 +18,7 @@ using MediatR;
 namespace Gems.Data.Sample.Operations.Persons.GetPersonsByFilter
 {
     [Endpoint("api/v1/persons/by-filter", "GET", OperationGroup = "Persons")]
-    public class GetPersonByFilterQueryHandler : IRequestHandler<GetPersonByFilterQuery, List<PersonDto>>
+    public class GetPersonByFilterQueryHandler : IRequestHandler<GetPersonsByFilterQuery, List<PersonDto>>
     {
         private readonly IUnitOfWorkProvider unitOfWorkProvider;
         private readonly IMapper mapper;
@@ -29,16 +29,16 @@ namespace Gems.Data.Sample.Operations.Persons.GetPersonsByFilter
             this.mapper = mapper;
         }
 
-        public async Task<List<PersonDto>> Handle(GetPersonByFilterQuery query, CancellationToken cancellationToken)
+        public async Task<List<PersonDto>> Handle(GetPersonsByFilterQuery query, CancellationToken cancellationToken)
         {
-            var person = await this.unitOfWorkProvider
+            var persons = await this.unitOfWorkProvider
                 .GetUnitOfWork(cancellationToken)
-                .QueryFirstOrDefaultAsync<Person>(CreateQuery(query, out var parameters), parameters);
+                .QueryAsync<Person>(CreateQuery(query, out var parameters), parameters);
 
-            return this.mapper.Map<List<PersonDto>>(person);
+            return this.mapper.Map<List<PersonDto>>(persons);
         }
 
-        private static string CreateQuery(GetPersonByFilterQuery query, out Dictionary<string, object> parameters)
+        private static string CreateQuery(GetPersonsByFilterQuery query, out Dictionary<string, object> parameters)
         {
             const string sql = """
                                SELECT * FROM public.person p
@@ -49,20 +49,20 @@ namespace Gems.Data.Sample.Operations.Persons.GetPersonsByFilter
             parameters = new Dictionary<string, object>();
             if (query.Age is not null)
             {
-                sb.AppendLine("AND p.age = @Age");
+                sb.AppendLine(" AND p.age = @Age");
                 parameters.Add("@Age", query.Age);
             }
 
-            if (string.IsNullOrEmpty(query.FirstName))
+            if (!string.IsNullOrEmpty(query.FirstName))
             {
-                sb.AppendLine("AND p.first_name = @FirstName");
+                sb.AppendLine(" AND p.first_name = @FirstName");
                 parameters.Add("@FirstName", query.FirstName);
             }
 
-            if (string.IsNullOrEmpty(query.LastName))
+            if (!string.IsNullOrEmpty(query.LastName))
             {
-                sb.AppendLine("AND p.last_name = @LastName");
-                parameters.Add("@LastName", query.FirstName);
+                sb.AppendLine(" AND p.last_name = @LastName");
+                parameters.Add("@LastName", query.LastName);
             }
 
             sb.AppendLine("LIMIT @Take OFFSET @Skip");
