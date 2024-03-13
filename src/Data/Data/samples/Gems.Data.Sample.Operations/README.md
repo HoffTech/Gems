@@ -115,15 +115,15 @@
 ```
 
 ### Запуск примера
-1. Для проверки сэмпла, настройте подключение~~~~ к реальной БД
-2. Реализуйте функции/процедуры 
+1. Для проверки сэмпла, настройте подключение к реальной БД
+2. Реализуйте функции/процедуры
    1. Получение объекта **Person** по id `public.person_get_person_by_id`
    2. Получение списка объектов **Person** с учетом пагинации `public.person_get_persons`
    3. Получение возраста объекта **Person** по id `public.person_get_age_by_id`
    4. Создание объекта **Person**  `public.person_create`
 4. Вызовите ендпоинты с помощью **Swagger**
-    1. `api/v1/persons/update` 
-    2. `api/v1/persons/update` 
-    3. `api/v1/persons/update` 
-    4. `api/v1/persons/update` 
-    5. `api/v1/persons/update` 
+    1. `GET /api/v1/persons/{id}`
+    2. `GET /api/v1/persons`
+    3. `GET /api/v1/persons/{id}`
+    4. `POST /api/v1/person`
+    5. `GET /api/v1/persons/by-filter`
