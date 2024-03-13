@@ -1,0 +1,81 @@
+﻿// Licensed to the Hoff Tech under one or more agreements.
+// The Hoff Tech licenses this file to you under the MIT license.
+
+using System;
+using System.Text.RegularExpressions;
+
+namespace Gems.Http;
+
+public class TemplateUri
+{
+    public const string TemplateArgsArgumentErrorMessage = $"Пустой массив {nameof(templateArgs)}";
+    public const string IncorrectPlaceholderErrorMessage = $"Не корректный плейсходер в {nameof(templateUri)}: {{0}}";
+    public const string TemplateArgsContainsNotAllPlaceholdersErrorMessage = $"Массив {nameof(templateArgs)}: {{0}} содержит не все аргументы, необходимые для замены плейсхолдеров в {nameof(templateUri)}: {{1}}";
+    private readonly string templateUri;
+    private readonly string[] templateArgs;
+
+    public TemplateUri(string templateUri, params string[] templateArgs)
+    {
+        this.templateUri = templateUri;
+        this.templateArgs = templateArgs;
+    }
+
+    public string GetTemplateUri()
+    {
+        return this.templateUri;
+    }
+
+    public string GetUri()
+    {
+        if (string.IsNullOrEmpty(this.templateUri))
+        {
+            return this.templateUri;
+        }
+
+        var templateUriParts = this.templateUri.Split('?');
+        var templateUriWithoutQueryString = templateUriParts[0];
+
+        if (templateUriWithoutQueryString.IndexOf("{", StringComparison.InvariantCulture) == -1)
+        {
+            return this.templateUri;
+        }
+
+        if (this.templateArgs == null || this.templateArgs.Length == 0)
+        {
+            throw new ArgumentException(TemplateArgsArgumentErrorMessage);
+        }
+
+        var placeholdersMatches = Regex.Matches(templateUriWithoutQueryString, "{[^}]*}");
+        if (placeholdersMatches.Count == 0)
+        {
+            throw new ArgumentException(string.Format(IncorrectPlaceholderErrorMessage, templateUriWithoutQueryString));
+        }
+
+        var templateUriWithPositionPlaceholders = templateUriWithoutQueryString;
+        for (var i = 0; i < placeholdersMatches.Count; i++)
+        {
+            templateUriWithPositionPlaceholders = templateUriWithPositionPlaceholders.Replace(placeholdersMatches[i].Value, $"{{{i}}}");
+        }
+
+        for (var i = 0; i < this.templateArgs.Length; i++)
+        {
+            templateUriWithPositionPlaceholders = templateUriWithPositionPlaceholders.Replace($"{{{i}}}", this.templateArgs[i]);
+        }
+
+        if (templateUriWithPositionPlaceholders.IndexOf("{", StringComparison.InvariantCulture) >= 0)
+        {
+            throw new ArgumentException(string.Format(TemplateArgsContainsNotAllPlaceholdersErrorMessage, string.Join(',', this.templateArgs), templateUriWithoutQueryString));
+        }
+
+        templateUriParts[0] = templateUriWithPositionPlaceholders;
+        return string.Join("?", templateUriParts);
+    }
+}
+
+public static class TemplateUriExtensions
+{
+    public static TemplateUri ToTemplateUri(this string uri, params string[] args)
+    {
+        return new TemplateUri(uri, args);
+    }
+}
