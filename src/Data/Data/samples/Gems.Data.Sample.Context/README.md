@@ -3,7 +3,37 @@
 ### Основные понятия
 - Контекст - это область действия объекта _UnitOfWork_
 - Контекст реализован на базе **Gems.Context**. Хранение объектов _UnitOfWork_ происходит в поле _AsyncLocal<IContext>_ класса _ContextAccessor_
-
+- Структурная схема работы контекста по _StackTrace_ на базе _AsyncLocal_
+```csharp
+MethodAsync1()
+{
+    CurrentContext.Value = “data1”
+    MethodAsync2()
+    {
+        “data1”
+        MethodAsync3()
+        {
+            “data1”
+            CurrentContext.Value = “data2”
+            MethodAsync4()
+            {
+                “data2”
+            }
+            “data2”
+            MethodAsync5()
+            {
+                “data2”
+            }        
+             “data2”           
+        }
+        “data1”
+        MethodAsync6()
+        {
+             “data1”
+         }
+         “data1”
+}
+```
 > Использование контекста позволяет создавать вложенные транзакции без необходимости создания нового _CancellationToken_ (_LinkedTokenSource_) для вложенного UnitOfWork.
 > > Каждый уникальный объект _UnitOfWork_ предполагает свою уникальную транзакцию
 
