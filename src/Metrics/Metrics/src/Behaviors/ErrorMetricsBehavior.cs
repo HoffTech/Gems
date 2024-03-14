@@ -39,42 +39,37 @@ namespace Gems.Metrics.Behaviors
 #pragma warning restore CS0618
 
                 var response = await next().ConfigureAwait(false);
-                await this.WriteMetricsAsync("feature_counters", "none", 200).ConfigureAwait(false);
 
 #pragma warning disable CS0618
                 await this.metricsService.Gauge(GetSuccessMetricName()).ConfigureAwait(false);
 #pragma warning restore CS0618
 
+                await this.WriteMetricsAsync().ConfigureAwait(false);
                 return response;
             }
             catch (NpgsqlException ex)
             {
-                await this.WriteMetricsAsync("feature_counters", "npgsql", this.exceptionConverter.Convert(ex).StatusCode).ConfigureAwait(false);
-                await this.WriteMetricsAsync("errors_counter", "npgsql", this.exceptionConverter.Convert(ex).StatusCode).ConfigureAwait(false);
+                await this.WriteMetricsAsync("npgsql", ex).ConfigureAwait(false);
                 throw;
             }
             catch (SqlException ex)
             {
-                await this.WriteMetricsAsync("feature_counters", "mssql", this.exceptionConverter.Convert(ex).StatusCode).ConfigureAwait(false);
-                await this.WriteMetricsAsync("errors_counter", "mssql", this.exceptionConverter.Convert(ex).StatusCode).ConfigureAwait(false);
+                await this.WriteMetricsAsync("mssql", ex).ConfigureAwait(false);
                 throw;
             }
             catch (Exception ex) when (ex is FluentValidation.ValidationException or ValidationException)
             {
-                await this.WriteMetricsAsync("feature_counters", "validation", this.exceptionConverter.Convert(ex).StatusCode).ConfigureAwait(false);
-                await this.WriteMetricsAsync("errors_counter", "validation", this.exceptionConverter.Convert(ex).StatusCode).ConfigureAwait(false);
+                await this.WriteMetricsAsync("validation", ex).ConfigureAwait(false);
                 throw;
             }
             catch (Exception ex) when (ex is BusinessException exception)
             {
-                await this.WriteMetricsAsync("feature_counters", "business", this.exceptionConverter.Convert(exception).StatusCode).ConfigureAwait(false);
-                await this.WriteMetricsAsync("errors_counter", "business", this.exceptionConverter.Convert(exception).StatusCode).ConfigureAwait(false);
+                await this.WriteMetricsAsync("business", ex).ConfigureAwait(false);
                 throw;
             }
             catch (Exception ex)
             {
-                await this.WriteMetricsAsync("feature_counters", "other", this.exceptionConverter.Convert(ex).StatusCode).ConfigureAwait(false);
-                await this.WriteMetricsAsync("errors_counter", "other", this.exceptionConverter.Convert(ex).StatusCode).ConfigureAwait(false);
+                await this.WriteMetricsAsync("other", ex).ConfigureAwait(false);
                 throw;
             }
         }
@@ -108,13 +103,36 @@ namespace Gems.Metrics.Behaviors
             return StringUtils.MapSpaceToUndescore(friendlyName.ToLower());
         }
 
-        private async Task WriteMetricsAsync(string metricName, string errorType, int? statusCode)
+        private async Task WriteMetricsAsync(string errorType = null, Exception exception = null)
         {
+            errorType ??= "none";
+            var featureName = GetFeatureName();
+            var statusCode = "200";
+            var customCode = "none";
+            if (exception != null)
+            {
+                var businessErrorViewModel = this.exceptionConverter.Convert(exception);
+                statusCode = businessErrorViewModel.StatusCode.ToString();
+                customCode = businessErrorViewModel.Error?.Code ?? "none";
+            }
+
             await this.metricsService.Gauge(new MetricInfo
             {
-                Name = metricName,
-                LabelNames = new[] { "feature_name", "error_type", "status_code" },
-                LabelValues = new[] { GetFeatureName(), errorType, statusCode.ToString() }
+                Name = "feature_counters",
+                LabelNames = new[] { "feature_name", "error_type", "status_code", "custom_code" },
+                LabelValues = new[] { featureName, errorType, statusCode, customCode }
+            }).ConfigureAwait(false);
+
+            if (errorType == "none")
+            {
+                return;
+            }
+
+            await this.metricsService.Gauge(new MetricInfo
+            {
+                Name = "errors_counter",
+                LabelNames = new[] { "feature_name", "error_type", "status_code", "custom_code" },
+                LabelValues = new[] { featureName, errorType, statusCode, customCode }
             }).ConfigureAwait(false);
         }
     }
