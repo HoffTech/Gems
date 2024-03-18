@@ -41,13 +41,17 @@ public class GitlabConfigurationValuesProvider
         projectId = null;
         prefix = null;
 
-        var aspNetEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        if (string.IsNullOrWhiteSpace(aspNetEnvironment))
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        if (string.IsNullOrWhiteSpace(environment))
         {
-            return false;
+            environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+            if (string.IsNullOrWhiteSpace(environment))
+            {
+                return false;
+            }
         }
 
-        if (!this.settings.Prefixes.TryGetValue(aspNetEnvironment, out prefix))
+        if (!this.settings.Prefixes.TryGetValue(environment, out prefix))
         {
             return false;
         }

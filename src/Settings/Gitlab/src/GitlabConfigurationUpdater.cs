@@ -29,13 +29,17 @@ public class GitlabConfigurationUpdater
     {
         try
         {
-            var aspNetEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            if (string.IsNullOrWhiteSpace(aspNetEnvironment))
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (string.IsNullOrWhiteSpace(environment))
             {
-                return;
+                environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+                if (string.IsNullOrWhiteSpace(environment))
+                {
+                    return;
+                }
             }
 
-            if (!this.settings.Prefixes.TryGetValue(aspNetEnvironment, out var prefix))
+            if (!this.settings.Prefixes.TryGetValue(environment, out var prefix))
             {
                 return;
             }
