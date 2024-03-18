@@ -23,15 +23,15 @@ namespace Gems.Settings.Gitlab
             SetByTag,
         }
 
-        public static async Task<string> GetVariableValueByName(string variableName, string url, string token, int projectId, string prefix, List<string> prefixes)
+        public static async Task<string> GetVariableValueByName(string variableName, IGitLabClient client, int projectId, string prefix, List<string> prefixes)
         {
-            var variables = await ReadFilteredByEnvironmentAsync(url, token, projectId, prefix, prefixes);
+            var variables = await ReadFilteredByEnvironmentAsync(client, projectId, prefix, prefixes);
             return variables.FirstOrDefault(x => x.Key == variableName).Value;
         }
 
-        public static async Task<Dictionary<string, string>> ReadFilteredByEnvironmentAsync(string url, string token, int projectId, string prefix, List<string> prefixes)
+        public static async Task<Dictionary<string, string>> ReadFilteredByEnvironmentAsync(IGitLabClient client, int projectId, string prefix, List<string> prefixes)
         {
-            var gitlabVariables = await ReadAllAsync(url, token, projectId);
+            var gitlabVariables = await ReadAllAsync(client, projectId);
             var variableValuesForEnvironment = FilterVariablesByEnvironment(gitlabVariables, prefixes, prefix);
             return GitlabConfigurationParser.Parse(variableValuesForEnvironment, prefix);
         }
@@ -50,11 +50,8 @@ namespace Gems.Settings.Gitlab
             return (string.Empty, variableName);
         }
 
-        private static async Task<IList<Variable>> ReadAllAsync(string url, string token, int projectId)
-        {
-            var client = new GitLabClient(url, token);
-            return await client.Projects.GetVariablesAsync(projectId);
-        }
+        private static async Task<IList<Variable>> ReadAllAsync(IGitLabClient client, int projectId)
+            => await client.Projects.GetVariablesAsync(projectId);
 
         private static Dictionary<string, string> FilterVariablesByEnvironment(IList<Variable> variables, List<string> prefixes, string targetPrefix)
         {

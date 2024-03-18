@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using Gems.Text.Json;
 
+using GitLabApiClient;
+
 namespace Gems.Settings.Gitlab;
 
 public class GitlabConfigurationValuesProvider
@@ -31,7 +33,8 @@ public class GitlabConfigurationValuesProvider
             return null;
         }
 
-        return await GitlabConfigurationReader.GetVariableValueByName(variableName, url, token, Convert.ToInt32(projectId), prefix, this.settings.Prefixes.Values.ToList());
+        var client = new GitLabClient(url, token);
+        return await GitlabConfigurationReader.GetVariableValueByName(variableName, client, Convert.ToInt32(projectId), prefix, this.settings.Prefixes.Values.ToList());
     }
 
     private bool GetSettings(out string url, out string token, out string projectId, out string prefix)

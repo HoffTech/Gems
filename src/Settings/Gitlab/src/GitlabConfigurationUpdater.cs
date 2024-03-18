@@ -5,6 +5,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
+using GitLabApiClient;
+
 using Microsoft.Extensions.Configuration;
 
 namespace Gems.Settings.Gitlab;
@@ -52,7 +54,8 @@ public class GitlabConfigurationUpdater
                 return;
             }
 
-            var variables = await GitlabConfigurationReader.ReadFilteredByEnvironmentAsync(url, token, Convert.ToInt32(projectId), prefix, this.settings.Prefixes.Values.ToList());
+            var client = new GitLabClient(url, token);
+            var variables = await GitlabConfigurationReader.ReadFilteredByEnvironmentAsync(client, Convert.ToInt32(projectId), prefix, this.settings.Prefixes.Values.ToList());
             var configurationChanged = false;
             foreach (var variable in variables)
             {

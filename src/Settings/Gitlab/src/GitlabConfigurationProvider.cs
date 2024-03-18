@@ -4,6 +4,8 @@
 using System;
 using System.Linq;
 
+using GitLabApiClient;
+
 using Microsoft.Extensions.Configuration;
 
 namespace Gems.Settings.Gitlab
@@ -42,7 +44,8 @@ namespace Gems.Settings.Gitlab
                 return;
             }
 
-            this.Data = GitlabConfigurationReader.ReadFilteredByEnvironmentAsync(url, token, Convert.ToInt32(projectId), prefix, this.settings.Prefixes.Values.ToList())
+            var client = new GitLabClient(url, token);
+            this.Data = GitlabConfigurationReader.ReadFilteredByEnvironmentAsync(client, Convert.ToInt32(projectId), prefix, this.settings.Prefixes.Values.ToList())
                 .GetAwaiter()
                 .GetResult();
         }
