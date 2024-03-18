@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Gems.OpenTelemetry.Api.Dto;
+using Gems.OpenTelemetry.Configuration;
 using Gems.OpenTelemetry.GlobalOptions;
 using Gems.Settings.Gitlab;
 
@@ -19,13 +20,27 @@ public class TracingFeatureFlagChecker : BackgroundService
 {
     private readonly TracingFeatureFlags flags;
     private readonly IServiceProvider serviceProvider;
+    private readonly TracingConfiguration configuration;
     private readonly ILogger<TracingFeatureFlagChecker> logger;
+    private readonly string environmentPrefix;
+    private bool wasEnabled;
 
-    public TracingFeatureFlagChecker(TracingFeatureFlags flags, IServiceProvider serviceProvider, ILogger<TracingFeatureFlagChecker> logger)
+    public TracingFeatureFlagChecker(
+        TracingFeatureFlags flags,
+        IServiceProvider serviceProvider,
+        ILogger<TracingFeatureFlagChecker> logger,
+        TracingConfiguration configuration)
     {
         this.flags = flags;
         this.serviceProvider = serviceProvider;
         this.logger = logger;
+        this.configuration = configuration;
+
+        this.environmentPrefix = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        if (string.IsNullOrEmpty(this.environmentPrefix))
+        {
+            this.environmentPrefix = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+        }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -35,7 +50,7 @@ public class TracingFeatureFlagChecker : BackgroundService
         {
             gitlabConfigurationProvider = this.serviceProvider.GetRequiredService<GitlabConfigurationValuesProvider>();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             this.logger.LogError($"Can't find {nameof(GitlabConfigurationValuesProvider)}. {nameof(TracingFeatureFlagChecker)} stopped");
             return;
@@ -43,9 +58,19 @@ public class TracingFeatureFlagChecker : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            if (this.flags.Tracing)
+            if (this.FeatureEnabled() && !this.wasEnabled)
             {
-                var request = await gitlabConfigurationProvider.GetGitlabVariableValueByName<TraceRequest>("tracing");
+                TraceRequest request;
+                try
+                {
+                    request = await gitlabConfigurationProvider.GetGitlabVariableValueByName<TraceRequest>("tracing");
+                }
+                catch (Exception)
+                {
+                    this.logger.LogError("Can't deserialize gitlab's variable \"tracing\"");
+                    await Task.Delay(TimeSpan.FromSeconds(this.configuration.FeatureFlagUpdateIntervalOnFailureSeconds ?? 300), stoppingToken);
+                    continue;
+                }
 
                 TracingGlobalOptions.Enabled = request?.Enabled ?? TracingGlobalOptions.Enabled;
                 TracingGlobalOptions.RequestInUrlFilter.Include = request?.RequestIn?.Include ?? TracingGlobalOptions.RequestInUrlFilter.Include;
@@ -58,9 +83,31 @@ public class TracingFeatureFlagChecker : BackgroundService
                 TracingGlobalOptions.MssqlCommandFilter.Exclude = request?.Mssql?.CommandFilter?.Exclude ?? TracingGlobalOptions.MssqlCommandFilter.Exclude;
                 TracingGlobalOptions.IncludeCommandRequest = request?.Command?.IncludeRequest ?? TracingGlobalOptions.IncludeCommandRequest;
                 TracingGlobalOptions.IncludeCommandResponse = request?.Command?.IncludeResponse ?? TracingGlobalOptions.IncludeCommandResponse;
-            }
 
-            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+                this.logger.LogInformation("Trace configuration updated successfully");
+                this.wasEnabled = true;
+            }
+            else
+            {
+                if (!this.wasEnabled)
+                {
+                    continue;
+                }
+
+                this.logger.LogInformation("Tracing disabled via feature flag");
+                this.wasEnabled = false;
+            }
         }
+    }
+
+    private bool FeatureEnabled()
+    {
+        return this.environmentPrefix switch
+        {
+            "Development" => this.flags.DevTracing || this.flags.Tracing,
+            "Staging" => this.flags.StageTracing || this.flags.Tracing,
+            "Production" => this.flags.ProdTracing || this.flags.Tracing,
+            _ => false
+        };
     }
 }
