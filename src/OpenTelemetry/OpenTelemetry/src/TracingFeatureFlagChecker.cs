@@ -58,7 +58,7 @@ public class TracingFeatureFlagChecker : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            if (this.FeatureEnabled() && !this.wasEnabled)
+            if (this.flags.TracingEnabled && !this.wasEnabled)
             {
                 TraceRequest request;
                 try
@@ -68,7 +68,7 @@ public class TracingFeatureFlagChecker : BackgroundService
                 catch (Exception)
                 {
                     this.logger.LogError("Can't deserialize gitlab's variable \"tracing\"");
-                    await Task.Delay(TimeSpan.FromSeconds(this.configuration.FeatureFlagUpdateIntervalOnFailureSeconds ?? 300), stoppingToken);
+                    await Task.Delay(TimeSpan.FromSeconds(this.configuration.FeatureFlagUpdateIntervalOnFailureSeconds ?? 10), stoppingToken);
                     continue;
                 }
 
@@ -89,25 +89,14 @@ public class TracingFeatureFlagChecker : BackgroundService
             }
             else
             {
-                if (!this.wasEnabled)
+                if (this.wasEnabled)
                 {
-                    continue;
+                    this.logger.LogInformation("Tracing disabled via feature flag");
+                    this.wasEnabled = false;
                 }
 
-                this.logger.LogInformation("Tracing disabled via feature flag");
-                this.wasEnabled = false;
+                await Task.Delay(TimeSpan.FromSeconds(this.configuration.FeatureFlagUpdateIntervalSeconds ?? 60), stoppingToken);
             }
         }
-    }
-
-    private bool FeatureEnabled()
-    {
-        return this.environmentPrefix switch
-        {
-            "Development" => this.flags.DevTracing || this.flags.Tracing,
-            "Staging" => this.flags.StageTracing || this.flags.Tracing,
-            "Production" => this.flags.ProdTracing || this.flags.Tracing,
-            _ => false
-        };
     }
 }
