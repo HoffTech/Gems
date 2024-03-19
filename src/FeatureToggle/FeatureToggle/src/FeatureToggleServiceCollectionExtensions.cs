@@ -19,8 +19,8 @@ public static class FeatureToggleServiceCollectionExtensions
         Action<FeatureToggleOptions> configureOptions = null)
     {
         var featureToggleConfigurationSection = configuration.GetSection("FeatureToggle");
-        var featureToggleOptinos = featureToggleConfigurationSection.Get<FeatureToggleOptions>();
-        if (featureToggleOptinos == null)
+        var featureToggleOptions = featureToggleConfigurationSection.Get<FeatureToggleOptions>();
+        if (featureToggleOptions == null)
         {
             return serviceCollection;
         }

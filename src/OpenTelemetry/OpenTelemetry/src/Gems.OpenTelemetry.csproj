@@ -20,4 +20,9 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="WildcardMatch" Version="1.0.7" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\FeatureToggle\FeatureToggle\src\Gems.FeatureToggle.csproj" />
+    <ProjectReference Include="..\..\..\Settings\Gitlab\src\Gems.Settings.Gitlab.csproj" />
+  </ItemGroup>
 </Project>

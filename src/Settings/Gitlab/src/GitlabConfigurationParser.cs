@@ -18,7 +18,8 @@ namespace Gems.Settings.Gitlab
 
         private static string ParseKey(string key, string prefix)
         {
-            return (string.IsNullOrEmpty(prefix) ? key : key.Substring(prefix.Length)).Replace("__", ":");
+            return (string.IsNullOrEmpty(prefix) || !key.StartsWith(prefix)
+                ? key : key.Substring(prefix.Length)).Replace("__", ":");
         }
 
         private static string ParseValue(string value)
