@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Gems.FeatureToggle;
 using Gems.OpenTelemetry.Api.Dto;
 using Gems.OpenTelemetry.Configuration;
 using Gems.OpenTelemetry.GlobalOptions;
@@ -13,6 +14,7 @@ using Gems.Settings.Gitlab;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Gems.OpenTelemetry;
 
@@ -22,25 +24,22 @@ public class TracingFeatureFlagChecker : BackgroundService
     private readonly IServiceProvider serviceProvider;
     private readonly TracingConfiguration configuration;
     private readonly ILogger<TracingFeatureFlagChecker> logger;
-    private readonly string environmentPrefix;
+    private readonly TimeSpan tracingFeatureFlagUpdateDelay;
     private bool wasEnabled;
 
     public TracingFeatureFlagChecker(
         TracingFeatureFlags flags,
         IServiceProvider serviceProvider,
         ILogger<TracingFeatureFlagChecker> logger,
-        TracingConfiguration configuration)
+        TracingConfiguration configuration,
+        IOptions<FeatureToggleOptions> featureToggleOptions)
     {
         this.flags = flags;
         this.serviceProvider = serviceProvider;
         this.logger = logger;
         this.configuration = configuration;
-
-        this.environmentPrefix = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        if (string.IsNullOrEmpty(this.environmentPrefix))
-        {
-            this.environmentPrefix = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
-        }
+        this.tracingFeatureFlagUpdateDelay = featureToggleOptions.Value.FetchTogglesInterval == default ?
+            TimeSpan.FromSeconds(30) : featureToggleOptions.Value.FetchTogglesInterval;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -58,33 +57,25 @@ public class TracingFeatureFlagChecker : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            if (this.flags.TracingEnabled && !this.wasEnabled)
+            if (this.flags.TracingEnabled)
             {
-                TraceRequest request;
-                try
+                if (this.wasEnabled)
                 {
-                    request = await gitlabConfigurationProvider.GetGitlabVariableValueByName<TraceRequest>("tracing");
-                }
-                catch (Exception)
-                {
-                    this.logger.LogError("Can't deserialize gitlab's variable \"tracing\"");
-                    await Task.Delay(TimeSpan.FromSeconds(this.configuration.FeatureFlagUpdateIntervalOnFailureSeconds ?? 10), stoppingToken);
+                    await Task.Delay(this.tracingFeatureFlagUpdateDelay, stoppingToken);
                     continue;
                 }
 
-                TracingGlobalOptions.Enabled = request?.Enabled ?? TracingGlobalOptions.Enabled;
-                TracingGlobalOptions.RequestInUrlFilter.Include = request?.RequestIn?.Include ?? TracingGlobalOptions.RequestInUrlFilter.Include;
-                TracingGlobalOptions.RequestInUrlFilter.Exclude = request?.RequestIn?.Exclude ?? TracingGlobalOptions.RequestInUrlFilter.Exclude;
-                TracingGlobalOptions.RequestOutUrlFilter.Include = request?.RequestOut?.Include ?? TracingGlobalOptions.RequestOutUrlFilter.Include;
-                TracingGlobalOptions.RequestOutUrlFilter.Exclude = request?.RequestOut?.Exclude ?? TracingGlobalOptions.RequestOutUrlFilter.Exclude;
-                TracingGlobalOptions.SourceFilter.Include = request?.SourceFilter?.Include ?? TracingGlobalOptions.SourceFilter.Include;
-                TracingGlobalOptions.SourceFilter.Exclude = request?.SourceFilter?.Exclude ?? TracingGlobalOptions.SourceFilter.Exclude;
-                TracingGlobalOptions.MssqlCommandFilter.Include = request?.Mssql?.CommandFilter?.Include ?? TracingGlobalOptions.MssqlCommandFilter.Include;
-                TracingGlobalOptions.MssqlCommandFilter.Exclude = request?.Mssql?.CommandFilter?.Exclude ?? TracingGlobalOptions.MssqlCommandFilter.Exclude;
-                TracingGlobalOptions.IncludeCommandRequest = request?.Command?.IncludeRequest ?? TracingGlobalOptions.IncludeCommandRequest;
-                TracingGlobalOptions.IncludeCommandResponse = request?.Command?.IncludeResponse ?? TracingGlobalOptions.IncludeCommandResponse;
+                try
+                {
+                    var request = await gitlabConfigurationProvider.GetGitlabVariableValueByName<TraceRequest>("tracing");
+                    UpdateTracingGlobalOptions(request);
+                    this.logger.LogInformation("Trace configuration updated successfully");
+                }
+                catch (Exception e)
+                {
+                    this.logger.LogCritical(e, "Error while fetching gitlab's variable \"tracing\"");
+                }
 
-                this.logger.LogInformation("Trace configuration updated successfully");
                 this.wasEnabled = true;
             }
             else
@@ -95,8 +86,23 @@ public class TracingFeatureFlagChecker : BackgroundService
                     this.wasEnabled = false;
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(this.configuration.FeatureFlagUpdateIntervalSeconds ?? 60), stoppingToken);
+                await Task.Delay(this.tracingFeatureFlagUpdateDelay, stoppingToken);
             }
         }
+    }
+
+    private static void UpdateTracingGlobalOptions(TraceRequest request)
+    {
+        TracingGlobalOptions.Enabled = request?.Enabled ?? TracingGlobalOptions.Enabled;
+        TracingGlobalOptions.RequestInUrlFilter.Include = request?.RequestIn?.Include ?? TracingGlobalOptions.RequestInUrlFilter.Include;
+        TracingGlobalOptions.RequestInUrlFilter.Exclude = request?.RequestIn?.Exclude ?? TracingGlobalOptions.RequestInUrlFilter.Exclude;
+        TracingGlobalOptions.RequestOutUrlFilter.Include = request?.RequestOut?.Include ?? TracingGlobalOptions.RequestOutUrlFilter.Include;
+        TracingGlobalOptions.RequestOutUrlFilter.Exclude = request?.RequestOut?.Exclude ?? TracingGlobalOptions.RequestOutUrlFilter.Exclude;
+        TracingGlobalOptions.SourceFilter.Include = request?.SourceFilter?.Include ?? TracingGlobalOptions.SourceFilter.Include;
+        TracingGlobalOptions.SourceFilter.Exclude = request?.SourceFilter?.Exclude ?? TracingGlobalOptions.SourceFilter.Exclude;
+        TracingGlobalOptions.MssqlCommandFilter.Include = request?.Mssql?.CommandFilter?.Include ?? TracingGlobalOptions.MssqlCommandFilter.Include;
+        TracingGlobalOptions.MssqlCommandFilter.Exclude = request?.Mssql?.CommandFilter?.Exclude ?? TracingGlobalOptions.MssqlCommandFilter.Exclude;
+        TracingGlobalOptions.IncludeCommandRequest = request?.Command?.IncludeRequest ?? TracingGlobalOptions.IncludeCommandRequest;
+        TracingGlobalOptions.IncludeCommandResponse = request?.Command?.IncludeResponse ?? TracingGlobalOptions.IncludeCommandResponse;
     }
 }

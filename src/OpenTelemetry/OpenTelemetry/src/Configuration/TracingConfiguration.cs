@@ -17,10 +17,6 @@ public class TracingConfiguration
 
     public bool? Enabled { get; set; }
 
-    public int? FeatureFlagUpdateIntervalSeconds { get; set; }
-
-    public int? FeatureFlagUpdateIntervalOnFailureSeconds { get; set; }
-
     public HttpConfiguration RequestIn { get; set; }
 
     public HttpConfiguration RequestOut { get; set; }

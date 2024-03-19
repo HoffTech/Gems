@@ -54,16 +54,6 @@ _appsettings.json_:
 - завести ci/cd переменную  "tracing". Для этого на странице проекта в левом меню открываете Settings -> CI/CD -> Variables.
 Далее, жмёте Add variable, Key обязательно `TRACING`, Value см. [здесь](trace-endpoint.md), выбираете Scope, далее Add variable.  
 
-Логика работы следующая - background service проверяет значение флага `tracing` раз в `FeatureFlagUpdateIntervalSeconds` секунд.
+Логика работы следующая - background service проверяет значение флага `tracing` раз в [FetchTogglesInterval](../../../FeatureToggle/FeatureToggle) секунд.
 Если состояние флага поменялось с false на true, сервис загрузит значение переменной `tracing`, попытается десериализовать и применить к настройкам трассировки.
-Если обновление прошло успешно, сервис продолжит проверять значение флага `tracing` раз в `FeatureFlagUpdateIntervalSeconds` секунд.
-Если же при обновлении недоступен gitlab или не прошла десериализация, то сервис попытается снова через `FeatureFlagUpdateIntervalOnFailureSeconds` секунд.
-
-Переменные `FeatureFlagUpdateIntervalSeconds` и `FeatureFlagUpdateIntervalOnFailureSeconds` можно задать в `appsettings`:
-```
-  "Tracing": {
-    "FeatureFlagUpdateIntervalSeconds": 600,
-    "FeatureFlagUpdateIntervalOnFailureSeconds": 20
-  }
-```
-Значения по умолчанию `FeatureFlagUpdateIntervalSeconds` = 60, `FeatureFlagUpdateIntervalOnFailureSeconds` = 10
+Сервис залоггирует результат попытки обновления и продолжит проверять значение флага `tracing` раз в [FetchTogglesInterval](../../../FeatureToggle/FeatureToggle) секунд.
