@@ -509,6 +509,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{69E68420-16AC-4947-A851-DDC9B0CF648E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Http.Samples.UseTemplateUri", "src\Http\Http\samples\Gems.Http.Samples.UseTemplateUri\Gems.Http.Samples.UseTemplateUri.csproj", "{A84B7280-4461-4DBA-B8AE-53F17AFFEEB9}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{C16F53D5-1CA1-46EE-BF9F-611E8D30F31C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking", "src\Patterns\SyncTables\samples\Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking\Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking.csproj", "{627904D9-8AB4-47DF-9014-F30623EF1D1C}"
