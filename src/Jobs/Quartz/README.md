@@ -17,7 +17,6 @@
 * [Изменение расписания задачи](#изменение-расписания-задачи)
 * [Регистрация триггера с данными](#регистрация-триггера-с-данными)
 * [Интерфейс ITriggerDataProvider](#интерфейс-itriggerdataprovider)
-* [Интерфейс IHasTriggerData](#интерфейс-ihastriggerdata)
 
 # Установка
 - Установите nuget пакет Gems.Jobs.Quartz через менеджер пакетов
@@ -756,6 +755,15 @@ DEV_Jobs_Triggers_TestJob_Cron: 0/10 \* \* \? \* \*
   ...
 }
 ```
+
+Обращение к полям TriggerData выполняется с помощью свойств из команды:
+```csharp
+public class SomeJobCommand : IRequest
+{
+    public string SomeData { get; init; }
+    public int SomeData2 { get; init; }
+}
+```
 В результате будет зарегистрирован джоб с именем SomeJobHandler и триггер TriggerTest1 для этого джоба.
 Раздел SomeJobHandler является массивом, соотв. можно указать несколько триггеров с разным названием и данными.
 
@@ -810,27 +818,5 @@ public class TestTriggerDataProvider : ITriggerDataProvider
 
         return Task.FromResult(dict);
     }
-}
-```
-
-# Интерфейс IHasTriggerData
-Содержит поле, для доступа к данным триггера:
-```csharp
-public Dictionary<string, object> JobData { get; set; }
-```
-Указывается для команды, которая передается в обработчик, при запуске джоба:
-```csharp
-public class ImportTestDataCommand : IRequest, IHasTriggerData
-{
-    public Dictionary<string, object> JobData { get; set; }
-}
-```
-Получение данных из словаря в обработчике команды:
-```csharp
-public Task Handle(ImportTestDataCommand request, CancellationToken cancellationToken)
-{
-    Console.WriteLine(request.JobData["testData1"]);  //output: "some string"
-    Console.WriteLine(request.JobData["testData2"]);  //output: 42
-    return Task.CompletedTask;
 }
 ```
