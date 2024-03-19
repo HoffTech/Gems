@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 using Gems.FeatureToggle;
 using Gems.OpenTelemetry.Api.Dto;
-using Gems.OpenTelemetry.Configuration;
 using Gems.OpenTelemetry.GlobalOptions;
 using Gems.Settings.Gitlab;
 
@@ -22,7 +21,6 @@ public class TracingFeatureFlagChecker : BackgroundService
 {
     private readonly TracingFeatureFlags flags;
     private readonly IServiceProvider serviceProvider;
-    private readonly TracingConfiguration configuration;
     private readonly ILogger<TracingFeatureFlagChecker> logger;
     private readonly TimeSpan tracingFeatureFlagUpdateDelay;
     private bool wasEnabled;
@@ -31,13 +29,11 @@ public class TracingFeatureFlagChecker : BackgroundService
         TracingFeatureFlags flags,
         IServiceProvider serviceProvider,
         ILogger<TracingFeatureFlagChecker> logger,
-        TracingConfiguration configuration,
         IOptions<FeatureToggleOptions> featureToggleOptions)
     {
         this.flags = flags;
         this.serviceProvider = serviceProvider;
         this.logger = logger;
-        this.configuration = configuration;
         this.tracingFeatureFlagUpdateDelay = featureToggleOptions.Value.FetchTogglesInterval == default ?
             TimeSpan.FromSeconds(30) : featureToggleOptions.Value.FetchTogglesInterval;
     }
