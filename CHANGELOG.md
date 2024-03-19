@@ -1,3 +1,9 @@
+## 2024.12.3 (2024-03-19)
+
+### changed (1 change)
+
+- [Merge branch 'feature/gems-jobs-quartz-init-prop' into 'main'](axdev/libraries/gems@4d8be2f1fae727c37be9c5d88aff0ccda778de7d) ([merge request](axdev/libraries/gems!100))
+
 ## 2024.12.2 (2024-03-19)
 
 ### added (1 change)
