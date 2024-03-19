@@ -19,11 +19,7 @@ namespace Gems.Settings.Gitlab
             this IServiceCollection services,
             Action<IGitlabConfigurationUpdaterSettingsBuilder> build = null)
         {
-            var builder = new GitlabConfigurationUpdaterSettingsBuilder();
-            build?.Invoke(builder);
-            services.AddSingleton(builder.Settings);
-            services.AddHostedService<GitlabConfigurationBackgroundUpdater>();
-            return services;
+            return AddGitlabConfigurationUpdater(services, null, build);
         }
 
         public static IServiceCollection AddGitlabConfigurationUpdater(
@@ -31,25 +27,29 @@ namespace Gems.Settings.Gitlab
             IConfiguration configuration,
             Action<IGitlabConfigurationUpdaterSettingsBuilder> build = null)
         {
-            var gitlabSettingsConfiguration = configuration.GetGitlabSettingsConfiguration();
             var builder = new GitlabConfigurationUpdaterSettingsBuilder();
             build?.Invoke(builder);
             services.AddSingleton(builder.Settings);
-            services.AddSingleton(gitlabSettingsConfiguration);
-            services.AddSingleton<GitlabConfigurationUpdater>();
-            services.AddSingleton<GitlabConfigurationValuesProvider>();
 
-            if (gitlabSettingsConfiguration.EnableBackgroundUpdater)
+            var gitlabSettingsConfiguration = configuration?.GetGitlabSettingsConfiguration();
+            if (gitlabSettingsConfiguration is not null)
+            {
+                services.AddSingleton(gitlabSettingsConfiguration);
+            }
+
+            if (gitlabSettingsConfiguration?.EnableBackgroundUpdater ?? true)
             {
                 services.AddHostedService<GitlabConfigurationBackgroundUpdater>();
             }
 
-            if (gitlabSettingsConfiguration.EnableEndpointUpdater)
+            if (gitlabSettingsConfiguration?.EnableEndpointUpdater ?? false)
             {
                 ControllerRegister.RegisterControllers(Assembly.GetExecutingAssembly());
                 services.AddMediatR(config => config.RegisterServicesFromAssemblyContaining<GitlabSettingsUpdateCommand>());
             }
 
+            services.AddSingleton<GitlabConfigurationUpdater>();
+            services.AddSingleton<GitlabConfigurationValuesProvider>();
             return services;
         }
     }
