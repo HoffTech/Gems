@@ -273,6 +273,11 @@ namespace Gems.Data.Tests.Behaviors.Fixtures
             throw new NotImplementedException();
         }
 
+        public IAsyncEnumerable<T> ExecuteReaderAsync<T>(string commandText, Enum timeMetricType = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task CommitAsync()
         {
             if (this.transaction == null)

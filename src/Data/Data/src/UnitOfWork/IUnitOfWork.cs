@@ -260,5 +260,9 @@ namespace Gems.Data.UnitOfWork
             string commandText,
             int commandTimeout,
             Enum timeMetricType = null);
+
+        IAsyncEnumerable<T> ExecuteReaderAsync<T>(
+            string commandText,
+            Enum timeMetricType = null);
     }
 }
