@@ -1,3 +1,9 @@
+## 2024.12.2 (2024-03-19)
+
+### added (1 change)
+
+- [Merge branch 'feature/tracing-control-using-feature-toggler' into 'main'](axdev/libraries/gems@bfcb319466b5aa41c30d31194c1f1a6d0161f2a9) ([merge request](axdev/libraries/gems!99))
+
 ## 2024.12.1 (2024-03-19)
 
 No changes.
