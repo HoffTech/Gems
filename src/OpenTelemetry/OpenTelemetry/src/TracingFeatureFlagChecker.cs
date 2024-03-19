@@ -72,6 +72,7 @@ public class TracingFeatureFlagChecker : BackgroundService
                     this.logger.LogCritical(e, "Error while fetching gitlab's variable \"tracing\"");
                 }
 
+                TracingGlobalOptions.Enabled = true;
                 this.wasEnabled = true;
             }
             else
@@ -79,6 +80,7 @@ public class TracingFeatureFlagChecker : BackgroundService
                 if (this.wasEnabled)
                 {
                     this.logger.LogInformation("Tracing disabled via feature flag");
+                    TracingGlobalOptions.Enabled = false;
                     this.wasEnabled = false;
                 }
 
@@ -89,7 +91,6 @@ public class TracingFeatureFlagChecker : BackgroundService
 
     private static void UpdateTracingGlobalOptions(TraceRequest request)
     {
-        TracingGlobalOptions.Enabled = request?.Enabled ?? TracingGlobalOptions.Enabled;
         TracingGlobalOptions.RequestInUrlFilter.Include = request?.RequestIn?.Include ?? TracingGlobalOptions.RequestInUrlFilter.Include;
         TracingGlobalOptions.RequestInUrlFilter.Exclude = request?.RequestIn?.Exclude ?? TracingGlobalOptions.RequestInUrlFilter.Exclude;
         TracingGlobalOptions.RequestOutUrlFilter.Include = request?.RequestOut?.Include ?? TracingGlobalOptions.RequestOutUrlFilter.Include;
