@@ -46,9 +46,9 @@ _appsettings.json_:
 
 ## Подключение обновления через feature flag
 
-### Для включения обновления трассировки через feature flag в первую очередь надо включить поддержку [feature flags](../../../FeatureToggle/FeatureToggle) и [gitlab settings](../../../Settings/Gitlab):
+### Для включения обновления трассировки через feature flag в первую очередь надо включить поддержку [feature flags](../../../FeatureToggle/FeatureToggle) и [gitlab settings](../../../Settings/Gitlab).
 
-Сначала в gitlab проекте необходимо сделать 2 вещи: 
+Потом в gitlab проекте необходимо сделать 2 вещи: 
 - завести feature flag "tracing". Для этого на странице проекта в левом меню открываете Deployments -> Feature Flags. 
 Далее, жмёте New feature flag, в поле Name обязательно пишете `tracing`, выбираете нужные среды, далее create.
 - завести ci/cd переменную  "tracing". Для этого на странице проекта в левом меню открываете Settings -> CI/CD -> Variables.

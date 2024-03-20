@@ -40,6 +40,12 @@ Gems.Settings.Gitlab позволяет хранить настройки в Git
     services.AddGitlabConfigurationUpdater();
 
 ## Настройки способов обновления
+
+Если хотите настроить способы обновления, файле Startup.cs в строку включения автоматического обновления добавьте конфигурацию:
+```
+    services.AddGitlabConfigurationUpdater(configuration);
+```
+
 В файле appsettings заведите секцию `GitlabSettings` и укажите в ней 2 переменные - `EnableBackgroundUpdater` и `EnableEndpointUpdater`.
 `EnableBackgroundUpdater` = true запустит фоновое обновление настроек раз в 5 минут. `EnableEndpointUpdater` = true добавит контроллер запроса POST `gitlabsettings/update`.
 Значение по умолчанию для `EnableBackgroundUpdater` = true, для `EnableEndpointUpdater` = true.

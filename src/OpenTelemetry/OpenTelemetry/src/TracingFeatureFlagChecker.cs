@@ -19,19 +19,16 @@ namespace Gems.OpenTelemetry;
 
 public class TracingFeatureFlagChecker : BackgroundService
 {
-    private readonly TracingFeatureFlags flags;
     private readonly IServiceProvider serviceProvider;
     private readonly ILogger<TracingFeatureFlagChecker> logger;
     private readonly TimeSpan tracingFeatureFlagUpdateDelay;
     private bool wasEnabled;
 
     public TracingFeatureFlagChecker(
-        TracingFeatureFlags flags,
         IServiceProvider serviceProvider,
         ILogger<TracingFeatureFlagChecker> logger,
         IOptions<FeatureToggleOptions> featureToggleOptions)
     {
-        this.flags = flags;
         this.serviceProvider = serviceProvider;
         this.logger = logger;
         this.tracingFeatureFlagUpdateDelay = featureToggleOptions.Value.FetchTogglesInterval == default ?
@@ -40,6 +37,17 @@ public class TracingFeatureFlagChecker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        IFeatureToggleService featureToggleService;
+        try
+        {
+            featureToggleService = this.serviceProvider.GetRequiredService<IFeatureToggleService>();
+        }
+        catch (Exception)
+        {
+            this.logger.LogWarning($"Can't get {nameof(IFeatureToggleService)} implementation. {nameof(TracingFeatureFlagChecker)} stopped");
+            return;
+        }
+
         GitlabConfigurationValuesProvider gitlabConfigurationProvider;
         try
         {
@@ -53,7 +61,7 @@ public class TracingFeatureFlagChecker : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            if (this.flags.TracingEnabled)
+            if (featureToggleService.IsEnabled("tracing"))
             {
                 if (this.wasEnabled)
                 {
