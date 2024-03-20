@@ -1,3 +1,9 @@
+## 2024.12.4 (2024-03-20)
+
+### added (1 change)
+
+- [Merge branch 'feature/fix-gitlab-settings-configuration-extension' into 'main'](axdev/libraries/gems@fc777d1f6feb855019aa6b57d5644f005de6da40) ([merge request](axdev/libraries/gems!102))
+
 ## 2024.12.3 (2024-03-19)
 
 ### changed (1 change)
