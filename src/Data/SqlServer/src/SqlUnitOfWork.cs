@@ -1171,6 +1171,28 @@ namespace Gems.Data.SqlServer
             }
         }
 
+        public async IAsyncEnumerable<T> ExecuteReaderAsync<T>(
+            string commandText,
+            Enum timeMetricType = null)
+        {
+            var timeMetric = this.timeMetricProvider.GetTimeMetric(timeMetricType, null);
+            try
+            {
+                await this.BeginTransactionAsync().ConfigureAwait(false);
+                await foreach (var item in SqlDapperHelper
+                                   .ExecuteReaderAsync<T>(this.connection, commandText, this.cancellationToken)
+                                   .ConfigureAwait(false))
+                {
+                    yield return item;
+                }
+            }
+            finally
+            {
+                await timeMetric.DisposeMetric().ConfigureAwait(false);
+                await this.CloseConnectionAsync().ConfigureAwait(false);
+            }
+        }
+
         public async Task CommitAsync()
         {
             if (this.transaction == null)

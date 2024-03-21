@@ -95,6 +95,7 @@ public static class ServiceCollectionExtensions
     {
         var tracingConfiguration = configuration.GetAndUpdateTracingConfiguration();
         ChangeToken.OnChange<object>(configuration.GetReloadToken, _ => configuration.GetAndUpdateTracingConfiguration(), null);
+        services.AddHostedService<TracingFeatureFlagChecker>();
 
         return services
             .AddOpenTelemetry()

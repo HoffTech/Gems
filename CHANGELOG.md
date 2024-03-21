@@ -1,3 +1,29 @@
+## 2024.12.4 (2024-03-20)
+
+### added (1 change)
+
+- [Merge branch 'feature/fix-gitlab-settings-configuration-extension' into 'main'](axdev/libraries/gems@fc777d1f6feb855019aa6b57d5644f005de6da40) ([merge request](axdev/libraries/gems!102))
+
+## 2024.12.3 (2024-03-19)
+
+### changed (1 change)
+
+- [Merge branch 'feature/gems-jobs-quartz-init-prop' into 'main'](axdev/libraries/gems@4d8be2f1fae727c37be9c5d88aff0ccda778de7d) ([merge request](axdev/libraries/gems!100))
+
+## 2024.12.2 (2024-03-19)
+
+### added (1 change)
+
+- [Merge branch 'feature/tracing-control-using-feature-toggler' into 'main'](axdev/libraries/gems@bfcb319466b5aa41c30d31194c1f1a6d0161f2a9) ([merge request](axdev/libraries/gems!99))
+
+## 2024.12.1 (2024-03-19)
+
+No changes.
+
+## 2024.11.4 (2024-03-17)
+
+No changes.
+
 ## 2024.11.3 (2024-03-13)
 
 No changes.

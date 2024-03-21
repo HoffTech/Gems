@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -1758,6 +1759,25 @@ namespace Gems.Data.Npgsql
                     null,
                     CommandType.Text,
                     cancellationToken: cancellationToken)).ConfigureAwait(false);
+        }
+
+        public static async IAsyncEnumerable<T> ExecuteReaderAsync<T>(
+            NpgsqlConnection connection,
+            string commandText,
+            [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            await using var command = new NpgsqlCommand(commandText, connection);
+            command.CommandTimeout = 0;
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+            if (reader.HasRows == false)
+            {
+                yield break;
+            }
+
+            while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+            {
+                yield return reader.GetRowParser<T>()(reader);
+            }
         }
 
         private static string BuildFunctionSql(string functionName)

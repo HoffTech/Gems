@@ -7,6 +7,6 @@ namespace Gems.Metrics.Http
 {
     public interface IStatusCodeMetricAvailable
     {
-        public Enum StatusCodeMetricType { get; set; }
+        public Enum StatusCodeMetricType { get; }
     }
 }

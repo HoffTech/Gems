@@ -530,6 +530,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Sample.Operations
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Sample.Context", "src\Data\Data\samples\Gems.Data.Sample.Context\Gems.Data.Sample.Context.csproj", "{A4944471-1844-46C8-964A-767D23018B39}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Settings.Gitlab.Tests", "src\Settings\Gitlab\tests\Gems.Settings.Gitlab.Tests\Gems.Settings.Gitlab.Tests.csproj", "{3D026A75-A8D2-4495-B52A-DB0D2CD6EAE9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -844,6 +846,10 @@ Global
 		{B7115921-2353-4B29-B709-9C64A857F92B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7115921-2353-4B29-B709-9C64A857F92B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7115921-2353-4B29-B709-9C64A857F92B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D026A75-A8D2-4495-B52A-DB0D2CD6EAE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D026A75-A8D2-4495-B52A-DB0D2CD6EAE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D026A75-A8D2-4495-B52A-DB0D2CD6EAE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D026A75-A8D2-4495-B52A-DB0D2CD6EAE9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E900EEFC-C25A-4AA4-8A1B-8C05E8653642}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E900EEFC-C25A-4AA4-8A1B-8C05E8653642}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E900EEFC-C25A-4AA4-8A1B-8C05E8653642}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -1028,6 +1034,7 @@ Global
 		{558E7B57-853B-4887-8478-86C629E1CEEB} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
 		{06344C7E-E3A0-4FB6-8CDE-A4BC5B555ED3} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
 		{A4944471-1844-46C8-964A-767D23018B39} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
+		{3D026A75-A8D2-4495-B52A-DB0D2CD6EAE9} = {5EF93D36-7AA5-47AB-A315-83FF67DF1567}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F59BAF6C-0E34-4F38-A0E7-2227592118CE}
