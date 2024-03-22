@@ -1,3 +1,9 @@
+## 2024.12.5 (2024-03-22)
+
+### added (1 change)
+
+- [Merge branch 'feature/tracing-feature-flag-checker-fix' into 'main'](axdev/libraries/gems@3817008e62da87fbaf740c8b1c5b04ade419bfc3) ([merge request](axdev/libraries/gems!104))
+
 ## 2024.12.4 (2024-03-20)
 
 ### added (1 change)
