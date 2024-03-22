@@ -1,3 +1,9 @@
+## 2024.12.6 (2024-03-22)
+
+### added (1 change)
+
+- [Merge branch 'feature/add-chedulermetadata' into 'main'](axdev/libraries/gems@3baac7eb46e98fc97dfba4ba0e5dd96b3c5207a1) ([merge request](axdev/libraries/gems!103))
+
 ## 2024.12.5 (2024-03-22)
 
 ### added (1 change)
