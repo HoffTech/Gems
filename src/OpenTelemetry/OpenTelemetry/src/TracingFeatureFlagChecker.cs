@@ -9,6 +9,7 @@ using Gems.FeatureToggle;
 using Gems.OpenTelemetry.Api.Dto;
 using Gems.OpenTelemetry.GlobalOptions;
 using Gems.Settings.Gitlab;
+using Gems.Text.Json;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -71,13 +72,21 @@ public class TracingFeatureFlagChecker : BackgroundService
 
                 try
                 {
-                    var request = await gitlabConfigurationProvider.GetGitlabVariableValueByName<TraceRequest>("tracing");
-                    UpdateTracingGlobalOptions(request);
-                    this.logger.LogInformation("Trace configuration updated successfully");
+                    var tracingConfig = await gitlabConfigurationProvider.GetGitlabVariableValueByName("TRACING");
+                    if (string.IsNullOrEmpty(tracingConfig))
+                    {
+                        this.logger.LogError("No variable \"TRACING\" found in gitlab");
+                    }
+                    else
+                    {
+                        var request = tracingConfig.Deserialize<TraceRequest>();
+                        UpdateTracingGlobalOptions(request);
+                        this.logger.LogInformation($"Tracing updated successfully with configuration: {tracingConfig}");
+                    }
                 }
                 catch (Exception e)
                 {
-                    this.logger.LogCritical(e, "Error while fetching gitlab's variable \"tracing\"");
+                    this.logger.LogCritical(e, "Error while fetching gitlab's variable \"TRACING\"");
                 }
 
                 TracingGlobalOptions.Enabled = true;
