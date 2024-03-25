@@ -1,6 +1,7 @@
 ﻿// Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,11 +58,17 @@ public class GetSchedulerInfoQueryHandler : IRequestHandler<GetSchedulerInfoQuer
             jobsInfo.Add(jobInfo);
         }
 
+        var metaData = await scheduler.GetMetaData(cancellationToken).ConfigureAwait(false);
+
         return new SchedulerInfo
         {
             SchedulerName = scheduler.SchedulerName,
+            MachineName = Environment.MachineName,
+            Started = metaData.Started,
+            RunningSince = metaData.RunningSince?.UtcDateTime,
             SchedulerInstanceId = scheduler.SchedulerInstanceId,
-            EnqueuedJobList = jobsInfo
+            EnqueuedJobList = jobsInfo,
+            CurrentlyExecutingJobsCount = (await scheduler.GetCurrentlyExecutingJobs(cancellationToken)).Count
         };
     }
 }
