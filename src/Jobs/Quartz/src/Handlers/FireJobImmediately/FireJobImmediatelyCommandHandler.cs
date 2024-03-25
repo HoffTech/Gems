@@ -41,21 +41,34 @@ namespace Gems.Jobs.Quartz.Handlers.FireJobImmediately
             this.triggerHelper = triggerHelper;
         }
 
-        public async Task Handle(FireJobImmediatelyCommand request, CancellationToken cancellationToken)
+        public async Task Handle(FireJobImmediatelyCommand command, CancellationToken cancellationToken)
         {
+            if (command.JobGroup == "string")
+            {
+                command.JobGroup = null;
+            }
+
             var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
-            if (await this.FireTriggerWithData(scheduler, request.JobName, request.TriggerName, request.JobGroup, cancellationToken).ConfigureAwait(false))
+            if (await this.FireTriggerWithData(scheduler, command.JobName, command.TriggerName, command.JobGroup, cancellationToken).ConfigureAwait(false))
             {
                 return;
             }
 
-            if (await this.FireTriggerFromDb(scheduler, request.JobName, request.TriggerName, request.JobGroup, cancellationToken).ConfigureAwait(false))
+            if (await this.FireTriggerFromDb(scheduler, command.JobName, command.TriggerName, command.JobGroup, cancellationToken).ConfigureAwait(false))
             {
+                return;
+            }
+
+            if (command.TriggerData != null && command.TriggerData.Any())
+            {
+                var jobDataMap = new JobDataMap { { QuartzJobWithDataConstants.JobDataKeyValue, command.TriggerData.Serialize() } };
+
+                await scheduler.TriggerJob(new JobKey(command.JobName, command.JobGroup ?? JobGroups.DefaultGroup), jobDataMap, cancellationToken).ConfigureAwait(false);
                 return;
             }
 
             await scheduler
-                .TriggerJob(new JobKey(request.JobName, request.JobGroup ?? JobGroups.DefaultGroup), cancellationToken)
+                .TriggerJob(new JobKey(command.JobName, command.JobGroup ?? JobGroups.DefaultGroup), cancellationToken)
                 .ConfigureAwait(false);
         }
 

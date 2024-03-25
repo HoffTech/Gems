@@ -32,22 +32,27 @@ namespace Gems.Jobs.Quartz.Handlers.RemoveJob
             this.jobsOptions = jobsOptions;
         }
 
-        public async Task Handle(RemoveJobCommand request, CancellationToken cancellationToken)
+        public async Task Handle(RemoveJobCommand command, CancellationToken cancellationToken)
         {
+            if (command.JobGroup == "string")
+            {
+                command.JobGroup = null;
+            }
+
             var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
-            if (await this.RemoveTriggerWithData(scheduler, request.JobName, request.TriggerName, request.JobGroup, cancellationToken).ConfigureAwait(false))
+            if (await this.RemoveTriggerWithData(scheduler, command.JobName, command.TriggerName, command.JobGroup, cancellationToken).ConfigureAwait(false))
             {
                 return;
             }
 
-            if (await this.RemoveTriggerFromDb(scheduler, request.JobName, request.TriggerName, request.JobGroup, cancellationToken).ConfigureAwait(false))
+            if (await this.RemoveTriggerFromDb(scheduler, command.JobName, command.TriggerName, command.JobGroup, cancellationToken).ConfigureAwait(false))
             {
                 return;
             }
 
             await scheduler
                 .UnscheduleJob(
-                    new TriggerKey(request.JobName, request.JobGroup ?? JobGroups.DefaultGroup),
+                    new TriggerKey(command.JobName, command.JobGroup ?? JobGroups.DefaultGroup),
                     cancellationToken)
                 .ConfigureAwait(false);
         }

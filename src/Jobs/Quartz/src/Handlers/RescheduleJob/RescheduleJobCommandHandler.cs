@@ -41,32 +41,37 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
             this.triggerHelper = triggerHelper;
         }
 
-        public async Task Handle(RescheduleJobCommand request, CancellationToken cancellationToken)
+        public async Task Handle(RescheduleJobCommand command, CancellationToken cancellationToken)
         {
+            if (command.JobGroup == "string")
+            {
+                command.JobGroup = null;
+            }
+
             var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
-            if (await this.RescheduleTriggerWithData(scheduler, request.JobName, request.TriggerName, request.JobGroup, request.CronExpression, cancellationToken).ConfigureAwait(false))
+            if (await this.RescheduleTriggerWithData(scheduler, command.JobName, command.TriggerName, command.JobGroup, command.CronExpression, cancellationToken).ConfigureAwait(false))
             {
                 return;
             }
 
-            if (await this.RescheduleTriggerFromDb(scheduler, request.JobName, request.TriggerName, request.JobGroup, request.CronExpression, cancellationToken).ConfigureAwait(false))
+            if (await this.RescheduleTriggerFromDb(scheduler, command.JobName, command.TriggerName, command.JobGroup, command.CronExpression, cancellationToken).ConfigureAwait(false))
             {
                 return;
             }
 
             var trigger = await scheduler
                 .GetTrigger(
-                    new TriggerKey(request.JobName, request.JobGroup ?? JobGroups.DefaultGroup),
+                    new TriggerKey(command.JobName, command.JobGroup ?? JobGroups.DefaultGroup),
                     cancellationToken)
                 .ConfigureAwait(false);
 
             if (trigger == null)
             {
-                throw new NotFoundException($"Не найдено задание {request.JobGroup ?? JobGroups.DefaultGroup}.{request.JobName}");
+                throw new NotFoundException($"Не найдено задание {command.JobGroup ?? JobGroups.DefaultGroup}.{command.JobName}");
             }
 
             var newTrigger = (CronTriggerImpl)trigger.Clone();
-            newTrigger.CronExpression = new CronExpression(request.CronExpression);
+            newTrigger.CronExpression = new CronExpression(command.CronExpression);
 
             await scheduler.UnscheduleJob(trigger.Key, cancellationToken).ConfigureAwait(false);
             await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);

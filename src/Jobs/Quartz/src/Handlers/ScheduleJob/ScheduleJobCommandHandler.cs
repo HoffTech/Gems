@@ -37,31 +37,36 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
             this.triggerHelper = triggerHelper;
         }
 
-        public async Task Handle(ScheduleJobCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ScheduleJobCommand command, CancellationToken cancellationToken)
         {
+            if (command.JobGroup == "string")
+            {
+                command.JobGroup = null;
+            }
+
             var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
             var trigger = await scheduler
                 .GetTrigger(
-                    new TriggerKey(request.JobName, request.JobGroup ?? JobGroups.DefaultGroup),
+                    new TriggerKey(command.JobName, command.JobGroup ?? JobGroups.DefaultGroup),
                     cancellationToken)
                 .ConfigureAwait(false);
 
             if (trigger != null)
             {
-                throw new InvalidOperationException($"Такое задание уже зарегистрировано {request.JobGroup ?? JobGroups.DefaultGroup}.{request.JobName}");
+                throw new InvalidOperationException($"Такое задание уже зарегистрировано {command.JobGroup ?? JobGroups.DefaultGroup}.{command.JobName}");
             }
 
-            if (await this.ScheduleSimpleTrigger(scheduler, request.JobName, request.JobGroup, request.CronExpression, cancellationToken).ConfigureAwait(false))
+            if (await this.ScheduleSimpleTrigger(scheduler, command.JobName, command.JobGroup, command.CronExpression, cancellationToken).ConfigureAwait(false))
             {
                 return;
             }
 
-            if (await this.ScheduleTriggerWithData(scheduler, request.JobName, request.JobGroup, request.CronExpression, request.TriggerName, cancellationToken).ConfigureAwait(false))
+            if (await this.ScheduleTriggerWithData(scheduler, command.JobName, command.JobGroup, command.CronExpression, command.TriggerName, cancellationToken).ConfigureAwait(false))
             {
                 return;
             }
 
-            await this.ScheduleTriggerFromDb(scheduler, request.JobName, request.JobGroup, request.CronExpression, request.TriggerName, cancellationToken).ConfigureAwait(false);
+            await this.ScheduleTriggerFromDb(scheduler, command.JobName, command.JobGroup, command.CronExpression, command.TriggerName, cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task<List<string>> GetTriggersForSchedule(IScheduler scheduler, string jobName, List<string> triggersFromConfiguration, CancellationToken cancellationToken)

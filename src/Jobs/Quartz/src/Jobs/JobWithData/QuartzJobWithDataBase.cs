@@ -45,7 +45,7 @@ public abstract class QuartzJobWithDataBase<TCommand> : IJob where TCommand : cl
         try
         {
             var jobDataValue = context.MergedJobDataMap.GetString(QuartzJobWithDataConstants.JobDataKeyValue);
-            var command = jobDataValue.Deserialize<TCommand>();
+            var command = jobDataValue?.Deserialize<TCommand>() ?? new TCommand();
             return command;
         }
         catch (Exception e)
