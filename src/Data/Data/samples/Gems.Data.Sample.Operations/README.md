@@ -124,6 +124,6 @@
 4. Вызовите ендпоинты с помощью **Swagger**
     1. `GET /api/v1/persons/{id}`
     2. `GET /api/v1/persons`
-    3. `GET /api/v1/persons/{id}`
+    3. `GET /api/v1/persons/{id}/age`
     4. `POST /api/v1/person`
     5. `GET /api/v1/persons/by-filter`
