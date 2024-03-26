@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Gems.Data.Sample.Operations.Persons.GetLogFile.Entities;
+using Gems.Data.Sample.Operations.Persons.GetPersonsLogFile.Entities;
 using Gems.Data.UnitOfWork;
 using Gems.Mvc.GenericControllers;
 using Gems.Text.Json;
@@ -12,19 +12,19 @@ using MediatR;
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace Gems.Data.Sample.Operations.Persons.GetLogFile
+namespace Gems.Data.Sample.Operations.Persons.GetPersonsLogFile
 {
-    [Endpoint("api/v1/logs-file", "GET", OperationGroup = "Logs")]
-    public class GetLogFileQueryHandler : IRequestHandler<GetLogFileQuery, FileStreamResult>
+    [Endpoint("api/v1/persons/logs-file", "GET", OperationGroup = "Logs")]
+    public class GetPersonsLogFileQueryHandler : IRequestHandler<GetPersonsLogFileQuery, FileStreamResult>
     {
         private readonly IUnitOfWorkProvider unitOfWorkProvider;
 
-        public GetLogFileQueryHandler(IUnitOfWorkProvider unitOfWorkProvider)
+        public GetPersonsLogFileQueryHandler(IUnitOfWorkProvider unitOfWorkProvider)
         {
             this.unitOfWorkProvider = unitOfWorkProvider;
         }
 
-        public async Task<FileStreamResult> Handle(GetLogFileQuery query, CancellationToken cancellationToken)
+        public async Task<FileStreamResult> Handle(GetPersonsLogFileQuery query, CancellationToken cancellationToken)
         {
             await using (var sw = new StreamWriter("output.txt"))
             {

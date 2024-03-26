@@ -4,7 +4,7 @@ using Gems.Data.Npgsql;
 
 using NpgsqlTypes;
 
-namespace Gems.Data.Sample.Operations.Persons.GetLogFile.Entities
+namespace Gems.Data.Sample.Operations.Persons.GetPersonsLogFile.Entities
 {
     [PgType]
     public class Log

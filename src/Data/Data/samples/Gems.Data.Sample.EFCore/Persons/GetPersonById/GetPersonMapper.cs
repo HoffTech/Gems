@@ -3,10 +3,10 @@
 
 using AutoMapper;
 
-using Gems.Data.Sample.Operations.Persons.GetPerson.Dto;
-using Gems.Data.Sample.Operations.Persons.Shared.Entities;
+using Gems.Data.Sample.EFCore.Persons.Entities;
+using Gems.Data.Sample.EFCore.Persons.GetPersonById.Dto;
 
-namespace Gems.Data.Sample.Operations.Persons.GetPerson
+namespace Gems.Data.Sample.EFCore.Persons.GetPersonById
 {
     public class GetPersonMapper : Profile
     {
