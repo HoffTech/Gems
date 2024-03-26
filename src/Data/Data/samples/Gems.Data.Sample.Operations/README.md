@@ -6,8 +6,11 @@
 - _CallScalarFunctionAsync_ - метод вызова скалярной функции для получения скалярного значения
 - _CallStoredProcedureAsync_ - метод вызова процедуры, не возвращающей значения
 - _QueryAsync_ - метод вызова SQL выражения для получения полного списка элементов выборки
+- _ExecuteReaderAsync_ - метод вызова SQL выражения для получения полного списка элементов в виде коллекции ASyncEnumerable
 
 > QueryAsync - удобно использовать при необходимости динамического формирования SQL выражения
+> 
+> ExecuteReaderAsync - удобно использовать для потоковой выгрузки объемной коллекции
 
 ### Параметры
 1. `string functionName/storeProcedureName` - наименование функции/процедуры в БД
@@ -104,14 +107,34 @@
 ```
 5. _QueryAsync_
 ```csharp
-        public async Task<List<PersonDto>> Handle(GetPersonsByFilterQuery query, CancellationToken cancellationToken)
-        {
-            var person = await this.unitOfWorkProvider
-                .GetUnitOfWork(cancellationToken)
-                .QueryAsync<Person>(CreateQuery(query, out var parameters), parameters);
+    public async Task<List<PersonDto>> Handle(GetPersonsByFilterQuery query, CancellationToken cancellationToken)
+    {
+        var person = await this.unitOfWorkProvider
+            .GetUnitOfWork(cancellationToken)
+            .QueryAsync<Person>(CreateQuery(query, out var parameters), parameters);
 
-            return this.mapper.Map<List<PersonDto>>(person);
+        return this.mapper.Map<List<PersonDto>>(person);
+    }
+```
+6. _ExecuteReaderAsync_
+```csharp
+    public async Task<FileStreamResult> Handle(GetLogFileQuery query, CancellationToken cancellationToken)
+    {
+        // ...
+        await foreach (var log in this.GetLogsAsAsyncEnumerable(cancellationToken))
+        {
+            await sw.WriteLineAsync(log.Serialize()).ConfigureAwait(false);
         }
+        
+        // ...
+    }
+
+    private IAsyncEnumerable<Log> GetLogsAsAsyncEnumerable(CancellationToken cancellationToken)
+    {
+        return this.unitOfWorkProvider
+            .GetUnitOfWork(cancellationToken)
+            .ExecuteReaderAsync<Log>("SELECT * FROM public.log");
+    }
 ```
 
 ### Запуск примера
@@ -127,3 +150,4 @@
     3. `GET /api/v1/persons/{id}/age`
     4. `POST /api/v1/person`
     5. `GET /api/v1/persons/by-filter`
+    6. `GET api/v1/logs-file`
