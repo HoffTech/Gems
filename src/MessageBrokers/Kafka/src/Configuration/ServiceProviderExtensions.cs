@@ -39,9 +39,15 @@ namespace Gems.MessageBrokers.Kafka.Configuration
             }
 
             services.Configure<KafkaConfiguration>(configuration.GetSection(nameof(KafkaConfiguration)));
-            var types = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(x => x.GetCustomAttributes<ConsumerListenerPropertyAttribute>().Any());
+            var startupAssembly = Assembly.GetEntryAssembly();
+            if (startupAssembly == null)
+            {
+                return;
+            }
+
+            var types = startupAssembly.GetTypes()
+                .Where(x => x.GetCustomAttributes<ConsumerListenerPropertyAttribute>().Any())
+                .ToList();
 
             foreach (var type in types)
             {
