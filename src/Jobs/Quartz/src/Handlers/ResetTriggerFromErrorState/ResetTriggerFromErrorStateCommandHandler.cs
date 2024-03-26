@@ -26,6 +26,11 @@ namespace Gems.Jobs.Quartz.Handlers.ResetTriggerFromErrorState
 
         public async Task Handle(ResetTriggerFromErrorStateCommand command, CancellationToken cancellationToken)
         {
+            if (command.JobGroup == "string")
+            {
+                command.JobGroup = null;
+            }
+
             var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
 
             var triggerKey = new TriggerKey(command.JobName, command.JobGroup ?? JobGroups.DefaultGroup);
