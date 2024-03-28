@@ -67,7 +67,7 @@ namespace Gems.Data.Sample.Operations.Persons.GetPersonsByFilter
 
             sb.AppendLine("LIMIT @Take OFFSET @Skip");
             parameters.Add("@Take", query.Take ?? 100);
-            parameters.Add("@SKIP", query.Skip ?? 0);
+            parameters.Add("@Skip", query.Skip ?? 0);
 
             return sb.ToString();
         }

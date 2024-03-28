@@ -534,7 +534,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Settings.Gitlab.Tests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Sample.Metrics", "src\Data\Data\samples\Gems.Data.Sample.Metrics\Gems.Data.Sample.Metrics.csproj", "{1E664A27-CB16-4B45-99CC-EF5E90ED0910}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Sample.EFCore", "src\Data\Data\samples\Gems.Data.Sample.EFCore\Gems.Data.Sample.EFCore.csproj", "{09B77FAC-C1BC-47C5-BB5C-EC2B35813C03}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Data.Sample.EFCore", "src\Data\Data\samples\Gems.Data.Sample.EFCore\Gems.Data.Sample.EFCore.csproj", "{1C3D39FB-FCAE-46CC-B92A-1E5C0EB5C005}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -874,10 +874,10 @@ Global
 		{1E664A27-CB16-4B45-99CC-EF5E90ED0910}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E664A27-CB16-4B45-99CC-EF5E90ED0910}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E664A27-CB16-4B45-99CC-EF5E90ED0910}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09B77FAC-C1BC-47C5-BB5C-EC2B35813C03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09B77FAC-C1BC-47C5-BB5C-EC2B35813C03}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09B77FAC-C1BC-47C5-BB5C-EC2B35813C03}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09B77FAC-C1BC-47C5-BB5C-EC2B35813C03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C3D39FB-FCAE-46CC-B92A-1E5C0EB5C005}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C3D39FB-FCAE-46CC-B92A-1E5C0EB5C005}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C3D39FB-FCAE-46CC-B92A-1E5C0EB5C005}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C3D39FB-FCAE-46CC-B92A-1E5C0EB5C005}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1048,7 +1048,7 @@ Global
 		{A4944471-1844-46C8-964A-767D23018B39} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
 		{3D026A75-A8D2-4495-B52A-DB0D2CD6EAE9} = {5EF93D36-7AA5-47AB-A315-83FF67DF1567}
 		{1E664A27-CB16-4B45-99CC-EF5E90ED0910} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
-		{09B77FAC-C1BC-47C5-BB5C-EC2B35813C03} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
+		{1C3D39FB-FCAE-46CC-B92A-1E5C0EB5C005} = {F582B5DC-9907-4C08-924E-5E41A15BD90E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F59BAF6C-0E34-4F38-A0E7-2227592118CE}

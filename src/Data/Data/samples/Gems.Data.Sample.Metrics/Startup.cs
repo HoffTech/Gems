@@ -38,6 +38,8 @@ public class Startup(IConfiguration configuration)
                         "default",
                         options =>
                         {
+                            options.ConnectionString = configuration.GetConnectionString("DefaultConnection");
+                            options.RegisterMappersFromAssemblyContaining<Startup>();
                             options.DbQueryMetricType = DbQueryMetricType.GemsDataSampleMetricsDbQueryTime;
 
                             // Альтернативная конфигурация

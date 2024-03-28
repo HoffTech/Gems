@@ -7,6 +7,7 @@ using Autofac;
 
 using Gems.CompositionRoot;
 using Gems.Data.Behaviors;
+using Gems.Data.Sample.EFCore.Persons;
 using Gems.Mvc;
 using Gems.Swagger;
 

@@ -11,11 +11,40 @@
 
 
 ### Как работать с **UnitOfWork**
-1) Зарегистрируйте Pipeline (по умолчанию регистрируется в Gems.CompositionRoot)
+1) Регистрацию _UnitOfWork_ можно осуществить c помощью конфигурации
+   1)  _appsettings.json_
+    ```json
+    {
+      "PostgresqlUnitOfWorks": [
+        {
+          "Key": "default",
+          "Options": {
+            "ConnectionString": "${ConnectionStrings.DefaultConnection}"
+          }
+        }
+      ]
+    }
+    ```
+   2) В классе _Startup_
+   ```csharp
+        opt.AddUnitOfWorks = () =>
+        {
+            services.AddPostgresqlUnitOfWork(
+                "default",
+                options =>
+                {
+                    // опционально - по умолчанию DefaultConnection
+                    options.ConnectionString = configuration.GetConnectionString("DefaultConnection");
+                    options.RegisterMappersFromAssemblyContaining<Startup>();
+                });
+        };
+   ```
+
+2) Зарегистрируйте Pipeline (по умолчанию регистрируется в Gems.CompositionRoot)
 ```csharp
     this.services.AddPipeline(typeof(UnitOfWorkBehavior<,>));
 ```
-2) Инъектируйте в конструктор класса интерфейс **IUnitOfWorkProvider**
+3) Инъектируйте в конструктор класса интерфейс **IUnitOfWorkProvider**
 ```csharp
     private readonly IUnitOfWorkProvider unitOfWorkProvider;
     
@@ -24,8 +53,7 @@
         this.unitOfWorkProvider = unitOfWorkProvider;
     }
 ```
-
-3) Получите объект **UnitOfWork** из провайдера **IUnitOfWorkProvider** и вызовите одну из доступных операций. В примере ниже вызываетяся процедура создания объекта **Person** с случайными характеристиками
+4) Получите объект **UnitOfWork** из провайдера **IUnitOfWorkProvider** и вызовите одну из доступных операций. В примере ниже вызываетяся процедура создания объекта **Person** с случайными характеристиками
 ```csharp
     public Task Handle(CreatePersonCommand command, CancellationToken cancellationToken)
     {

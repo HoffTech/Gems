@@ -2,28 +2,32 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
-
-using Gems.Data.Npgsql;
-
-using NpgsqlTypes;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gems.Data.Sample.EFCore.Persons.Entities;
 
-[PgType("public.person_type")]
+[Table("person", Schema = "public")]
 public class Person
 {
-    [PgName("person_id")]
+    [Key]
+    [Required]
+    [Column("person_id")]
     public Guid PersonId { get; init; }
 
-    [PgName("first_name")]
+    [Required]
+    [Column("first_name")]
     public string FirstName { get; init; }
 
-    [PgName("last_name")]
+    [Required]
+    [Column("last_name")]
     public string LastName { get; init; }
 
-    [PgName("age")]
+    [Required]
+    [Column("age")]
     public int Age { get; init; }
 
-    [PgName("gender")]
+    [Required]
+    [Column("gender")]
     public int Gender { get; init; }
 }

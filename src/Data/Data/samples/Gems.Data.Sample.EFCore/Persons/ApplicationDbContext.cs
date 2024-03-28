@@ -2,7 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 
-namespace Gems.Data.Sample.EFCore
+namespace Gems.Data.Sample.EFCore.Persons
 {
     public class ApplicationDbContext : DbContext
     {
