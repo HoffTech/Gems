@@ -162,13 +162,36 @@ await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken).CallSt
         .QueryFirstOrDefaultAsync<Person>("SELECT * FROM public.person LIMIT @Skip OFFSET @Take", parameters);
 ```
 
+6. Получения массива данных в виде _IAsyncEnumerable_
+```csharp
+    public async Task<FileStreamResult> Handle(GetLogFileQuery query, CancellationToken cancellationToken)
+    {
+        // ...
+        await foreach (var log in this.GetLogsAsAsyncEnumerable(cancellationToken))
+        {
+            await sw.WriteLineAsync(log.Serialize()).ConfigureAwait(false);
+        }
+        
+        // ...
+    }
+
+    private IAsyncEnumerable<Log> GetLogsAsAsyncEnumerable(CancellationToken cancellationToken)
+    {
+        return this.unitOfWorkProvider
+            .GetUnitOfWork(cancellationToken)
+            .ExecuteReaderAsync<Log>("SELECT * FROM public.log");
+    }
+```
+
 # Использование Linked Token
+
+Связанные токены является **Obsolete**. Смотрите раздел "Использование контекста".
+
 Связанные токены позволяют доменным обработчикам создать собственные объекты unit of work.
 ```csharp
 using var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 await this.mediator.Send(new SomeInnerCommand(), linkedTokenSource.Token);
 ```
-Связанные токены является obsolete. Смотрите раздел "Использование контекста".
 
 # Использование локального контекста
 
@@ -192,15 +215,19 @@ await this.mediator.Send(new SomeInnerCommand(), cancellationToken);
 ```
 
 # Метрики
-В unit of work можно настроить автоматическую запись метрик для хранимых процедур и функций. Как работать с метриками с бд смотрите [здесь](/src/Metrics/Data/README.md#метрики-с-iunitofwork).
+
 **[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.Metrics)**
 
+В unit of work можно настроить автоматическую запись метрик для хранимых процедур и функций. Как работать с метриками с бд смотрите [здесь](/src/Metrics/Data/README.md#метрики-с-iunitofwork).
+
+
 # Работа с EF
+
+**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.EFCore)**
+
 Библиотека предоставляет DbContextProvider для доступа к дб контексту EF. DbContextProvider хранит дб контекст в локальном контексте.    
 Это добавляет возможность доменным обработчикам создать собственные дб контексты.  
 Если обработчику нужна транзакция, то необходимо предварять команду/запрос - интерфейсом IRequestUnitOfWork. Это избавляет разработчика от прямых вызовов SaveChangeAsync и CommitAsync. За все эти вызовы отвечает пайплайн UnitOfWorkBehavior.
-
-**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.EFCore)**
 
 Для того чтобы использовать DbContextProvider необходимо вместо регистрации дб контекста: 
 ```csharp
