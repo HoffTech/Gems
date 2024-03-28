@@ -200,6 +200,8 @@ await this.mediator.Send(new SomeInnerCommand(), cancellationToken);
 Это добавляет возможность доменным обработчикам создать собственные дб контексты.  
 Если обработчику нужна транзакция, то необходимо предварять команду/запрос - интерфейсом IRequestUnitOfWork. Это избавляет разработчика от прямых вызовов SaveChangeAsync и CommitAsync. За все эти вызовы отвечает пайплайн UnitOfWorkBehavior.
 
+**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.EFCore)**
+
 Для того чтобы использовать DbContextProvider необходимо вместо регистрации дб контекста: 
 ```csharp
 services.AddDbContext<SomeDbContext>(options => options.UseNpgsql(this.Configuration.GetConnectionString("connectionString")));

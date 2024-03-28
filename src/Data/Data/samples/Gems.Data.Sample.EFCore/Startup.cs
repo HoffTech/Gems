@@ -36,7 +36,11 @@ public class Startup(IConfiguration configuration)
                 opt.AddUnitOfWorks = () =>
                 {
                     services.AddDbContextFactory<ApplicationDbContext>(
-                        options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")!));
+                        options => options.UseNpgsql(
+                            configuration.GetConnectionString("DefaultConnection") ?? throw new ArgumentNullException()));
+                    services.AddDbContextFactory<MigrationDbContext>(
+                        options => options.UseNpgsql(
+                            configuration.GetConnectionString("MigrationConnection") ?? throw new ArgumentNullException()));
                     services.AddDbContextProvider();
                 };
             });
