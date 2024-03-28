@@ -10,59 +10,20 @@
 * .NET 6.0
 
 # Содержание
-
+* [Unit of work](#unit-of-work)
+* [UnitOfWorkBehavior](#unitofworkbehavior)
+* [Транзакция](#транзакция)
 * [Cкалярная функция](#скалярная-функция)
 * [Табличная функция](#табличная-функция)
 * [Хранимая процедура](#хранимая-процедура)
 * [Sql выражение](#sql-выражение)
-* [Unit of work](#unit-of-work)
-* [UnitOfWorkBehavior](#unitofworkbehavior)
 * [Использование Linked Token](#использование-linked-token)
 * [Использование локального контекста](#использование-локального-контекста)
 * [Метрики](#метрики)
 * [Работа с EF](#работа-с-ef)
 
-# Cкалярная функция
-```csharp
-var result = await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
-    .CallScalarFunctionAsync<T>(
-        string functionName,
-        int commandTimeout,
-        DynamicParameters parameters).ConfigureAwait(false);
-
-// в библиотеке присутсвуют множество перегруженных версий для данного метода
-```
-# Табличная функция
-```csharp
-var result = await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
-    .CallTableFunctionAsync<T>(
-        string functionName,
-        int commandTimeout,
-        DynamicParameters parameters).ConfigureAwait(false);
-
-// в библиотеке присутсвуют множество перегруженных версий для данного метода
-```
-# Хранимая процедура
-```csharp
-await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
-    .CallStoredProcedureAsync(
-        string storeProcedureName,
-        int commandTimeout,
-        DynamicParameters parameters).ConfigureAwait(false);
-
-// в библиотеке присутсвуют множество перегруженных версий для данного метода
-```
-# Sql выражение
-```csharp
-var result = await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken)
-    .QueryAsync<T>(
-        string storeProcedureName,
-        int commandTimeout,
-        DynamicParameters parameters).ConfigureAwait(false);
-
-// в библиотеке присутсвуют множество перегруженных версий для данного метода
-```
 # Unit of work
+**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.UnitOfWork)**
 ```csharp
 // объект unit of work получается из провайдера, в котором создается один раз и закрепляется за определенным cancellationToken.
 // провайдер необходимо передать в конструктор, вызываемого класса: IUnitOfWorkProvider unitOfWorkProvider
@@ -117,15 +78,125 @@ await this.unitOfWorkProvider.GetUnitOfWork("default", cancellationToken).CallSt
     }).ConfigureAwait(false);
 ```
 По умолчанию пайплайн UnitOfWorkBehavior может создать только один объект unit of work. Доменные обработчики (внутренние обработчики) не создают объект unit of work (даже если их команда или запрос наследуется от интерфейса IRequestUnitOfWork), а использует тот, который создался командой веб запроса или воркера. Смотрите разделы ниже "Использование Linked Token" и "Использование контекста" для того чтобы дать возможность доменному обработчику создавать свой объект unit of work.
+
+# Транзакция
+**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.Transaction)**
+
+Возможность работы с транзакциями предоставляет интерфейс _IRequestUnitOfWork_
+
+Пример регистрации
+```csharp
+    public class UpdatePersonCommand : IRequest, IRequestUnitOfWork
+    {
+        public string UpdatedBy { get; init; }
+
+        public PersonDto Person { get; init; }
+    }
+```
+
+Имплементировав данный интрфейс в команде/запросе операции в БД рассматриваются, как единое целое и в случае ошибки в ходе выполнения методов Обработчика данные в БД будут возвращены к исходному состоянию
+
+# Операции
+**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.Operations)**
+
+### Доступные параметры
+1. `string functionName/storeProcedureName` - наименование функции/процедуры в БД
+2. `commandTimeout` - таймаут на выполнение функции/процедуры в секундах
+3. `DynamicParameters` или `Dictionary<string, object> parameters` - входящие параметры функции/процедуры
+4. `Enum timeMetricType` - перечисление типа метрики (регистрируется по умолчанию в _Gems.CompositionRoot_ , но если требуется можно переопределить)
+
+### Примеры
+1. Табличная функция получения первого элемента выборки
+```csharp
+    var person = await this.unitOfWorkProvider
+        .GetUnitOfWork(cancellationToken)
+        .CallTableFunctionFirstAsync<Person>(
+            "public.person_get_person_by_id",
+            new Dictionary<string, object>
+            {
+                ["p_person_id"] = query.PersonId
+            });
+```
+2. Табличная функция получения полного списка элементов выборки
+```csharp
+    var persons = await this.unitOfWorkProvider
+        .GetUnitOfWork(cancellationToken)
+        .CallTableFunctionAsync<Person>(
+            "public.person_get_persons",
+            new Dictionary<string, object>
+            {
+                ["p_skip"] = query.Skip ?? default,
+                ["p_take"] = query.Take ?? 100
+            });
+```
+
+3. Скалярная функция
+```csharp
+    var age = this.unitOfWorkProvider
+        .GetUnitOfWork(cancellationToken)
+        .CallScalarFunctionAsync<int>(
+            "public.person_get_age_by_id",
+            new Dictionary<string, object>
+            {
+                ["p_person_id"] = query.PersonId
+            });
+```
+
+4. Хранимая процедура
+```csharp
+    this.unitOfWorkProvider
+        .GetUnitOfWork(cancellationToken)
+        .CallStoredProcedureAsync(
+            "public.person_create",
+            new Dictionary<string, object>
+            {
+                ["p_person"] = this.mapper.Map<Person>(command.Person)
+            });
+
+```
+
+5. Sql выражение
+```csharp
+    var persons = await this.unitOfWorkProvider
+        .GetUnitOfWork(cancellationToken)
+        .QueryFirstOrDefaultAsync<Person>("SELECT * FROM public.person LIMIT @Skip OFFSET @Take", parameters);
+```
+
+6. Получения массива данных в виде _IAsyncEnumerable_
+```csharp
+    public async Task<FileStreamResult> Handle(GetLogFileQuery query, CancellationToken cancellationToken)
+    {
+        // ...
+        await foreach (var log in this.GetLogsAsAsyncEnumerable(cancellationToken))
+        {
+            await sw.WriteLineAsync(log.Serialize()).ConfigureAwait(false);
+        }
+        
+        // ...
+    }
+
+    private IAsyncEnumerable<Log> GetLogsAsAsyncEnumerable(CancellationToken cancellationToken)
+    {
+        return this.unitOfWorkProvider
+            .GetUnitOfWork(cancellationToken)
+            .ExecuteReaderAsync<Log>("SELECT * FROM public.log");
+    }
+```
+
 # Использование Linked Token
+
+Связанные токены является **Obsolete**. Смотрите раздел "Использование контекста".
+
 Связанные токены позволяют доменным обработчикам создать собственные объекты unit of work.
 ```csharp
 using var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 await this.mediator.Send(new SomeInnerCommand(), linkedTokenSource.Token);
 ```
-Связанные токены является obsolete. Смотрите раздел "Использование контекста".
 
 # Использование локального контекста
+
+**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.Context)**
+
 Провадер Unit of Work (UnitOfWorkProvider) можно сконфигурировать на работу с локальным контекстом. 
 Тем самым делегировать источник хранения объектов Unit of Work на локальный контекст вместо собственного словаря (в UnitOfWorkProvider).
 ```json
@@ -144,9 +215,16 @@ await this.mediator.Send(new SomeInnerCommand(), cancellationToken);
 ```
 
 # Метрики
+
+**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.Metrics)**
+
 В unit of work можно настроить автоматическую запись метрик для хранимых процедур и функций. Как работать с метриками с бд смотрите [здесь](/src/Metrics/Data/README.md#метрики-с-iunitofwork).
 
+
 # Работа с EF
+
+**[Пример кода](/src/Data/Data/samples/Gems.Data.Sample.EFCore)**
+
 Библиотека предоставляет DbContextProvider для доступа к дб контексту EF. DbContextProvider хранит дб контекст в локальном контексте.    
 Это добавляет возможность доменным обработчикам создать собственные дб контексты.  
 Если обработчику нужна транзакция, то необходимо предварять команду/запрос - интерфейсом IRequestUnitOfWork. Это избавляет разработчика от прямых вызовов SaveChangeAsync и CommitAsync. За все эти вызовы отвечает пайплайн UnitOfWorkBehavior.
