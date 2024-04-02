@@ -116,18 +116,15 @@ namespace Gems.IO.LibreOffice
                 process.BeginErrorReadLine();
                 await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
 
-                if (errorOutput.Length > 0)
-                {
-                    errorOutput.Insert(0, "LibreOffice error output:\r\n");
-                    this.logger.LogError(errorOutput.ToString());
-                }
-
                 if (process.ExitCode != 0)
                 {
+                    this.LogLibreOfficeOutput(errorOutput, process);
                     throw new LibreOfficeException(process.ExitCode);
                 }
                 else
                 {
+                    this.LogLibreOfficeOutput(errorOutput, process);
+
                     var pdfFile = Path.Combine(tempFolder, Path.GetFileNameWithoutExtension(docxPath) + ".pdf");
                     if (File.Exists(pdfPath))
                     {
@@ -160,6 +157,19 @@ namespace Gems.IO.LibreOffice
                     Directory.Delete(directory, true);
                 }
             }
+        }
+
+        private void LogLibreOfficeOutput(StringBuilder errorOutput, Process process)
+        {
+            if (errorOutput is not null && errorOutput.Length <= 0)
+            {
+                return;
+            }
+
+            this.logger.LogError(
+                "ExitCode: {ExitCode}. ErrorOutput: {ErrorOutput}",
+                process.ExitCode,
+                errorOutput?.ToString() ?? "Error Output is null");
         }
 
         private List<string> GetCommandArguments(string docx, long userId, string tempFolder)
