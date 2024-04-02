@@ -1,3 +1,10 @@
+## 2024.14.1 (2024-04-02)
+
+### added (2 changes)
+
+- [Merge branch 'feature/rework-logging-for-libreoffice' into 'main'](axdev/libraries/gems@b7a800ce999260977d02e078da619215aa9f0b74) ([merge request](axdev/libraries/gems!105))
+- [Merge branch 'feature/unit-of-work-sample' into 'main'](axdev/libraries/gems@260d60be5ecfcc3c3ec454c5b3b1b68e0b7d94de) ([merge request](axdev/libraries/gems!98))
+
 ## 2024.13.2 (2024-03-26)
 
 No changes.
