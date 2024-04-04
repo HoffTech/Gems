@@ -2125,27 +2125,22 @@ namespace Gems.Http
                         await metricWriter.WriteMetrics(response.StatusCode).ConfigureAwait(false);
                     }
 
-                    sw.Stop();
                     return deserializedResponse;
                 }
                 catch (TaskCanceledException e) when (this.RequestTimeout > 0)
                 {
-                    sw.Stop();
                     throw new RequestException<TError>(e.Message, e, HttpStatusCode.GatewayTimeout);
                 }
                 catch (HttpRequestException e) when (e.InnerException is SocketException { SocketErrorCode: SocketError.TimedOut })
                 {
-                    sw.Stop();
                     throw new RequestException<TError>(e.Message, e, HttpStatusCode.GatewayTimeout);
                 }
                 catch (HttpRequestException e) when (e.InnerException is SocketException se)
                 {
-                    sw.Stop();
                     throw new RequestException<TError>(e.Message, e, HttpStatusCode.BadGateway);
                 }
                 catch (DeserializeException e)
                 {
-                    sw.Stop();
                     throw new RequestException<TError>(
                         $"{e.Message}. InnerResponse: {e.ResponseAsString}",
                         e,
@@ -2153,18 +2148,15 @@ namespace Gems.Http
                 }
                 catch (RequestException<TError>)
                 {
-                    sw.Stop();
                     throw;
                 }
                 catch (Exception e)
                 {
-                    sw.Stop();
                     throw new RequestException<TError>("Failed request.", e, HttpStatusCode.InternalServerError);
                 }
             }
             catch (RequestException<TError> e)
             {
-                sw.Stop();
                 await metricWriter.WriteMetrics(e.StatusCode ?? HttpStatusCode.InternalServerError)
                     .ConfigureAwait(false);
                 logsCollector.AddStatus((int)e.StatusCode);
@@ -2172,12 +2164,14 @@ namespace Gems.Http
             }
             finally
             {
-                logsCollector.AddRequestDuration(sw.Elapsed.Milliseconds);
-                logsCollector.WriteLogs();
                 if (timeMetric != null)
                 {
                     await timeMetric.DisposeAsync().ConfigureAwait(false);
                 }
+
+                sw.Stop();
+                logsCollector.AddRequestDuration(sw.Elapsed.TotalMilliseconds);
+                logsCollector.WriteLogs();
             }
         }
 

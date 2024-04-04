@@ -113,7 +113,7 @@ namespace Gems.Logging.Mvc.LogsCollector
             this.AddOrUpdateValueInLogs(key, value);
         }
 
-        public void AddRequestDuration(long durationMilliseconds)
+        public void AddRequestDuration(double durationMilliseconds)
         {
             this.AddOrUpdateValueInLogs("requestDuration", durationMilliseconds);
         }
