@@ -72,13 +72,13 @@ namespace Gems.Logging.Mvc.Behaviors
             }
             finally
             {
-                sw.Stop();
                 if (context != null)
                 {
                     logsCollector.AddResponseHeaders(context.Response.Headers.ToDictionary(x => x.Key, y => string.Join(',', y.Value)));
                 }
 
-                logsCollector.AddRequestDuration(sw.Elapsed.Milliseconds);
+                sw.Stop();
+                logsCollector.AddRequestDuration(sw.Elapsed.TotalMilliseconds);
                 logsCollector.WriteLogs();
             }
         }
