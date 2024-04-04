@@ -1,3 +1,9 @@
+## 2024.14.2 (2024-04-04)
+
+### added (1 change)
+
+- [Merge branch 'fix_log_request_duration' into 'main'](axdev/libraries/gems@3d9e536cd5b71731422e0fb3a8ed1302ffada2c0) ([merge request](axdev/libraries/gems!106))
+
 ## 2024.14.1 (2024-04-02)
 
 ### added (2 changes)
