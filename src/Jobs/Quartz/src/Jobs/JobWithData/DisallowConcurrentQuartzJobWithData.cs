@@ -3,6 +3,7 @@
 
 using MediatR;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using Quartz;
@@ -14,8 +15,9 @@ public sealed class DisallowConcurrentQuartzJobWithData<TCommand> : QuartzJobWit
 {
     public DisallowConcurrentQuartzJobWithData(
         IMediator mediator,
-        ILogger<DisallowConcurrentQuartzJobWithData<TCommand>> logger)
-        : base(mediator, logger)
+        ILogger<DisallowConcurrentQuartzJobWithData<TCommand>> logger,
+        IConfiguration configuration)
+        : base(mediator, logger, configuration)
     {
     }
 }

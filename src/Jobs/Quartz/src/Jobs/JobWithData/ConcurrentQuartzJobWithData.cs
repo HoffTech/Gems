@@ -3,6 +3,7 @@
 
 using MediatR;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Gems.Jobs.Quartz.Jobs.JobWithData;
@@ -11,8 +12,9 @@ public sealed class ConcurrentQuartzJobWithData<TCommand> : QuartzJobWithDataBas
 {
     public ConcurrentQuartzJobWithData(
         IMediator mediator,
-        ILogger<ConcurrentQuartzJobWithData<TCommand>> logger)
-        : base(mediator, logger)
+        ILogger<ConcurrentQuartzJobWithData<TCommand>> logger,
+        IConfiguration configuration)
+        : base(mediator, logger, configuration)
     {
     }
 }

@@ -49,6 +49,15 @@ namespace Gems.Jobs.Quartz.Handlers.FireJobImmediately
             }
 
             var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
+
+            if (command.TriggerData != null && command.TriggerData.Any())
+            {
+                var jobDataMap = new JobDataMap { { QuartzJobWithDataConstants.JobDataKeyValue, command.TriggerData.Serialize() } };
+
+                await scheduler.TriggerJob(new JobKey(command.JobName, command.JobGroup ?? JobGroups.DefaultGroup), jobDataMap, cancellationToken).ConfigureAwait(false);
+                return;
+            }
+
             if (await this.FireTriggerWithData(scheduler, command.JobName, command.TriggerName, command.JobGroup, cancellationToken).ConfigureAwait(false))
             {
                 return;
@@ -56,14 +65,6 @@ namespace Gems.Jobs.Quartz.Handlers.FireJobImmediately
 
             if (await this.FireTriggerFromDb(scheduler, command.JobName, command.TriggerName, command.JobGroup, cancellationToken).ConfigureAwait(false))
             {
-                return;
-            }
-
-            if (command.TriggerData != null && command.TriggerData.Any())
-            {
-                var jobDataMap = new JobDataMap { { QuartzJobWithDataConstants.JobDataKeyValue, command.TriggerData.Serialize() } };
-
-                await scheduler.TriggerJob(new JobKey(command.JobName, command.JobGroup ?? JobGroups.DefaultGroup), jobDataMap, cancellationToken).ConfigureAwait(false);
                 return;
             }
 
@@ -86,20 +87,28 @@ namespace Gems.Jobs.Quartz.Handlers.FireJobImmediately
                         .Select(t => t.TriggerName))}");
             }
 
-            if (this.jobsOptions.Value.TriggersWithData.TryGetValue(jobName, out var triggersWithData)
-                && triggersWithData.All(t => t.TriggerName != triggerName))
-            {
-                throw new InvalidOperationException($"Триггер с именем '{triggerName}' не был найден в конфигурации");
-            }
-
-            var triggerOptions = this.jobsOptions.Value.TriggersWithData.GetValueOrDefault(jobName).First(t => t.TriggerName == triggerName);
             var jobDataMap = new JobDataMap();
-            if (triggerOptions.TriggerData != null && triggerOptions.TriggerData.Any())
+            jobDataMap.Add("TriggerName", triggerName);
+            if (this.jobsOptions.Value.TriggersWithData.TryGetValue(jobName, out var triggersWithData))
             {
-                jobDataMap.Add(QuartzJobWithDataConstants.JobDataKeyValue, triggerOptions.TriggerData.Serialize());
+                var triggerFound = false;
+                for (var triggerPosition = 0; triggerPosition < triggersWithData.Count; triggerPosition++)
+                {
+                    if (triggersWithData[triggerPosition].TriggerName == triggerName)
+                    {
+                        jobDataMap.Add("TriggerPosition", triggerPosition.ToString());
+                        triggerFound = true;
+                        break;
+                    }
+                }
+
+                if (!triggerFound)
+                {
+                    throw new InvalidOperationException($"Триггер с именем '{triggerName}' не был найден в конфигурации");
+                }
             }
 
-            await scheduler.TriggerJob(new JobKey(jobName, jobGroup ?? JobGroups.DefaultGroup), jobDataMap, cancellationToken).ConfigureAwait(false);
+            await scheduler.TriggerJob(new JobKey(jobName!, jobGroup ?? JobGroups.DefaultGroup), jobDataMap, cancellationToken).ConfigureAwait(false);
             return true;
         }
 
