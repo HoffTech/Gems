@@ -10,6 +10,17 @@ namespace Gems.Http.Tests;
 public class TemplateUriTests
 {
     /// <summary>
+    /// Возвращает uri со всеми подстановками плейсхолдеров.
+    /// </summary>
+    /// <param name="uri">uri.</param>
+    [Test]
+    public void GetUri_ValidUriAndPlaceholders_ReturnsUri()
+    {
+        var templateUri = new TemplateUri("v1/users/{userId}/orders/{orderId}?isPreorder={isPreorder}", "123", "456", "true");
+        Assert.AreEqual("v1/users/123/orders/456?isPreorder=true", templateUri.GetUri());
+    }
+
+    /// <summary>
     /// Возвращает uri без обработки, если uri равен null или пустой строке.
     /// </summary>
     /// <param name="uri">uri.</param>
@@ -25,12 +36,12 @@ public class TemplateUriTests
     /// Возвращает uri без обработки, если uri не имеет плейсхолдеров.
     /// </summary>
     /// <param name="uri">uri.</param>
-    [TestCase("http://someapi/v1/somauri")]
-    [TestCase("http://someapi/v1/somauri?someparamter=somevalue")]
-    [TestCase("/v1/somauri")]
-    [TestCase("/v1/somauri?someparamter=somevalue")]
-    [TestCase("v1/somauri")]
-    [TestCase("v1/somauri?someparamter=somevalue")]
+    [TestCase("http://someapi/v1/someuri")]
+    [TestCase("http://someapi/v1/someuri?someparamter=somevalue")]
+    [TestCase("/v1/someuri")]
+    [TestCase("/v1/someuri?someparamter=somevalue")]
+    [TestCase("v1/someuri")]
+    [TestCase("v1/someuri?someparamter=somevalue")]
     public void GetUri_TemplateUriHasNoPlaceholders_ReturnsTheSameUri(string uri)
     {
         var templateUri = new TemplateUri(uri);
@@ -63,8 +74,7 @@ public class TemplateUriTests
         var templateUri = new TemplateUri(uri, arg1);
         var exception = Assert.Throws<ArgumentException>(() => templateUri.GetUri());
         Assert.NotNull(exception);
-        var templateUriWithoutQueryString = uri.Split('?')[0];
-        Assert.AreEqual(string.Format(TemplateUri.IncorrectPlaceholderErrorMessage, templateUriWithoutQueryString), exception.Message);
+        Assert.AreEqual(string.Format(TemplateUri.IncorrectPlaceholderErrorMessage, uri), exception.Message);
     }
 
     /// <summary>
@@ -79,7 +89,6 @@ public class TemplateUriTests
         var templateUri = new TemplateUri(uri, arg1);
         var exception = Assert.Throws<ArgumentException>(() => templateUri.GetUri());
         Assert.NotNull(exception);
-        var templateUriWithoutQueryString = uri.Split('?')[0];
-        Assert.AreEqual(string.Format(TemplateUri.TemplateArgsContainsNotAllPlaceholdersErrorMessage, arg1, templateUriWithoutQueryString), exception.Message);
+        Assert.AreEqual(string.Format(TemplateUri.TemplateArgsContainsNotAllPlaceholdersErrorMessage, arg1, uri), exception.Message);
     }
 }

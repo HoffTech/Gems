@@ -42,10 +42,7 @@ public class TemplateUri
             return this.templateUri;
         }
 
-        var templateUriParts = this.templateUri.Split('?');
-        var templateUriWithoutQueryString = templateUriParts[0];
-
-        if (templateUriWithoutQueryString.IndexOf("{", StringComparison.InvariantCulture) == -1)
+        if (this.templateUri.IndexOf("{", StringComparison.InvariantCulture) == -1)
         {
             return this.templateUri;
         }
@@ -55,13 +52,13 @@ public class TemplateUri
             throw new ArgumentException(TemplateArgsArgumentErrorMessage);
         }
 
-        var placeholdersMatches = Regex.Matches(templateUriWithoutQueryString, "{[^}]*}");
+        var placeholdersMatches = Regex.Matches(this.templateUri, "{[^}]*}");
         if (placeholdersMatches.Count == 0)
         {
-            throw new ArgumentException(string.Format(IncorrectPlaceholderErrorMessage, templateUriWithoutQueryString));
+            throw new ArgumentException(string.Format(IncorrectPlaceholderErrorMessage, this.templateUri));
         }
 
-        var templateUriWithPositionPlaceholders = templateUriWithoutQueryString;
+        var templateUriWithPositionPlaceholders = this.templateUri;
         for (var i = 0; i < placeholdersMatches.Count; i++)
         {
             templateUriWithPositionPlaceholders = templateUriWithPositionPlaceholders.Replace(placeholdersMatches[i].Value, $"{{{i}}}");
@@ -74,11 +71,10 @@ public class TemplateUri
 
         if (templateUriWithPositionPlaceholders.IndexOf("{", StringComparison.InvariantCulture) >= 0)
         {
-            throw new ArgumentException(string.Format(TemplateArgsContainsNotAllPlaceholdersErrorMessage, string.Join(',', this.templateArgs), templateUriWithoutQueryString));
+            throw new ArgumentException(string.Format(TemplateArgsContainsNotAllPlaceholdersErrorMessage, string.Join(',', this.templateArgs), this.templateUri));
         }
 
-        templateUriParts[0] = templateUriWithPositionPlaceholders;
-        return string.Join("?", templateUriParts);
+        return templateUriWithPositionPlaceholders;
     }
 }
 
