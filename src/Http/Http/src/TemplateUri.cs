@@ -20,9 +20,19 @@ public class TemplateUri
         this.templateArgs = templateArgs;
     }
 
-    public string GetTemplateUri()
+    public string GetUriWithoutQueryString()
     {
-        return this.templateUri;
+        if (string.IsNullOrWhiteSpace(this.templateUri))
+        {
+            return null;
+        }
+
+        if (this.templateUri.IndexOf("?", StringComparison.Ordinal) == -1)
+        {
+            return this.templateUri;
+        }
+
+        return this.templateUri.Split('?')[0];
     }
 
     public string GetUri()

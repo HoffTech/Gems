@@ -2076,7 +2076,7 @@ namespace Gems.Http
             bool isAuthenticationRequest,
             CancellationToken cancellationToken)
         {
-            var metricWriter = new RequestMetricWriter(this.metricsService, requestData, templateUri.GetTemplateUri());
+            var metricWriter = new RequestMetricWriter(this.metricsService, requestData, templateUri.GetUriWithoutQueryString());
             var logsCollector = this.logsCollectorFactoryMethod(this.logger);
             var timeMetric = metricWriter.GetTimeMetric();
             var sw = new Stopwatch();
