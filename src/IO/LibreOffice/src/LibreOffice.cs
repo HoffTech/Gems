@@ -116,15 +116,14 @@ namespace Gems.IO.LibreOffice
                 process.BeginErrorReadLine();
                 await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
 
+                this.LogLibreOfficeOutput(errorOutput, process.ExitCode);
+
                 if (process.ExitCode != 0)
                 {
-                    this.LogLibreOfficeOutput(errorOutput, process);
                     throw new LibreOfficeException(process.ExitCode);
                 }
                 else
                 {
-                    this.LogLibreOfficeOutput(errorOutput, process);
-
                     var pdfFile = Path.Combine(tempFolder, Path.GetFileNameWithoutExtension(docxPath) + ".pdf");
                     if (File.Exists(pdfPath))
                     {
@@ -159,17 +158,28 @@ namespace Gems.IO.LibreOffice
             }
         }
 
-        private void LogLibreOfficeOutput(StringBuilder errorOutput, Process process)
+        private void LogLibreOfficeOutput(StringBuilder errorOutput, int exitCode)
         {
-            if (errorOutput is not null && errorOutput.Length <= 0)
+            if (errorOutput is null || errorOutput.Length <= 0)
             {
                 return;
             }
 
-            this.logger.LogError(
-                "ExitCode: {ExitCode}. ErrorOutput: {ErrorOutput}",
-                process.ExitCode,
-                errorOutput?.ToString() ?? "Error Output is null");
+            const int successExitCode = 0;
+            if (exitCode == successExitCode)
+            {
+                this.logger.LogWarning(
+                    "ExitCode: {ExitCode}. LibreOffice Warning Output : {WarningOutput}",
+                    exitCode,
+                    errorOutput.ToString());
+            }
+            else
+            {
+                this.logger.LogError(
+                    "ExitCode: {ExitCode}. LibreOffice Error Output: {ErrorOutput}",
+                    exitCode,
+                    errorOutput.ToString());
+            }
         }
 
         private List<string> GetCommandArguments(string docx, long userId, string tempFolder)
