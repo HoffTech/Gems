@@ -166,17 +166,17 @@ namespace Gems.IO.LibreOffice
             }
 
             const int successExitCode = 0;
-            if (exitCode == successExitCode)
+            if (exitCode != successExitCode)
             {
-                this.logger.LogWarning(
-                    "ExitCode: {ExitCode}. LibreOffice Warning Output : {WarningOutput}",
+                this.logger.LogError(
+                    "ExitCode: {ExitCode}. LibreOffice Error Output: {ErrorOutput}",
                     exitCode,
                     errorOutput.ToString());
             }
             else
             {
-                this.logger.LogError(
-                    "ExitCode: {ExitCode}. LibreOffice Error Output: {ErrorOutput}",
+                this.logger.LogWarning(
+                    "ExitCode: {ExitCode}. LibreOffice Warning Output : {WarningOutput}",
                     exitCode,
                     errorOutput.ToString());
             }
