@@ -1,3 +1,9 @@
+## 2024.16.4 (2024-04-17)
+
+### added (1 change)
+
+- [Merge branch 'feature/edit-libreoffice-log-output' into 'main'](axdev/libraries/gems@3ab0dcb509f04854cb8e36be1f47d7a959439cef) ([merge request](axdev/libraries/gems!108))
+
 ## 2024.16.3 (2024-04-15)
 
 No changes.
