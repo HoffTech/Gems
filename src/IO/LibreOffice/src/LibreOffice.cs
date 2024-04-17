@@ -165,8 +165,7 @@ namespace Gems.IO.LibreOffice
                 return;
             }
 
-            const int successExitCode = 0;
-            if (exitCode != successExitCode)
+            if (exitCode != 0)
             {
                 this.logger.LogError(
                     "ExitCode: {ExitCode}. LibreOffice Error Output: {ErrorOutput}",
