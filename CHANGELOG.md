@@ -1,3 +1,9 @@
+## 2024.17.1 (2024-04-23)
+
+### added (1 change)
+
+- [Merge branch 'feature/remove-auth-header-from-log' into 'main'](axdev/libraries/gems@c94a1d3f3b2e48e598f011229a5386cfc901a9a7) ([merge request](axdev/libraries/gems!110))
+
 ## 2024.16.4 (2024-04-17)
 
 ### added (1 change)
