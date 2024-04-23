@@ -73,6 +73,7 @@ namespace Gems.Logging.Mvc.LogsCollector
 
         public void AddRequestHeaders(Dictionary<string, string> headers)
         {
+            headers.Remove("Authorization");
             this.AddOrUpdateValueInLogs("requestHeaders", headers);
         }
 
