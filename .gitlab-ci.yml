@@ -14,6 +14,7 @@ build:
     - python3 /app/build_gems.py
   only:
     - main
+    - /^feature\/.*$
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^20\d\d\/v\d+\s*$/
