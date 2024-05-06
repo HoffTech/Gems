@@ -11,7 +11,7 @@ stages:
 build:
   stage: build
   script:
-    - python3 /app/build_gems.py
+    - python3 /app/build_gems_test.py
   only:
     - main
     - /^feature\/.*$
