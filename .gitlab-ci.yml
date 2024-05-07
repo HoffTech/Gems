@@ -11,13 +11,19 @@ stages:
 build:
   stage: build
   script:
-    - python3 /app/build_gems_test.py
+    - python3 /app/build_gems.py
   only:
     - main
-    - /^feature\/.*$
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^20\d\d\/v\d+\s*$/
+
+build_test:
+  stage: build
+  script:
+    - python3 /app/build_gems_test.py
+  only:
+    - /^feature\/.*$
 
 mirror_to_github:
   stage: mirror_to_github
@@ -25,6 +31,7 @@ mirror_to_github:
   script:
     - python3 /app/mirror_to_github.py
   only:
+    - main
     variables:
       - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
 
@@ -34,6 +41,7 @@ publish_to_nuget:
   script:
     - python3 /app/publish_to_nuget.py
   only:
+    - main
     variables:
       - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
 
@@ -63,6 +71,8 @@ prepare_release:
   script:
     - apk add curl jq
     - 'curl -H "PRIVATE-TOKEN: $CI_API_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/repository/changelog?version=$CI_COMMIT_TAG" | jq -r .notes > release_notes.md'
+  only:
+    - main
   artifacts:
     paths:
     - release_notes.md
@@ -77,6 +87,8 @@ create_release:
   - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
   script:
     - echo "Creating release"
+  only:
+    - main
   release:
     name: 'Release $CI_COMMIT_TAG'
     description: release_notes.md
