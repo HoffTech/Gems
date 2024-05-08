@@ -1,3 +1,9 @@
+## 2024.19.1 (2024-05-08)
+
+### added (1 change)
+
+- [Merge branch 'feature/add-endoding-recognizer' into 'main'](axdev/libraries/gems@7655792233388f4506b5eb2c28920949cb247617) ([merge request](axdev/libraries/gems!113))
+
 ## 2024.17.1 (2024-04-23)
 
 ### added (1 change)
