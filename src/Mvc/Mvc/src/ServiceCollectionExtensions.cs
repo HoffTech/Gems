@@ -47,6 +47,7 @@ namespace Gems.Mvc
             });
             services.AddSingleton<IConverter<Exception, BusinessErrorViewModel>, ExceptionToBusinessErrorViewModelConverter>();
             services.AddSingleton<DelegateConverterProvider<ModelStateValidationException, Exception>>();
+            services.AddSingleton<DelegateConverterProvider<BusinessErrorViewModel, object>>();
             return services.AddControllers(options =>
                 {
                     options.Filters.Add(typeof(ModelStateValidationFilter));
@@ -72,7 +73,11 @@ namespace Gems.Mvc
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <param name="configureOptions">An <see cref="Action{MvcOptions}"/> to configure the provided <see cref="MvcOptions"/>.</param>
-        public static void AddControllersWithViewsAndMediatR(this IServiceCollection services, Action<MvcOptions> configureOptions = null)
+        /// <param name="configuration">An <see cref="Action{configuration}"/> to configure the provided <see cref="IConfiguration"/>.</param>
+        public static void AddControllersWithViewsAndMediatR(
+            this IServiceCollection services,
+            Action<MvcOptions> configureOptions = null,
+            IConfiguration configuration = null)
         {
             services.ConfigureOptions<MultipleModelBinderSetup>();
             services.Configure<ApiBehaviorOptions>(options =>
@@ -81,12 +86,22 @@ namespace Gems.Mvc
             });
             services.AddSingleton<IConverter<Exception, BusinessErrorViewModel>, ExceptionToBusinessErrorViewModelConverter>();
             services.AddSingleton<DelegateConverterProvider<ModelStateValidationException, Exception>>();
+            services.AddSingleton<DelegateConverterProvider<BusinessErrorViewModel, object>>();
             services.AddControllersWithViews(options =>
                 {
                     options.Filters.Add(typeof(ModelStateValidationFilter));
                     options.Filters.Add(typeof(HandleErrorFilter));
                     options.Conventions.Add(new GenericControllerRouteConvention());
                     configureOptions?.Invoke(options);
+                })
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+                    var jsonDefaultIgnoreConditions = configuration?.GetValue<string>("JsonOptions:DefaultIgnoreConditions");
+                    options.JsonSerializerOptions.DefaultIgnoreCondition =
+                        Enum.TryParse<JsonIgnoreCondition>(jsonDefaultIgnoreConditions, out var condition)
+                            ? condition
+                            : JsonIgnoreCondition.Never;
                 })
                 .ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider()));
         }
@@ -137,12 +152,12 @@ namespace Gems.Mvc
             services.AddFluentValidationClientsideAdapters();
         }
 
-        public static void AddConverter<TValidationExceptionToBusinessException>(this IServiceCollection services)
+        public static void AddConverter<TConverter>(this IServiceCollection services)
         {
-            var allInterfaces = typeof(TValidationExceptionToBusinessException).GetInterfaces();
+            var allInterfaces = typeof(TConverter).GetInterfaces();
             foreach (var @interface in allInterfaces)
             {
-                services.AddSingleton(@interface, typeof(TValidationExceptionToBusinessException));
+                services.AddSingleton(@interface, typeof(TConverter));
                 if (@interface.Name != "IConverter`3" || @interface.GetGenericArguments().Length != 3)
                 {
                     continue;

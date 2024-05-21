@@ -74,4 +74,16 @@ public class DelegateConverterProvider<TFrom, TTo>
         var delegateConverter = delegateConverterFactory.CreateDelegateConverter(arg);
         return delegateConverter;
     }
+
+    public BaseDelegateConverter<TFrom, TTo> GetConverter(Type argType)
+    {
+        var delegateConverterFactory = this.converterFactories.FirstOrDefault(x => x.ArgType == argType);
+        if (delegateConverterFactory == null)
+        {
+            return null;
+        }
+
+        var delegateConverter = delegateConverterFactory.CreateDelegateConverter(null);
+        return delegateConverter;
+    }
 }

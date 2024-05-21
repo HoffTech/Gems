@@ -30,13 +30,13 @@ namespace Gems.Mvc.Filters
                     throw exception;
                 }
 
-                var delegateConverter = this.delegateConverterProvider.GetConverter(context.ActionArguments.First().Value);
-                if (delegateConverter != null)
+                var delegateConverter = this.delegateConverterProvider.GetConverter(context.ActionArguments.First().Value.GetType());
+                if (delegateConverter == null)
                 {
-                    throw delegateConverter.Convert(exception);
+                    throw exception;
                 }
 
-                throw exception;
+                throw delegateConverter.Convert(exception);
             }
 
             await next().ConfigureAwait(false);

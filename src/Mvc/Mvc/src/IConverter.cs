@@ -5,6 +5,7 @@ using System;
 
 using FluentValidation;
 
+using Gems.Mvc.Filters.Errors;
 using Gems.Mvc.Filters.Exceptions;
 
 namespace Gems.Mvc
@@ -38,6 +39,10 @@ namespace Gems.Mvc
     }
 
     public interface IModelStateValidationExceptionConverter<in TRequest> : IExceptionConverter<ModelStateValidationException, TRequest>
+    {
+    }
+
+    public interface IBusinessErrorViewModelConverter<in TRequest> : IConverter<BusinessErrorViewModel, object, TRequest>
     {
     }
 }
