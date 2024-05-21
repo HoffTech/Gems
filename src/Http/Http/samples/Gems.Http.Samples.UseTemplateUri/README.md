@@ -1,30 +1,6 @@
-# Пример http сервиса на базе BaseClientService
+# Пример использования TemplateUri
 
-Для того, чтобы отправить http запрос необходимо сделать следующее:
-
-**Унаследоваться от класса BaseClientService<TDefaultError> с указанием типа ошибки по умолчанию TDefaultError**
-```csharp
-public class PongService : BaseClientService<string>
-{
-    private readonly IConfiguration configuration;
-
-    public PongService(IConfiguration configuration, IOptions<HttpClientServiceOptions> options, BaseClientServiceHelper helper) : base(options, helper)
-    {
-        this.configuration = configuration;
-    }
-    // ...
-}
-```
-**Переопределить свойство, отвечающее за базовый url**
-```csharp
-public class PongService : BaseClientService<string>
-{
-    // ...
-    protected override string BaseUrl => this.configuration?.GetConnectionString("PongApiUrl") ?? throw new InvalidOperationException();
-    // ...
-}
-```
-**Создать метод, отвечающий за отправку http запроса**
+Для того, чтобы отправить http запрос с использованием _TemplateUri_ необходимо cоздать метод, отвечающий за отправку http запроса
 ```csharp
 public class PongService : BaseClientService<string>
 {
@@ -35,6 +11,8 @@ public class PongService : BaseClientService<string>
     }
 }
 ```
-Метод GetAsync определяет обобщенный тип выходных данных, как строка.  
-Метод GetAsync принимает аргумент TemplateUri, отвечающий за эндпоинт, на который делается http запрос. Для этого у строки, определяющий uri, необходимо вызвать метод расширения ToTemplateUri и передать нужные аргументы для замены плейсхолдеров в uri.
+Метод _GetAsync_ принимает аргумент _TemplateUri_, отвечающий за эндпоинт, на который делается http запрос. Для этого у строки, определяющий _uri_, необходимо вызвать метод расширения _ToTemplateUri_ и передать нужные аргументы для замены плейсхолдеров в uri.
+
+### Запуск примера
+Вызовите ендпоинт с помощью **Swagger** `POST /v1/samples/ping`
 
