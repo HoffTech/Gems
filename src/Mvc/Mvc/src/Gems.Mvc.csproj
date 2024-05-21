@@ -13,6 +13,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
+    <!--TODO Sergey Vlasenko Package 'Npgsql' 6.0.9 has a known high severity vulnerability - Требуется обновление до 8.0.3 http://jira.kifr-ru.local:8080/browse/CODE-1080-->
+    <NoWarn>NU1903</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

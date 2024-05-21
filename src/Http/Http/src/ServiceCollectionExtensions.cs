@@ -9,12 +9,12 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Gems.Http
 {
     /// <summary>
-    ///     Class with middleware extensions.
+    /// Class with middleware extensions.
     /// </summary>
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        ///     Add prometheus.
+        /// Add Http Services.
         /// </summary>
         /// <param name="services">IServiceCollection.</param>
         /// <param name="configuration">IConfiguration.</param>
