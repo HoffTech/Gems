@@ -10,10 +10,11 @@ namespace Gems.Text.Json.Converters
 {
     public class UnspecifiedDateTimeConverter : JsonConverter<DateTime>
     {
+        private const string DefaultDateTimeFormat = "yyyy-MM-ddTHH:mm:ss";
+
         public UnspecifiedDateTimeConverter()
         {
             this.TargetTimeKind = DateTimeKind.Unspecified;
-            this.SerializerFormat = "yyyy-MM-ddTHH:mm:ss";
         }
 
         public virtual DateTimeKind TargetTimeKind { get; set; }
@@ -35,8 +36,10 @@ namespace Gems.Text.Json.Converters
             try
             {
                 var dateTimeFormat = this.DeserializerFormat;
-                if (this.DeserializerTimeZone != null && dateTimeFormat?.IndexOf("z") == -1)
+                if (this.DeserializerTimeZone != null)
                 {
+                    dateTimeFormat ??= DefaultDateTimeFormat;
+                    dateTimeFormat = dateTimeFormat.Replace("z", string.Empty);
                     dateTimeFormat += "zzz";
                     dateTimeAsString += GetOffsetByTimeZone(this.DeserializerTimeZone);
                 }
@@ -61,14 +64,23 @@ namespace Gems.Text.Json.Converters
             DateTime dateTimeValue,
             JsonSerializerOptions options)
         {
+            var dateTimeFormat = this.SerializerFormat ?? DefaultDateTimeFormat;
             dateTimeValue = this.SpecifyDateTimeKind(dateTimeValue);
-
             if (!string.IsNullOrEmpty(this.SerializerTimeZone))
             {
+                dateTimeFormat = dateTimeFormat.Replace("z", string.Empty);
+                dateTimeValue = dateTimeValue.Kind == DateTimeKind.Utc
+                    ? dateTimeValue.ToLocalTime()
+                    : dateTimeValue;
                 dateTimeValue = TimeZoneInfo.ConvertTime(dateTimeValue, TimeZoneInfoHelper.FindSystemTimeZoneById(this.SerializerTimeZone));
+                var dateTimeAsString = dateTimeValue.ToString(dateTimeFormat);
+                dateTimeAsString += GetOffsetByTimeZone(this.SerializerTimeZone);
+                writer.WriteStringValue(dateTimeAsString);
             }
-
-            writer.WriteStringValue(dateTimeValue.ToString(this.SerializerFormat));
+            else
+            {
+                writer.WriteStringValue(dateTimeValue.ToString(dateTimeFormat));
+            }
         }
 
         private static string GetOffsetByTimeZone(string timeZoneId)
