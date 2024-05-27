@@ -32,8 +32,8 @@ mirror_to_github:
     - python3 /app/mirror_to_github.py
   only:
     - main
-    variables:
-      - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+  variables:
+    - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
 
 publish_to_nuget:
   stage: publish_to_nuget
@@ -42,8 +42,8 @@ publish_to_nuget:
     - python3 /app/publish_to_nuget.py
   only:
     - main
-    variables:
-      - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+  variables:
+    - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
 
 test:
   stage: test
