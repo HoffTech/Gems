@@ -12,8 +12,8 @@ build:
   stage: build
   script:
     - python3 /app/build_gems.py
-  only:
-    - main
+  rules:
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "main"
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /^20\d\d\/v\d+\s*$/
@@ -22,28 +22,30 @@ build_test:
   stage: build
   script:
     - python3 /app/build_gems_test.py
-  only:
-    - /^feature\/.*$
+  rules:
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature\/.*$
 
 mirror_to_github:
   stage: mirror_to_github
   #when: manual
   script:
     - python3 /app/mirror_to_github.py
+  rules:
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "main"
   only:
-    - main
-  variables:
-    - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+    variables:
+      - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
 
 publish_to_nuget:
   stage: publish_to_nuget
   #when: manual
   script:
     - python3 /app/publish_to_nuget.py
+  rules:
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "main"
   only:
-    - main
-  variables:
-    - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+    variables:
+      - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
 
 test:
   stage: test
@@ -67,12 +69,12 @@ prepare_release:
   stage: prepare_release
   image: alpine:latest
   rules:
-  - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
+  - if: 
+    - '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
+    - $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "main"
   script:
     - apk add curl jq
     - 'curl -H "PRIVATE-TOKEN: $CI_API_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/repository/changelog?version=$CI_COMMIT_TAG" | jq -r .notes > release_notes.md'
-  only:
-    - main
   artifacts:
     paths:
     - release_notes.md
@@ -84,11 +86,11 @@ create_release:
     - job: prepare_release
       artifacts: true
   rules:
-  - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
+  - if: 
+    - '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
+    - $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "main"
   script:
     - echo "Creating release"
-  only:
-    - main
   release:
     name: 'Release $CI_COMMIT_TAG'
     description: release_notes.md
