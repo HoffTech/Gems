@@ -10,7 +10,7 @@
 Установите nuget пакет Gems.IO через менеджер пакетов
 
 # Описание
-**Расширение для выгрузки коллекции `IEnumerable<T>` в Excel файл, для работы с данным функционалом необходимо**:
+### Расширение для выгрузки коллекции `IEnumerable<T>` в Excel файл, для работы с данным функционалом необходимо:
 - В классе, описывающем экземпляр коллекции, для свойств выводимых в файл указать атрибут `ColumnHeaderNameAttribute`, в атрибут передать в качестве параметра заголовок колонки, который будет отображаться в файле, например так:
 ```csharp
 public class SaveToFileCollectionElement
@@ -42,7 +42,7 @@ public class SaveToFileCollectionElement
 ```
 - Вызвать на коллекции метод расширения `SaveToFile`, в качестве параметра передать полное имя файла, реузльтат метода - признак успешности записи.
 
-**Сервис для работы с сетевыми папками общего доступа через SMB протокол.**
+### Сервис для работы с сетевыми папками общего доступа через SMB протокол.
 
 - Добавьте конфигурацию настроек подключения к хранилищу в файле appsettings.json:
 ```csharp
@@ -74,7 +74,7 @@ public class SaveToFileCollectionElement
         }
 ````
 
-# Примеры:
+#### Примеры:
 - Удаление файла если существует:
 ```csharp
   public void DeleteDocumentIfExists(string path)
@@ -104,3 +104,13 @@ public class SaveToFileCollectionElement
         return this.smbStorageService.CreateDirectoryIfNotExists(path);
   }
 ````
+
+### Определение кодировки файла
+Для определения кодировки файла используется метод _EncodingHelper.GetFileEncoding_
+
+_EncodingHelper.GetFileEncoding(Stream file, int encodingCodePage, int defaultEncodingCodePage)_, где
+-  _file_ - файл в виде потока
+- _encodingCodePage_ - ожидаемая кодировка
+- _defaultEncodingCodePage_ - кодировка по умолчанию в случае ошибки определения ожидаемой кодировки
+
+Для возможности работы с кодировками **ANSI** перед вызовов метода _EncodingHelper.GetEncoding_ зарегистрируйте провайдер кодировок с помощью метода _Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);_

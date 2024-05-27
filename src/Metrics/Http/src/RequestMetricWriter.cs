@@ -16,20 +16,16 @@ namespace Gems.Metrics.Http
         private readonly string requestUri;
         private readonly Enum statusCodeMetricType;
 
-        public RequestMetricWriter(IMetricsService metricsService, object request, string requestUri)
+        public RequestMetricWriter(IMetricsService metricsService, Enum statusCodeMetricType, object request, string requestUri)
         {
             this.metricsService = metricsService;
+            this.statusCodeMetricType = statusCodeMetricType;
+
             this.requestUri = requestUri ?? string.Empty;
             if (request is IStatusCodeMetricAvailable metricsRequest)
             {
                 this.statusCodeMetricType = metricsRequest.StatusCodeMetricType;
             }
-        }
-
-        public RequestMetricWriter(IMetricsService metricsService, Enum statusCodeMetricType)
-        {
-            this.metricsService = metricsService;
-            this.statusCodeMetricType = statusCodeMetricType;
         }
 
         public Task WriteMetricsAsError200(HttpStatusCode statusCode)
@@ -60,7 +56,12 @@ namespace Gems.Metrics.Http
                     (code < 500 ? $"{errorStatusGroup}_400" : $@"{errorStatusGroup}_500");
             }
 
-            var metricInfo = this.statusCodeMetricType != null ? MetricNameHelper.GetMetricInfo(this.statusCodeMetricType) : new MetricInfo { Name = StatusCodeRequestMetricName };
+            var metricInfo = this.statusCodeMetricType != null
+                ? MetricNameHelper.GetMetricInfo(this.statusCodeMetricType)
+                : new MetricInfo
+                {
+                    Name = StatusCodeRequestMetricName
+                };
             metricInfo.LabelNames = new[] { "statusGroup", "statusSubGroup", "statusCode", "requestUri" };
             metricInfo.LabelValues = new[] { statusGroup, statusSubGroup, code.ToString(), this.requestUri };
             await this.metricsService.Gauge(metricInfo, 1).ConfigureAwait(false);
@@ -73,7 +74,12 @@ namespace Gems.Metrics.Http
                 return null;
             }
 
-            var metricInfo = this.statusCodeMetricType != null ? MetricNameHelper.GetMetricInfo(this.statusCodeMetricType) : new MetricInfo { Name = StatusCodeRequestMetricName };
+            var metricInfo = this.statusCodeMetricType != null
+                ? MetricNameHelper.GetMetricInfo(this.statusCodeMetricType)
+                : new MetricInfo
+                {
+                    Name = StatusCodeRequestMetricName
+                };
             metricInfo.Name += "_time";
             metricInfo.LabelNames = new[] { "requestUri" };
             metricInfo.LabelValues = new[] { this.requestUri };

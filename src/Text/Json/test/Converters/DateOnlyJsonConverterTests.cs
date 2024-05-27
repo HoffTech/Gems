@@ -33,4 +33,9 @@ public class DateOnlyJsonConverterTests
         Assert.NotNull(data);
         Assert.AreEqual(dateOnly, data.DateOnly);
     }
+
+    private class DateOnlyHolder
+    {
+        public DateOnly DateOnly { get; set; }
+    }
 }

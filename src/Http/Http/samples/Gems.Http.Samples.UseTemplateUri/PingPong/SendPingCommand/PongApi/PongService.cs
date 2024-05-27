@@ -5,19 +5,16 @@ using Microsoft.Extensions.Options;
 
 namespace Gems.Http.Samples.UseTemplateUri.PingPong.SendPingCommand.PongApi;
 
-public class PongService : BaseClientService<string>
+public class PongService(
+    IConfiguration configuration,
+    IOptions<HttpClientServiceOptions> options,
+    BaseClientServiceHelper helper)
+    : BaseClientService<string>(options, helper)
 {
-    private readonly IConfiguration configuration;
-
-    public PongService(IConfiguration configuration, IOptions<HttpClientServiceOptions> options, BaseClientServiceHelper helper) : base(options, helper)
-    {
-        this.configuration = configuration;
-    }
-
-    protected override string BaseUrl => this.configuration?.GetConnectionString("PongApiUrl") ?? throw new InvalidOperationException();
+    protected override string BaseUrl => configuration?.GetConnectionString("PongApiUrl") ?? throw new InvalidOperationException();
 
     public Task<string> GetPong(CancellationToken cancellationToken)
     {
-        return this.GetAsync<string>("v1/Samples/UseTemplateUri/{secret}/pong".ToTemplateUri("ping"), cancellationToken);
+        return this.GetAsync<string>("v1/samples/{secret}/pong".ToTemplateUri("ping"), cancellationToken);
     }
 }

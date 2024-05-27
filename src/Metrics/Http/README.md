@@ -69,4 +69,4 @@ var yourrUriAsTemplate = "v1/orders/{orderId}".ToTemplateUri("3fa85f64-5717-4562
 ```csharp
 status_code_request{statusGroup="success",statusSubGroup="success_200",statusCode="201",requestUri="v1/orders/{orderId}" }
 ```
-Пример кода**[Пример кода](/src/Http/Http/samples/Gems.Http.Samples.UseTemplateUri)**
+[Пример кода](/src/Http/Http/samples/Gems.Http.Samples.UseTemplateUri)

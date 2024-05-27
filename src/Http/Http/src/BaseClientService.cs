@@ -2076,7 +2076,12 @@ namespace Gems.Http
             bool isAuthenticationRequest,
             CancellationToken cancellationToken)
         {
-            var metricWriter = new RequestMetricWriter(this.metricsService, requestData, templateUri.GetTemplateUri());
+            var metricWriter = new RequestMetricWriter(
+                this.metricsService,
+                this.options?.Value?.StatusCodeMetricType,
+                requestData,
+                templateUri.GetTemplateUri());
+
             var logsCollector = this.logsCollectorFactoryMethod(this.logger);
             var timeMetric = metricWriter.GetTimeMetric();
             var sw = new Stopwatch();
@@ -2316,7 +2321,6 @@ namespace Gems.Http
             }
 
             var responseAsString = await response.Content.ReadAsStringAsync();
-            logsCollector.AddResponse(responseAsString);
             if (string.IsNullOrEmpty(responseAsString))
             {
                 return default;
@@ -2338,6 +2342,7 @@ namespace Gems.Http
                 responseWithStatusCode.StatusCode = (int)response.StatusCode;
             }
 
+            logsCollector.AddResponse(deserializedResponse);
             logsCollector.AddLogsFromPayload(deserializedResponse);
 
             return deserializedResponse;
