@@ -14,9 +14,7 @@ build:
     - python3 /app/build_gems.py
   rules:
     - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "main"
-  except:
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /^20\d\d\/v\d+\s*$/
+    - if: $CI_COMMIT_MESSAGE =~ /^20\d\d\/v\d+\s*$/
 
 build_test:
   stage: build
@@ -32,9 +30,7 @@ mirror_to_github:
     - python3 /app/mirror_to_github.py
   rules:
     - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "main"
-  only:
-    variables:
-      - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+    - if: $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
 
 publish_to_nuget:
   stage: publish_to_nuget
@@ -43,9 +39,7 @@ publish_to_nuget:
     - python3 /app/publish_to_nuget.py
   rules:
     - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "main"
-  only:
-    variables:
-      - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+    - if: $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
 
 test:
   stage: test
