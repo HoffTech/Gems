@@ -27,7 +27,7 @@ namespace Gems.Http
         /// </summary>
         public static void Kmp(string uri)
         {
-            var result = Uri.TryCreate(uri, UriKind.Absolute, out var uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            var result = Uri.TryCreate(uri, UriKind.Relative, out var uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
         }
     }
 }
