@@ -21,7 +21,7 @@ build_test:
   script:
     - python3 /app/build_gems_test.py
   rules:
-    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature\/.*$
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature\/.*$/
 
 mirror_to_github:
   stage: mirror_to_github
