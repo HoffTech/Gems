@@ -35,10 +35,6 @@ namespace Gems.Jobs.Quartz.Jobs
             {
                 await this.mediator.Send(new T(), context.CancellationToken).ConfigureAwait(false);
             }
-            catch
-            {
-                // ignored
-            }
             finally
             {
                 this.logger.LogInformation(
