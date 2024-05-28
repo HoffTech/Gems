@@ -15,6 +15,8 @@ namespace Gems.Logging.Mvc.LogsCollector
 {
     public class RequestLogsCollector
     {
+        private const string ResponseStatusKey = "responseStatus";
+
         private readonly ILogger logger;
 
         private readonly Dictionary<string, object> logs = new Dictionary<string, object>();
@@ -96,7 +98,7 @@ namespace Gems.Logging.Mvc.LogsCollector
 
         public void AddStatus(int status)
         {
-            this.AddOrUpdateValueInLogs("responseStatus", status);
+            this.AddOrUpdateValueInLogs(ResponseStatusKey, status);
         }
 
         public void AddPath(string path)
@@ -124,7 +126,7 @@ namespace Gems.Logging.Mvc.LogsCollector
             var template = string.Join(", ", this.logs.Keys.Select(x => $"{x}: {{{x}}}"));
             var args = this.logs.Values.ToArray();
 
-            this.logger?.LogInformation(template, args);
+            this.logger?.Log(this.GetLogLevel(), template, args);
         }
 
         private static string MapDataToString(object data)
@@ -162,6 +164,22 @@ namespace Gems.Logging.Mvc.LogsCollector
             {
                 this.logs.Add(key, value);
             }
+        }
+
+        private LogLevel GetLogLevel()
+        {
+            if (this.logs.TryGetValue(ResponseStatusKey, out var responseStatus))
+            {
+                if (responseStatus != null &&
+                    responseStatus is int intResponseStatus &&
+                    intResponseStatus >= 400 &&
+                    intResponseStatus <= 599)
+                {
+                    return LogLevel.Error;
+                }
+            }
+
+            return LogLevel.Information;
         }
     }
 }
