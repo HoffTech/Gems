@@ -36,6 +36,9 @@ sales_return_claim_status_code_request{statusGroup="success",statusSubGroup="suc
 // время выполнения запроса
 sales_return_claim_status_code_request_time{requestUri="v1/some_uri" }
 ```
+
+[Пример кода](/src/Http/Http/samples/Gems.Http.Samples.Metrics.GlobalOverride)
+
 Если нужно переопределить название метрики для одного исходящего запроса, то запрос должен реализовывать интерфейс **IStatusCodeMetricAvailable**, а в поле **StatusCodeMetricType**, добавляемом интерфейсом, нужно передать тип метрики. Чтобы тип метрики не попал в запрос, ему нужно назначить аттрибут **JsonIgnoreAttribute**. Пример:
 ```csharp
 public class MessageRequestDto : IStatusCodeMetricAvailable
@@ -55,6 +58,9 @@ my_cool_metric{statusGroup="success",statusSubGroup="success_200",statusCode="20
 // время выполнения запроса
 my_cool_metric{requestUri="v1/some_uri" }
 ```
+
+[Пример кода](/src/Http/Http/samples/Gems.Http.Samples.Mertics.RequestOverride)
+
 Если в uri присустсвуют динамические данные, например идентификаторы, то uri можно привести к шаблону.  
 Например запрос пишет такие метрики:
 ```csharp

@@ -221,7 +221,7 @@ Task<byte[]> GetByteArrayAsync(TemplateUri templateUri, IDictionary<string, stri
 # Метрики
 В BaseClientService можно настроить автоматическую запись метрик для исходящих запросов. Как работать с метриками смотрите [здесь](/src/Metrics/Http/README.md#метрики-с-baseclientservice).
 
-1. **глобальное переопределение наименования метрик в _BaseClientService_**
+1. **Глобальное переопределение наименования метрик в _BaseClientService_**
 
 **[ Пример кода](/src\Http\Http\samples\Gems.Http.Samples.Metrics.GlobalOverride)**
 
