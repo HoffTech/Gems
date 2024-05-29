@@ -15,10 +15,10 @@ using Gems.Mvc.GenericControllers;
 
 using MediatR;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Quartz;
-using Quartz.Impl.Triggers;
 
 using InvalidOperationException = Gems.Mvc.Filters.Exceptions.InvalidOperationException;
 
@@ -30,15 +30,18 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
         private readonly SchedulerProvider schedulerProvider;
         private readonly IOptions<JobsOptions> jobsOptions;
         private readonly TriggerHelper triggerHelper;
+        private readonly ILogger<RescheduleJobCommandHandler> logger;
 
         public RescheduleJobCommandHandler(
             SchedulerProvider schedulerProvider,
             IOptions<JobsOptions> jobsOptions,
-            TriggerHelper triggerHelper)
+            TriggerHelper triggerHelper,
+            ILogger<RescheduleJobCommandHandler> logger)
         {
             this.schedulerProvider = schedulerProvider;
             this.jobsOptions = jobsOptions;
             this.triggerHelper = triggerHelper;
+            this.logger = logger;
         }
 
         public async Task Handle(RescheduleJobCommand command, CancellationToken cancellationToken)
@@ -70,11 +73,24 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
                 throw new NotFoundException($"Не найдено задание {command.JobGroup ?? JobGroups.DefaultGroup}.{command.JobName}");
             }
 
-            var newTrigger = (CronTriggerImpl)trigger.Clone();
-            newTrigger.CronExpression = new CronExpression(command.CronExpression);
+            var newTrigger = trigger.GetTriggerBuilder()
+                .WithCronSchedule(command.CronExpression)
+                .StartNow()
+                .Build();
 
-            await scheduler.UnscheduleJob(trigger.Key, cancellationToken).ConfigureAwait(false);
-            await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
+            var rescheduledJobNextTime = await scheduler.RescheduleJob(trigger.Key, newTrigger, cancellationToken)
+                .ConfigureAwait(false);
+            if (rescheduledJobNextTime.HasValue)
+            {
+                this.logger.LogInformation(
+                    "Trigger ({TriggerKey}) successfully re-scheduled, next time:{rescheduledJobNextTime}",
+                    trigger.JobKey.Name,
+                    rescheduledJobNextTime);
+            }
+            else
+            {
+                this.logger.LogInformation("Trigger ({TriggerKey}) failed to re-schedule", trigger.JobKey.Name);
+            }
         }
 
         private async Task<bool> RescheduleTriggerWithData(IScheduler scheduler, string jobName, string triggerName, string jobGroup, string cronExpression, CancellationToken cancellationToken)
@@ -106,9 +122,21 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
                 cronExpression ?? triggerOptions.CronExpression,
                 triggerOptions.TriggerData);
 
-            await scheduler.UnscheduleJob(new TriggerKey(newTrigger.Key.Name), cancellationToken).ConfigureAwait(false);
-            await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
-            return true;
+            var rescheduledJobNextTime = await scheduler.RescheduleJob(newTrigger.Key, newTrigger, cancellationToken)
+                .ConfigureAwait(false);
+            if (rescheduledJobNextTime.HasValue)
+            {
+                this.logger.LogInformation(
+                    "Trigger ({TriggerKey}) successfully re-scheduled, next time:{rescheduledJobNextTime}",
+                    newTrigger.JobKey.Name,
+                    rescheduledJobNextTime);
+                return true;
+            }
+            else
+            {
+                this.logger.LogInformation("Trigger ({TriggerKey}) failed to re-schedule", newTrigger.JobKey.Name);
+                return false;
+            }
         }
 
         private async Task<bool> RescheduleTriggerFromDb(IScheduler scheduler, string jobName, string triggerName, string jobGroup, string cronExpression, CancellationToken cancellationToken)
@@ -148,9 +176,21 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
                 cronExpression ?? triggerCronExpr,
                 triggerData);
 
-            await scheduler.UnscheduleJob(new TriggerKey(newTrigger.Key.Name), cancellationToken).ConfigureAwait(false);
-            await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
-            return true;
+            var rescheduledJobNextTime = await scheduler.RescheduleJob(newTrigger.Key, newTrigger, cancellationToken)
+                .ConfigureAwait(false);
+            if (rescheduledJobNextTime.HasValue)
+            {
+                this.logger.LogInformation(
+                    "Trigger ({TriggerKey}) successfully re-scheduled, next time:{rescheduledJobNextTime}",
+                    newTrigger.JobKey.Name,
+                    rescheduledJobNextTime);
+                return true;
+            }
+            else
+            {
+                this.logger.LogInformation("Trigger ({TriggerKey}) failed to re-schedule", newTrigger.JobKey.Name);
+                return false;
+            }
         }
     }
 }
