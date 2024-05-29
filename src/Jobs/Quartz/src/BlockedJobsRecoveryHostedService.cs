@@ -53,8 +53,9 @@ namespace Gems.Jobs.Quartz
                 {
                     var blockedJobsRecoveryOptions = this.options.Value.BlockedJobsRecovery;
                     var workersToRecover = blockedJobsRecoveryOptions.WorkersToRecover;
-                    var maxDelayBetweenLastFireTimeAndRecoverTime = new TimeSpan(blockedJobsRecoveryOptions
-                        .MaxDelayBetweenLastFireTimeAndRecoverTimeInMilliseconds);
+                    var maxDelayBetweenLastFireTimeAndRecoverTime =
+                        TimeSpan.FromMilliseconds(
+                            blockedJobsRecoveryOptions.MaxDelayBetweenLastFireTimeAndRecoverTimeInMilliseconds);
 
                     if (workersToRecover is not { Count: > 0 })
                     {
@@ -80,7 +81,7 @@ namespace Gems.Jobs.Quartz
                             continue;
                         }
 
-                        var lastFireTime = trigger.GetPreviousFireTimeUtc() ?? DateTimeOffset.MinValue;
+                        var lastFireTime = trigger.GetPreviousFireTimeUtc() ?? trigger.StartTimeUtc;
                         var needToRecover = (DateTime.UtcNow - lastFireTime) >
                                             maxDelayBetweenLastFireTimeAndRecoverTime;
                         this.logger.LogInformation("Trigger ({TriggerKey}) fired at ({TriggerLastFireTime}). Should it be recovered? ({TriggerShouldBeRecovered})", trigger.JobKey.Name, lastFireTime, needToRecover);
@@ -88,21 +89,22 @@ namespace Gems.Jobs.Quartz
                             && trigger is CronTriggerImpl cronTrigger
                             && !string.IsNullOrWhiteSpace(cronTrigger.CronExpressionString))
                         {
-                            var newTrigger = (CronTriggerImpl)cronTrigger.Clone();
-                            newTrigger.CronExpression =
-                                new CronExpression(cronTrigger.CronExpressionString);
+                            var newTrigger = cronTrigger.GetTriggerBuilder()
+                                .WithCronSchedule(cronTrigger.CronExpressionString)
+                                .StartNow()
+                                .Build();
 
-                            var unscheduledResult = await scheduler.UnscheduleJob(trigger.Key, cancellationToken)
-                                                       .ConfigureAwait(false);
-                            if (unscheduledResult)
+                            var rescheduledJobNextTime = await scheduler.RescheduleJob(trigger.Key, newTrigger, cancellationToken);
+                            if (rescheduledJobNextTime.HasValue)
                             {
-                                await scheduler.ScheduleJob(newTrigger, cancellationToken)
-                                    .ConfigureAwait(false);
-                                this.logger.LogInformation("Trigger ({TriggerKey}) successfully rescheduled", trigger.JobKey.Name);
+                                this.logger.LogInformation(
+                                    "Trigger ({TriggerKey}) successfully re-scheduled, next time:{rescheduledJobNextTime}",
+                                    trigger.JobKey.Name,
+                                    rescheduledJobNextTime);
                             }
                             else
                             {
-                                this.logger.LogInformation("Trigger ({TriggerKey}) failed to unschedule", trigger.JobKey.Name);
+                                this.logger.LogInformation("Trigger ({TriggerKey}) failed to re-schedule", trigger.JobKey.Name);
                             }
                         }
                         else
