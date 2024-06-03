@@ -5,27 +5,23 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Gems.Metrics.Contracts;
+using Gems.Metrics.Consts;
 
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Gems.Metrics
 {
     public class ResetMetricsHostedService : BackgroundService
     {
         private readonly ILogger<ResetMetricsHostedService> logger;
-        private readonly IOptions<MetricsConfig> options;
         private readonly IMetricsService metricsService;
 
         public ResetMetricsHostedService(
             ILogger<ResetMetricsHostedService> logger,
-            IOptions<MetricsConfig> options,
             IMetricsService metricsService)
         {
             this.logger = logger;
-            this.options = options;
             this.metricsService = metricsService;
         }
 
@@ -44,7 +40,7 @@ namespace Gems.Metrics
                 finally
                 {
                     await Task
-                        .Delay(this.options.Value.ResetMillisecondsDelay, cancellationToken)
+                        .Delay(MetricsConfig.ResetMillisecondsDelay, cancellationToken)
                         .ConfigureAwait(false);
                 }
             }

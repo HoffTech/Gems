@@ -1,7 +1,6 @@
 // Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
-using Gems.Metrics.Contracts;
 using Gems.Metrics.LabelsProvider;
 using Gems.Metrics.MetricDecorators;
 using Gems.Metrics.Prometheus.Contracts;
@@ -25,8 +24,6 @@ namespace Gems.Metrics.Prometheus
         {
             services.Configure<PrometheusMetrics>(configuration.GetSection("PrometheusMetrics"));
 
-            var metricsConfigSection = configuration.GetSection("MetricsConfig");
-            services.Configure<MetricsConfig>(metricsConfigSection);
             services.AddSingleton<MetricsService>();
             services.AddSingleton<LifeMetricsServiceDecorator>();
             services.AddSingleton<LabelsProviderSelector>();
