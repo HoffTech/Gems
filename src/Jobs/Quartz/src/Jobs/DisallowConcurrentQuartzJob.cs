@@ -36,6 +36,15 @@ namespace Gems.Jobs.Quartz.Jobs
             {
                 await this.mediator.Send(new T(), context.CancellationToken).ConfigureAwait(false);
             }
+            catch (Exception exception)
+            {
+                this.logger.LogError(
+                    "NonConcurrent Job {JobName} {FireInstanceId} failed to execute at {Time} ex: {Exception}",
+                    typeof(T).Name,
+                    context.FireInstanceId,
+                    DateTime.UtcNow,
+                    exception);
+            }
             finally
             {
                 this.logger.LogInformation(

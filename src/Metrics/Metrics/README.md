@@ -28,16 +28,28 @@
 - Подключите реализацию интерфейса IMetricsService с помощью DI (смотрите в описании [библиотеки](/src/Metrics/Prometheus/README.md), реализующей данный интерфейс)
 
 # Счетчик
+
+**[Пример кода](/src/Metrics/Metrics/samples/Gems.Metrics.Samples.Operations.Counter)**
+
 Счетчик считает элементы за период времени. Cчетчик может только увеличивать или обнулять число. Счетчик не подходит для значений, которые могут уменьшаться, или для отрицательных значений.
+
+> Сброс счетчика происходит в случае рестарта всех реплик сервиса
+
 ```csharp
 await this.metricsService.Counter("opd_update_orders", "opd update orders", 37).ConfigureAwait(false)
 ```
 # Измеритель
+
+**[Пример кода](/src/Metrics/Metrics/samples/Gems.Metrics.Samples.Operations.Gauge)**
+
 Измеритель подходит для измерения текущего значения метрики, которое со временем может уменьшиться. 
 ```csharp
 await this.metricsService.Gauge("order_num_in_current_queue", "Order number in current change tracking version queue", 8).ConfigureAwait(false);
 ```
 # Гистограмма
+
+**[Пример кода](/src/Metrics/Metrics/samples/Gems.Metrics.Samples.Operations.Histogram)**
+
 Гистограмма — это более сложный тип метрики. Она предоставляет дополнительную информацию. Например, сумму измерений и их количество.
 Значения собираются в области с настраиваемой верхней границей. 
 ```csharp
@@ -47,20 +59,28 @@ await this.metricsService.Histogram(
 	"Время подбора").ConfigureAwait(false);
 ```	
 Для корректной работы данной метрики может потребоваться произвести соответсвующие настройки (смотрите в описании библиотеки, реализующей интерфейс IMetricsService).
+```
+
 # Таймер
+
+**[Пример кода](/src/Metrics/Metrics/samples/Gems.Metrics.Samples.Operations.Time)**
+
 Таймер измеряет время какой-либо операции в коде.
 ```csharp
 await using(var timeMetric = this.metricsService.Time("order_time_sec", "Time for loading each order")) 
 {
 	// ваш код
 }
-```
+
 # Сброс значения метрики
 В некоторых случаях метрики необходимо сбрасывать. Например, если у вас приложение работает в кластере и каждый экземпляр приложения конкурирует за взятие задачи на выполнение. Получается некоторые экземпляры могут простаивать и не брать долго задачи, и метрики будут показывать постоянно старые значения, которые уже не несут полезной информации. Чтобы сбросить метрику, необходимо ее просто установить в ноль.
 ```csharp
 await this.metricsService.GaugeSet( "opd_opdb_errors", "opd opdb errors", 0).ConfigureAwait(false);
 ```
 # Метки
+
+**[Пример кода](/src/Metrics/Metrics/samples/Gems.Metrics.Samples.Labels)**
+
 Если у вас есть несколько метрик, которые вы хотите сложить/усреднить/суммировать, обычно это должна быть одна метрика с метками, а не несколько метрик.
 Например, вместо http_responses_500_total и http_responses_403_total создайте одну метрику с именем http_responses_total с меткой кода для кода ответа HTTP. Затем вы можете обрабатывать всю метрику как одну в правилах и графиках.
 
@@ -119,6 +139,9 @@ await using (var timeMetric = this.metricsService.Time(new MetricInfo
 ```
 
 # Установка метрики посредством перечисления MetricType
+
+> **Приоритетный подход**, который позволяет хранить все метрики в перечислениях, что в свою очередь упрощает навигацию по метрикам
+
 Интерфейс  IMetricsService содержит методы, принимающие перечисления MetricType, которые позволяют установить метрику, с помощью одного параметра Enum, вместо передачи трех параметров (name, description и labelValues).
 Использование перечисления предпочтительней, чем использование структуры MetricInfo или передачи параметров (name, description, labelValues), так как позволяет сгруппировать все метрики для фичи в одном месте и вызов метода, записывающий метрику выглядет более лакончино. 
 
@@ -170,7 +193,13 @@ await using (var timeMetric = this.metricsService.Time(SomeFeatureMetricType.Cha
 }
 ```
 # Сброс метрик
+
+**[Пример кода](/src/Metrics/Metrics/samples/Gems.Metrics.Samples.Reset)**
+
 Фоновое задание ResetMetricsHostedService позволяет произвести сброс метрик через временной интервал указанный в appsettings:
+
+> Сброс работает только на метриках типа _Gauge_, _Time_, но не оказывает влияния на метрику типа _Counter_
+
 ```json
   "MetricsConfig": {
     "ResetMillisecondsDelay": 60000 // время, через которое необходимо сбрасывать метрики, по умолчанию 60 секунд
@@ -189,14 +218,24 @@ services.AddPipeline(typeof(ErrorMetricsBehavior<,>));
 services.AddPipeline(typeof(TimeMetricBehavior<,>));
 ```
 # ErrorMetricsBehavior
-Пайплайн ErrorMetricsBehavior отлавливает все исключения и регистрирует метрики. Пример для команды ImportInventTableCommand:
-- feature_counter{feature_name="import_invent_table",error_type="business","status_code"="4xx", "custom_code": "none"} - Бизнесовые ошибки
-- feature_counter{feature_name="import_invent_table",error_type="npgsql","status_code"="4xx", "custom_code": "none"} - Ошибки в бд 
-- feature_counter{feature_name="import_invent_table",error_type="mssql","status_code"="4xx", "custom_code": "none"} - Ошибки в бд 
-- feature_counter{feature_name="import_invent_table",error_type="validation","status_code"="4xx", "custom_code": "none"} - Ошибки валидации
-- feature_counter{feature_name="import_invent_table",error_type="other","status_code"="5xx", "custom_code": "none"} - Другие ошибки
 
-- feature_counters{feature_name="import_invent_table",error_type="none","status_code"="200", "custom_code": "none"} - Успешные
+**[Пример кода](/src/Metrics/Metrics/samples/Gems.Metrics.Samples.Behaviors.ErrorMetricsBehaviort)**
+
+Пайплайн ErrorMetricsBehavior отлавливает все исключения и регистрирует метрики. Пример для команды ImportInventTableCommand:
+1. Метрики **feature_counterss**:
+   - `feature_counters{feature_name="import_invent_table",error_type="business","status_code"="4xx", "custom_code": "none"}` - Бизнесовые ошибки
+   - `feature_counters{feature_name="import_invent_table",error_type="npgsql","status_code"="4xx", "custom_code": "none"}` - Ошибки в бд 
+   - `feature_counters{feature_name="import_invent_table",error_type="mssql","status_code"="4xx", "custom_code": "none"}` - Ошибки в бд 
+   - `feature_counters{feature_name="import_invent_table",error_type="validation","status_code"="4xx", "custom_code": "none"}` - Ошибки валидации
+   - `feature_counters{feature_name="import_invent_table",error_type="other","status_code"="5xx", "custom_code": "none"}` - Другие ошибки
+   - `feature_counterss{feature_name="import_invent_table",error_type="none","status_code"="200", "custom_code": "none"}` - Успешные
+2. Метрики **errors_counter**:
+    > отличается от **feautre_counter** тем, что никогда не пишет успешных сценариев
+   - `errors_counter{feature_name="import_invent_table",error_type="business","status_code"="4xx", "custom_code": "none"}` - Бизнесовые ошибки
+   - `errors_counter{feature_name="import_invent_table",error_type="npgsql","status_code"="4xx", "custom_code": "none"}` - Ошибки в бд
+   - `errors_counter{feature_name="import_invent_table",error_type="mssql","status_code"="4xx", "custom_code": "none"}` - Ошибки в бд
+   - `errors_counter{feature_name="import_invent_table",error_type="validation","status_code"="4xx", "custom_code": "none"}` - Ошибки валидации
+   - `errors_counter{feature_name="import_invent_table",error_type="other","status_code"="5xx", "custom_code": "none"}` - Другие ошибки
 
 Где:
 - "status_code"="4xx" - Ошибки 4xx (метка status_code >= 400 и <= 499)
@@ -212,6 +251,9 @@ services.AddPipeline(typeof(TimeMetricBehavior<,>));
 
 # TimeMetricBehavior
 Пайплайн TimeMetricBehavior регистрирует метрику времени выполнения запроса(команды). Название метрики устанавливается согласно названию запроса(команды). 
+
+**[Пример кода](/src/Metrics/Metrics/samples/Gems.Metrics.Samples.Behaviors.TimeMetricBehavior.Default)**
+
 Пример для команды ImportInventTableCommand:
 ```json
 # HELP import_invent_table_time import invent table time
@@ -219,6 +261,9 @@ services.AddPipeline(typeof(TimeMetricBehavior<,>));
 import_invent_table_time 7243.1196
 ```
 Интерфейс IRequestTimeMetric позволяет переопределить название метрики и определить метки и значения меток:
+
+**[Пример кода](/src/Metrics/Metrics/samples/Gems.Metrics.Samples.Behaviors.TimeMetricBehavior.Custom)**
+
 ```csharp
 public interface IRequestTimeMetric
 {
