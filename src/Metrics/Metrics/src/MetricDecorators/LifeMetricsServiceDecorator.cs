@@ -5,29 +5,24 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
+using Gems.Metrics.Consts;
 using Gems.Metrics.Contracts;
 
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Gems.Metrics.MetricDecorators
 {
     public class LifeMetricsServiceDecorator : AMetricsServiceDecorator
     {
-        private const int DefaultResetMillisecondsDelay = 60000;
-
         private readonly ConcurrentDictionary<MetricInfo, MetricLifeInfo> gaugeMetrics = new ConcurrentDictionary<MetricInfo, MetricLifeInfo>();
         private readonly ILogger<IMetricsService> logger;
-        private readonly IOptions<MetricsConfig> metricsConfig;
 
         public LifeMetricsServiceDecorator(
             ILogger<IMetricsService> logger,
-            IOptions<MetricsConfig> metricsConfig,
             IHostApplicationLifetime hostLifetime)
         {
             this.logger = logger;
-            this.metricsConfig = metricsConfig;
             this.SubscribeOnApplicationStopping(hostLifetime);
         }
 
@@ -263,7 +258,7 @@ namespace Gems.Metrics.MetricDecorators
 
         private int GetResetMillisecondsDelay()
         {
-            return this.metricsConfig?.Value?.ResetMillisecondsDelay ?? DefaultResetMillisecondsDelay;
+            return MetricsConfig.ResetMillisecondsDelay;
         }
     }
 }
