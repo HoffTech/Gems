@@ -2,6 +2,7 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using MediatR;
@@ -34,6 +35,17 @@ namespace Gems.Jobs.Quartz.Jobs
             try
             {
                 await this.mediator.Send(new T(), context.CancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                this.logger.LogError(
+                    "Concurrent Job {JobName} {FireInstanceId} failed to execute at {Time} ex: {Exception}",
+                    typeof(T).Name,
+                    context.FireInstanceId,
+                    DateTime.UtcNow,
+                    exception);
+
+                context.Put(QuartzJobConsts.JobExecutionException, exception);
             }
             finally
             {
