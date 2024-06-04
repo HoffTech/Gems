@@ -116,24 +116,46 @@ namespace Gems.Metrics.Behaviors
                 customCode = businessErrorViewModel.Error?.Code ?? "none";
             }
 
-            await this.metricsService.Gauge(new MetricInfo
-            {
-                Name = "feature_counters",
-                LabelNames = new[] { "feature_name", "error_type", "status_code", "custom_code" },
-                LabelValues = new[] { featureName, errorType, statusCode, customCode }
-            }).ConfigureAwait(false);
+            await this.metricsService.Counter(
+                new MetricInfo
+                {
+                    Name = "feature_counters",
+                    LabelNames = new[]
+                    {
+                        "feature_name", "error_type", "status_code", "custom_code"
+                    },
+                    LabelValues = new[]
+                    {
+                        featureName, errorType, statusCode, customCode
+                    }
+                }).ConfigureAwait(false);
 
             if (errorType == "none")
             {
                 return;
             }
 
-            await this.metricsService.Gauge(new MetricInfo
-            {
-                Name = "errors_counter",
-                LabelNames = new[] { "feature_name", "error_type", "status_code", "custom_code" },
-                LabelValues = new[] { featureName, errorType, statusCode, customCode }
-            }).ConfigureAwait(false);
+#pragma warning disable CS0618
+            await this.WriteErrorCountersAsync(featureName, errorType, statusCode, customCode).ConfigureAwait(false);
+#pragma warning restore CS0618
+        }
+
+        [Obsolete("Оставлено для обратной совместимости. Будет удалено с версией 7.0")]
+        private Task WriteErrorCountersAsync(string featureName, string errorType, string statusCode, string customCode)
+        {
+            return this.metricsService.Gauge(
+                new MetricInfo
+                {
+                    Name = "errors_counter",
+                    LabelNames = new[]
+                    {
+                        "feature_name", "error_type", "status_code", "custom_code"
+                    },
+                    LabelValues = new[]
+                    {
+                        featureName, errorType, statusCode, customCode
+                    }
+                });
         }
     }
 }
