@@ -3,6 +3,7 @@ image: ${CI_REGISTRY}/build-images/python-gems:latest
 stages:
   - test
   - build
+  - build_test
   - mirror_to_github
   - publish_to_nuget
   - prepare_release
@@ -12,29 +13,29 @@ build:
   stage: build
   script:
     - python3 /app/build_gems.py
-  only:
-    - main
-  except:
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /^20\d\d\/v\d+\s*$/
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE !~ /^20\d\d\/v\d+$/'
+
+build_test:
+  stage: build
+  script:
+    - python3 /app/build_gems_test.py
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
 
 mirror_to_github:
   stage: mirror_to_github
-  #when: manual
   script:
     - python3 /app/mirror_to_github.py
-  only:
-    variables:
-      - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/'
 
 publish_to_nuget:
   stage: publish_to_nuget
-  #when: manual
   script:
     - python3 /app/publish_to_nuget.py
-  only:
-    variables:
-      - $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/'
 
 test:
   stage: test
@@ -53,12 +54,16 @@ test:
       cobertura: ../results/coverage.net8.0.cobertura.xml
   tags:
     - dind
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE !~ /^20\d\d\/v\d+$/'
+    - if: '$CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/'
+    - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
 
 prepare_release:
   stage: prepare_release
   image: alpine:latest
   rules:
-  - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
+    - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
   script:
     - apk add curl jq
     - 'curl -H "PRIVATE-TOKEN: $CI_API_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/repository/changelog?version=$CI_COMMIT_TAG" | jq -r .notes > release_notes.md'
@@ -73,7 +78,7 @@ create_release:
     - job: prepare_release
       artifacts: true
   rules:
-  - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
+    - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
   script:
     - echo "Creating release"
   release:
