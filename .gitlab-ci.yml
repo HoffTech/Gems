@@ -14,7 +14,7 @@ build:
     - python3 /app/build_gems.py
   rules:
     - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "main"
-    - if: $CI_COMMIT_MESSAGE =~ /^20\d\d\/v\d+\s*$/
+    - if: $CI_COMMIT_MESSAGE !~ /^20\d\d\/v\d+\s*$/
 
 build_test:
   stage: build
