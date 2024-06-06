@@ -55,7 +55,7 @@ test:
   tags:
     - dind
   rules:
-    - if: '$CI_COMMIT_BRANCH == main && $CI_COMMIT_MESSAGE !~ /^20\d\d\/v\d+$/'
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE !~ /^20\d\d\/v\d+$/'
     - if: '$CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/'
     - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
 
