@@ -14,7 +14,7 @@ build:
   script:
     - python3 /app/build_gems.py
   rules:
-    - if: '$CI_COMMIT_BRANCH == main && $CI_COMMIT_MESSAGE !~ /^20\d\d\/v\d+$/'
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE !~ /^20\d\d\/v\d+$/'
 
 build_test:
   stage: build
