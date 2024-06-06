@@ -21,13 +21,5 @@ namespace Gems.Http
 
             return result;
         }
-
-        /// <summary>
-        /// Удалить после отладки.
-        /// </summary>
-        public static void Kmp(string uri)
-        {
-            var result = Uri.TryCreate(uri, UriKind.Absolute, out var uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-        }
     }
 }
