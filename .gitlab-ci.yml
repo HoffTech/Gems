@@ -14,28 +14,28 @@ build:
   script:
     - python3 /app/build_gems.py
   rules:
-    - if: $CI_COMMIT_BRANCH == main && $CI_COMMIT_MESSAGE !~ /^20\d\d\/v\d+$/
+    - if: '$CI_COMMIT_BRANCH == main && $CI_COMMIT_MESSAGE !~ /^20\d\d\/v\d+$/'
 
 build_test:
   stage: build
   script:
     - python3 /app/build_gems_test.py
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /^feature\/.*$/
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
 
 mirror_to_github:
   stage: mirror_to_github
   script:
     - python3 /app/mirror_to_github.py
   rules:
-    - if: $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+    - if: '$CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/'
 
 publish_to_nuget:
   stage: publish_to_nuget
   script:
     - python3 /app/publish_to_nuget.py
   rules:
-    - if: $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+    - if: '$CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/'
 
 test:
   stage: test
@@ -55,8 +55,8 @@ test:
   tags:
     - dind
   rules:
-    - if: $CI_COMMIT_BRANCH == main && $CI_COMMIT_MESSAGE !~ /^20\d\d\/v\d+$/
-    - if: $CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/
+    - if: '$CI_COMMIT_BRANCH == main && $CI_COMMIT_MESSAGE !~ /^20\d\d\/v\d+$/'
+    - if: '$CI_COMMIT_TAG =~ /^20\d\d\/v\d+$/'
     - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
 
 prepare_release:
