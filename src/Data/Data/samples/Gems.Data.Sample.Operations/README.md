@@ -118,22 +118,34 @@
 ```
 6. _ExecuteReaderAsync_
 ```csharp
-    public async Task<FileStreamResult> Handle(GetLogFileQuery query, CancellationToken cancellationToken)
+    public async Task Handle(SendAllPersonsToDaxCommand query, CancellationToken cancellationToken)
     {
-        // ...
-        await foreach (var log in this.GetLogsAsAsyncEnumerable(cancellationToken))
+        var personsBuffer = new List<Person>();
+
+        // чтение персон построчно и размещение в буфере для последующей отправки
+        await foreach (var person in this.GetPersonsAsAsyncEnumerable(cancellationToken))~~~~
         {
-            await sw.WriteLineAsync(log.Serialize()).ConfigureAwait(false);
+            personsBuffer.Add(person);
+
+            // отправка Персон пачками по 1000
+            if (personsBuffer.Count >= 1000)
+            {
+                await this.SendPersonsToDaxAsync(personsBuffer, cancellationToken).ConfigureAwait(false);
+            }
         }
-        
-        // ...
+
+        // отправка оставшихся персон
+        if (personsBuffer.Count >= 0)
+        {
+            await this.SendPersonsToDaxAsync(personsBuffer, cancellationToken).ConfigureAwait(false);
+        }
     }
 
-    private IAsyncEnumerable<Log> GetLogsAsAsyncEnumerable(CancellationToken cancellationToken)
+    private IAsyncEnumerable<Person> GetPersonsAsAsyncEnumerable(CancellationToken cancellationToken)
     {
         return this.unitOfWorkProvider
             .GetUnitOfWork(cancellationToken)
-            .ExecuteReaderAsync<Log>("SELECT * FROM public.log");
+            .ExecuteReaderAsync<Person>("SELECT * FROM public.person");
     }
 ```
 
@@ -150,4 +162,4 @@
     3. `GET /api/v1/persons/{id}/age`
     4. `POST /api/v1/person`
     5. `GET /api/v1/persons/by-filter`
-    6. `GET api/v1/logs-file`
+    6. `POST api/v1/persons/send-to-dax`

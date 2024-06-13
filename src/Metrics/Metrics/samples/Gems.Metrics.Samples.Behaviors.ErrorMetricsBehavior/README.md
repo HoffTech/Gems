@@ -39,11 +39,11 @@
       - Перейдите на страницу `http(s)://<your_domain>:<your_port>/metrics` и зафиксируйте результат записи метрик
           ```
           # HELP feature_counters 
-          # TYPE feature_counters gauge
+          # TYPE feature_counters counter
           feature_counters{feature_name="create_person",error_type="validation",status_code="400",custom_code="none"} 1
 
           # HELP errors_counter 
-          # TYPE errors_counter gauge
+          # TYPE errors_counter counter
           errors_counter{feature_name="create_person",error_type="validation",status_code="400",custom_code="none"} 1
           ```
    2. **Ошибка по бизнес правилу**
@@ -55,11 +55,11 @@
       - Перейдите на страницу `http(s)://<your_domain>:<your_port>/metrics` и зафиксируйте результат записи метрик
           ```
           # HELP feature_counters 
-          # TYPE feature_counters gauge
+          # TYPE feature_counters counter
           feature_counters{feature_name="create_person",error_type="business",status_code="422",custom_code="none"} 1
         
           # HELP errors_counter 
-          # TYPE errors_counter gauge
+          # TYPE errors_counter counter
           errors_counter{feature_name="create_person",error_type="business",status_code="422",custom_code="none"} 1
           ```
    3. **Успешный сценарий**
@@ -71,7 +71,7 @@
        - Перейдите на страницу `http(s)://<your_domain>:<your_port>/metrics` и зафиксируйте результат записи метрик
            ```
            # HELP feature_counters 
-           # TYPE feature_counters gauge
+           # TYPE feature_counters counter
            feature_counters{feature_name="create_person",error_type="none",status_code="200",custom_code="none"} 2
            ```
 

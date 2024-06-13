@@ -52,7 +52,7 @@ opt.AddSecureLogging = services.AddSecureLogging;
     "MessageTemplate": "requestPath: {requestPath}, requestBody: {requestBody}, requestHeaders: {requestHeaders}, responseHeaders: {responseHeaders}, responseStatus: {responseStatus}, responseBody: {responseBody}, requestDuration: {requestDuration}",
     "requestPath": "http: //localhost:5135/api/v1/bank/payments",
     // В requestBody поле userSecret было скрыто, а поле userEmail заменено символами по маске
-    "requestBody": "{\"code\":\"aae4b87a-7606-459a-95b1-b6fcbe38f2c2\",\"amount\":120\"userEmail\":\"M*****l@MyCompany.com\"}",
+    "requestBody": "{\"code\":\"aae4b87a-7606-459a-95b1-b6fcbe38f2c2\",\"amount\":120\"userEmail\":\"M*****l@M******y.com\"}",
     "requestHeaders": {},
     "responseHeaders": {
         "Date": "Fri, 17 May 2024 06:00:48 GMT",
