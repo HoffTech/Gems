@@ -66,33 +66,51 @@ db_query_time{functionName="public_person_get_person_by_id"} 385.7019
 
 ### Переопределение глобальной конфигурации
 Для того чтобы переопределить глобальное имя метрики для _UnitOfWork_:
-1. Создайте перечисление
-```csharp
-public enum DbQueryMetricType
-{
-    // Применение атрибута опционально, если необходимо переопределить дополнительные поля
-    [Metric(
-        Name = "gems_data_sample_metrics_db_query",
-        Description = "Time of Gems Data Sample Metrics Db Query",
-        LabelNames = new[] { "query_name" })]
-    GemsDataSampleMetricsDbQueryTime
-}
-```
-2. Зарегистрироуйте _UnitOfWork_ с переопределенной конфигурацией
-```csharp
-opt.AddUnitOfWorks = () =>
-{
-    services.AddPostgresqlUnitOfWork(
-        "default",
-        options =>
+1. Зарегистрироуйте _UnitOfWork_ с переопределенной конфигурацией. Есть 2 способа конфигурации: В appsettings.json или в Startup.cs
+   1. В `appsettings.json`
+       ```json
+       "PostgresqlUnitOfWorks": [
         {
-            options.DbQueryMetricType = DbQueryMetricType.GemsDataSampleMetricsDbQueryTime;
-
-            // Альтернативная конфигурация без использования перечисления
-            options.DbQueryMetricInfo = new MetricInfo { Name = "gems_data_sample_metrics_db_query_time", Description = "Gems Data Sample Metrics Db Query Time" };
-        });
-};
-```
+          "Key": "default",
+          "Options": {
+            "ConnectionString": "${ConnectionStrings.DefaultConnection}",
+            "DbQueryMetricInfo": {
+              "Name": "gems_data_sample_metrics_db_query",
+              "Description": "Time of Gems Data Sample Metrics Db Query",
+              "LabelNames": ["query_name"]
+            }
+          }
+        }
+      ]
+        ```
+   2. В `Startup.cs`
+      1. Создайте перечисление
+        ```csharp
+        public enum DbQueryMetricType
+        {
+            // Применение атрибута опционально, если необходимо переопределить дополнительные поля
+            [Metric(
+                Name = "gems_data_sample_metrics_db_query",
+                Description = "Time of Gems Data Sample Metrics Db Query",
+                LabelNames = new[] { "query_name" })]
+            GemsDataSampleMetricsDbQueryTime
+        }
+        ```
+      2. Зарегистрируйте перечисление в `Startup.cs`
+        ```csharp
+        opt.AddUnitOfWorks = () =>
+        {
+            services.AddPostgresqlUnitOfWork(
+                "default",
+                options =>
+                {
+                    options.DbQueryMetricType = DbQueryMetricType.GemsDataSampleMetricsDbQueryTime;
+        
+                    // Альтернативная конфигурация без использования перечисления
+                    options.DbQueryMetricInfo = new MetricInfo { Name = "gems_data_sample_metrics_db_query_time", Description = "Gems Data Sample Metrics Db Query Time" };
+                });
+        };
+        ```
 3. Зафиксируйте результат на странице `/metrics`
 ```
 # HELP gems_data_sample_metrics_db_query Time of GemsDataSampleMetrics db query
@@ -108,8 +126,7 @@ public enum AtomicQueryMetricType
 {
     [Metric(
         Name = "gems_data_sample_atomic_metrics_db_query",
-        Description = "Time of Atomic Gems Data Sample Metrics db query",
-        LabelNames = new[] { "atomic_query_name" })]
+        Description = "Time of Atomic Gems Data Sample Metrics db query"
     GemsDataSampleMetricsAtomicDbQueryTime
 }
 ```

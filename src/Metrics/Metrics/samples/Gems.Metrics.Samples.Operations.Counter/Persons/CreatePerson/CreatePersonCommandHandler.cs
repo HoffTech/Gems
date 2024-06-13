@@ -22,7 +22,7 @@ namespace Gems.Metrics.Samples.Operations.Counter.Persons.CreatePerson
             // ...
 
             // Счетчик количества созданных персон с момента старта сервиса. Инкремент на 1
-            await metricsService.Counter(CreatePersonMetricType.PersonsCreated, increment: 1).ConfigureAwait(false);
+            await metricsService.Counter(CreatePersonMetricType.PersonsCreated).ConfigureAwait(false);
 
             return new PersonDto
             {

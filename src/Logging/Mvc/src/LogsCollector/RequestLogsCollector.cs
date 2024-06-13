@@ -53,7 +53,7 @@ namespace Gems.Logging.Mvc.LogsCollector
             foreach (var property in properties)
             {
                 var logFieldAttribute = (LogFieldAttribute)Attribute.GetCustomAttribute(property, typeof(LogFieldAttribute));
-                var logFieldName = logFieldAttribute?.Name ?? property.Name;
+                var logFieldName = $"{Assembly.GetEntryAssembly()?.GetName().Name}_{logFieldAttribute?.Name ?? property.Name}";
                 var propValue = property.GetValue(obj, null);
                 if (property.PropertyType.IsValueType || propValue is string)
                 {

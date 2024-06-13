@@ -36,6 +36,17 @@
     ```
 
 3. Унаследуйте команду `CreatePersonCommand` от интерфейса `IRequestTimeMetric` и переопределите метод `public Enum GetTimeMetricType()`, возвратив метрику созданную в п.2
+    ```csharp
+    public record CreatePersonCommand : IRequest<PersonDto>, IRequestTimeMetric
+    {
+        // ...
+
+        public Enum GetTimeMetricType()
+        {
+            return CreatePersonMetricType.CreatePersonTime;
+        }
+    }
+    ```
 
 4. Вызовите обработчик `CreatePersonCommandHandler`
     ```csharp
