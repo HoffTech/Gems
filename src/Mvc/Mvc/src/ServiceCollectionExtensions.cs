@@ -19,6 +19,7 @@ using Gems.Text.Json.Converters;
 
 using MediatR;
 
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -172,6 +173,11 @@ namespace Gems.Mvc
                     return delegateConverterInstance;
                 });
             }
+        }
+
+        public static IApplicationBuilder UseContentType(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<ContentTypeMiddleware>();
         }
     }
 }
