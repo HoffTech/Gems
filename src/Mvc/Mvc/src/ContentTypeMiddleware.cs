@@ -21,7 +21,7 @@ public class ContentTypeMiddleware
         context.Response.OnStarting(
             _ =>
             {
-                if (context.Response.Headers.TryGetValue("Content-Type", out var contentType) && contentType.ToString().StartsWith("application/json"))
+                if (context.Response.Headers.TryGetValue("Content-Type", out var contentType) && contentType.ToString() == "application/json; charset=utf-8")
                 {
                     context.Response.Headers.Remove("Content-Type");
                     context.Response.Headers.Append("Content-Type", "application/json");
