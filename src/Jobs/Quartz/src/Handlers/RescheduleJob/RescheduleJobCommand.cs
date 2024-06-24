@@ -22,5 +22,7 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
         public string TriggerName { get; set; }
 
         public string CronExpression { get; set; }
+
+        public bool NeedWriteToPersistenceStore { get; set; }
     }
 }

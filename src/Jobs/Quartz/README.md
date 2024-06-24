@@ -9,6 +9,7 @@
 # Содержание
 
 * [Установка](#установка)
+* [Подключение персистентного хранилища](#подключение-персистентного-хранилища)
 * [Перезапуск задачи по ошибке](#перезапуск-задачи-по-ошибке)
 * [Регистрация конкурентной задачи](#регистрация-конкурентной-задачи)
 * [Получить список активных джобов с триггерами](#получить-список-активных-джобов-с-триггерами)
@@ -26,6 +27,7 @@
     "SchedulerName": "Service Name",             // наименование планировщика
     "TablePrefix": "quartz.qrtz_",               // префикс таблиц, хранящих данные по элементам Quartz(Jobs, Triggers etc.)
     "JobRecoveryDelayInMilliseconds": 600000,    // Задержка перед итерацией мониторинга и восстановления триггеров, находящихся в состоянии Error (по умолчанию 15000)
+    "EnablePersistenceStore": false              // Включает/выключает использование персистентного хранилища расписаний 
     "Triggers": {                                // словарь триггеров
       "UploadSelloutGoods": "0 0 0 * * ?"        // триггер, где ключ - наименование задания, значение - крон выполнения
     }, 
@@ -45,6 +47,7 @@
       "AnotherJobHandler":[                      // название джоба
         { 
           "TriggerName": "TriggerTest1",         // название триггера
+          "CronExpression": "0/5 * * * * ?",     // cron-выражение по умолчанию
           "ProviderType": "TriggerDataProvider1" // провайдер данных для триггера TriggerTest1, должен реализовывать интерфейс ITriggerDataProvider
         }
       ]
@@ -84,6 +87,9 @@
 
 - Примените миграцию для БД
 С использованием sql-скриптов
+<details>
+<summary>Скрипт миграции</summary>
+
 ```sql
 DO
 $do$
@@ -526,6 +532,8 @@ CREATE INDEX IF NOT EXISTS idx_qrtz_ft_job_group ON quartz.qrtz_fired_triggers U
 
 CREATE INDEX IF NOT EXISTS idx_qrtz_ft_job_req_recovery ON quartz.qrtz_fired_triggers USING btree (requests_recovery);
 ```
+</details>
+
 С использованием EF Core (с использованием пакета `appany.quartz.entityframeworkcore.migrations.postgresql`)
 ```csharp
 public class DatabaseContext : DbContext
@@ -541,7 +549,88 @@ public class DatabaseContext : DbContext
   }
 }
 ```
+
 Затем примените миграцию с помощью `databaseContext.Database.MigrateAsync()` или `dotnet ef database update`
+
+# Подключение персистентного хранилища
+
+Персистентное хранилище позволяет вам хранить расписания триггеров в таблице БД.
+Для подлкючения персистентного хранилища необходимо установить параметр `EnablePersistenceStore` в значение `true`:
+
+```json
+  "Jobs": {
+    "EnablePersistenceStore": true  // Включает/выключает использование персистентного хранилища расписаний 
+
+  }
+```
+
+Затем выполнить следующий скрипт миграции:
+<details>
+<summary>Скрипт миграции для подключения персхранилища</summary>
+
+```sql
+CREATE TABLE IF NOT EXISTS quartz.qrtz_stored_cron_triggers 
+(
+    sched_name text NOT NULL,
+    trigger_name text NOT NULL,
+    trigger_group text NOT NULL,
+    cron_expression text NOT NULL,
+    time_zone_id text NULL,
+    CONSTRAINT qrtz_stored_cron_triggers_pkey PRIMARY KEY (sched_name, trigger_name, trigger_group)
+);
+
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE quartz.qrtz_stored_cron_triggers TO quartz_jobstore_user;
+
+CREATE OR REPLACE FUNCTION quartz.get_qrtz_stored_cron_triggers(p_sched_name character varying, p_trigger_name character varying, p_trigger_group character varying)
+ RETURNS TABLE(sched_name text, trigger_name text, trigger_group text, cron_expression text, time_zone_id text)
+ LANGUAGE plpgsql
+ IMMUTABLE STRICT
+AS $function$
+BEGIN
+RETURN query
+SELECT c.sched_name, c.trigger_name, c.trigger_group, c.cron_expression , c.time_zone_id
+FROM quartz.qrtz_stored_cron_triggers AS c
+WHERE   c.sched_name = p_sched_name AND
+    c.trigger_name = p_trigger_name AND
+    c.trigger_group = p_trigger_group
+    LIMIT 1;
+END;
+$function$
+;
+
+GRANT EXECUTE ON FUNCTION quartz.get_qrtz_stored_cron_triggers(varchar,varchar,varchar) TO quartz_jobstore_user;
+                                                              
+CREATE OR REPLACE PROCEDURE quartz.upsert_qrtz_stored_cron_triggers(p_sched_name character varying, p_trigger_name character varying, p_trigger_group character varying, p_cron_expression character varying, p_time_zone_id character varying)
+ LANGUAGE plpgsql
+AS $procedure$
+BEGIN
+    INSERT INTO quartz.qrtz_stored_cron_triggers
+    (sched_name, trigger_name, trigger_group, cron_expression, time_zone_id)
+    VALUES(p_sched_name, p_trigger_name, p_trigger_group, p_cron_expression, p_time_zone_id)
+    ON CONFLICT (sched_name, trigger_name, trigger_group) DO UPDATE
+     SET cron_expression=excluded.cron_expression,
+     time_zone_id=excluded.time_zone_id;
+END;
+$procedure$
+;
+
+GRANT EXECUTE ON PROCEDURE quartz.upsert_qrtz_stored_cron_triggers(varchar,varchar,varchar,varchar,varchar) TO quartz_jobstore_user;
+
+CREATE OR REPLACE PROCEDURE quartz.delete_qrtz_stored_cron_triggers(p_trigger_name character varying)
+ LANGUAGE plpgsql
+AS $procedure$
+BEGIN
+DELETE FROM quartz.qrtz_stored_cron_triggers
+WHERE trigger_name = p_trigger_name;
+END;
+$procedure$
+;
+
+GRANT EXECUTE ON PROCEDURE quartz.delete_qrtz_stored_cron_triggers(varchar) TO quartz_jobstore_user;
+```
+
+</details>
+
 
 # Перезапуск задачи по ошибке
 Пайплайн ReFireJobOnFailedBehavior позволяет повторно запустить задачу после задержки в случае возникновения исключения. По умолчанию задержка равна 10 секундам.<br>

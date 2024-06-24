@@ -92,6 +92,11 @@ namespace Gems.Jobs.Quartz.Configuration
         /// </summary>
         public string AdminUiUrlPrefix { get; set; }
 
+        /// <summary>
+        /// Включает/Выключает использование персистентного хранилища.
+        /// </summary>
+        public bool EnablePersistenceStore { get; set; }
+
         public void RegisterJobsFromAssemblyContaining<T>()
         {
             JobRegister.RegisterJobs(typeof(T).Assembly);

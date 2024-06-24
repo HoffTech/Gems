@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Gems.Jobs.Quartz.Configuration;
 using Gems.Jobs.Quartz.Handlers.Consts;
 using Gems.Jobs.Quartz.Handlers.Shared;
+using Gems.Jobs.Quartz.Jobs.JobTriggerFromDb;
 using Gems.Jobs.Quartz.Jobs.JobWithData;
 using Gems.Mvc.GenericControllers;
 using Gems.Text.Json;
@@ -138,7 +139,9 @@ namespace Gems.Jobs.Quartz.Handlers.FireJobImmediately
                 throw new InvalidOperationException($"Для триггера {triggerName} не был найден ProviderType или ProviderType не реализует интерфейс ITriggerDataProvider");
             }
 
-            var triggerProviderType = this.triggerHelper.GetTriggerDbType(triggerOptions);
+            var triggerProviderType = this.triggerHelper.GetTriggerDbType(triggerOptions.ProviderType) ?? throw new InvalidOperationException(
+                    $"Для триггера {triggerOptions.TriggerName}, тип {triggerOptions.ProviderType} не был найден или не реализует интерфейс ITriggerDataProvider");
+
             var triggerDataDict = await triggerProviderType.GetTriggerData(triggerOptions.TriggerName, cancellationToken).ConfigureAwait(false);
             var jobDataMap = new JobDataMap();
             if (triggerDataDict != null && triggerDataDict.Any())

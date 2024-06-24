@@ -2,16 +2,14 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 using Gems.Jobs.Quartz.Configuration;
 using Gems.Jobs.Quartz.Handlers.FireJobImmediately;
 using Gems.Jobs.Quartz.Handlers.Shared;
-using Gems.Jobs.Quartz.Jobs.JobWithData;
+using Gems.Jobs.Quartz.TriggerProviders;
+using Gems.Jobs.Quartz.TriggerValidators;
 using Gems.Mvc.GenericControllers;
-using Gems.Text.Json;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -117,8 +115,6 @@ namespace Gems.Jobs.Quartz
                 {
                     var jobKey = new JobKey(jobName);
                     q.AddJob(jobType, jobKey, c => c.StoreDurably());
-                    RegisterSimpleTrigger(q, jobsOptions, jobName, jobKey);
-                    RegisterTriggersWithData(q, jobsOptions, jobName, jobKey);
                 }
             });
 
@@ -129,66 +125,15 @@ namespace Gems.Jobs.Quartz
 
             services.AddHostedService<JobRecoveryHostedService>();
             services.AddHostedService<BlockedJobsRecoveryHostedService>();
-            services.AddHostedService<JobTriggerFromDbRegisterHostedService>();
-        }
+            services.AddHostedService<JobTriggerRegisterHostedService>();
 
-        private static void RegisterSimpleTrigger(
-            IServiceCollectionQuartzConfigurator configurator,
-            JobsOptions jobsOptions,
-            string jobName,
-            JobKey jobKey)
-        {
-            if (jobsOptions.Triggers == null || !jobsOptions.Triggers.ContainsKey(jobName))
-            {
-                return;
-            }
+            services.AddSingleton<StoredCronTriggerProvider>();
 
-            var cronExpression = jobsOptions.Triggers.GetValueOrDefault(jobName);
-            configurator.AddTrigger(
-                tConf =>
-                {
-                    var configuredTrigger = tConf
-                        .ForJob(jobKey)
-                        .WithIdentity(jobName)
-                        .WithDescription(jobName);
-                    if (!string.IsNullOrWhiteSpace(cronExpression))
-                    {
-                        configuredTrigger.WithCronSchedule(cronExpression);
-                    }
-                });
-        }
+            services.AddSingleton<ITriggerProvider, TriggersFromConfigProvider>();
+            services.AddSingleton<ITriggerProvider, TriggersFromConfigWithDataProvider>();
+            services.AddSingleton<ITriggerProvider, TriggersFromDbProvider>();
 
-        private static void RegisterTriggersWithData(
-            IServiceCollectionQuartzConfigurator configurator,
-            JobsOptions jobsOptions,
-            string jobName,
-            JobKey jobKey)
-        {
-            if (jobsOptions.TriggersWithData == null || !jobsOptions.TriggersWithData.ContainsKey(jobName))
-            {
-                return;
-            }
-
-            foreach (var triggerWithData in jobsOptions.TriggersWithData.GetValueOrDefault(jobName))
-            {
-                configurator.AddTrigger(
-                    tConf =>
-                    {
-                        var configuredTrigger = tConf
-                            .ForJob(jobKey)
-                            .WithIdentity(triggerWithData.TriggerName ?? jobName)
-                            .WithDescription(jobName);
-                        if (!string.IsNullOrWhiteSpace(triggerWithData.CronExpression))
-                        {
-                            configuredTrigger.WithCronSchedule(triggerWithData.CronExpression);
-                        }
-
-                        if (triggerWithData.TriggerData.Any())
-                        {
-                            configuredTrigger.UsingJobData(new JobDataMap { [QuartzJobWithDataConstants.JobDataKeyValue] = triggerWithData.TriggerData.Serialize() });
-                        }
-                    });
-            }
+            services.AddSingleton<ITriggerValidator, TriggerDuplicateValidator>();
         }
     }
 }
