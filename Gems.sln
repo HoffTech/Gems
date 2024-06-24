@@ -582,6 +582,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Jobs.Quartz.Samples.Ha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Http.Samples.DownloadCertificate", "src\Http\Http\samples\Gems.Http.Samples.DownloadCertificate\Gems.Http.Samples.DownloadCertificate.csproj", "{009E2A44-24A5-411B-B6AD-040F2BBD87AD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Jobs.Quartz.Samples.PersistenceStore", "src\Jobs\Quartz\samples\Gems.Jobs.Quartz.Samples.PersistenceStore\Gems.Jobs.Quartz.Samples.PersistenceStore.csproj", "{EC78F477-401D-49C9-A954-E63BCD034C5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1008,6 +1010,10 @@ Global
 		{009E2A44-24A5-411B-B6AD-040F2BBD87AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{009E2A44-24A5-411B-B6AD-040F2BBD87AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{009E2A44-24A5-411B-B6AD-040F2BBD87AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC78F477-401D-49C9-A954-E63BCD034C5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC78F477-401D-49C9-A954-E63BCD034C5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC78F477-401D-49C9-A954-E63BCD034C5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC78F477-401D-49C9-A954-E63BCD034C5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1202,6 +1208,7 @@ Global
 		{1884B588-F902-4E2F-A458-C72ECD251087} = {3A940E2B-58D2-477D-B831-05330C399E17}
 		{93AC73E1-6CA9-4013-84B0-2564D221A2D9} = {1884B588-F902-4E2F-A458-C72ECD251087}
 		{009E2A44-24A5-411B-B6AD-040F2BBD87AD} = {69E68420-16AC-4947-A851-DDC9B0CF648E}
+		{EC78F477-401D-49C9-A954-E63BCD034C5B} = {1884B588-F902-4E2F-A458-C72ECD251087}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F59BAF6C-0E34-4F38-A0E7-2227592118CE}

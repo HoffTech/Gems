@@ -20,5 +20,7 @@ namespace Gems.Jobs.Quartz.Handlers.RemoveJob
 
         [FromQuery]
         public string TriggerName { get; set; }
+
+        public bool NeedRemoveFromPersistenceStore { get; set; }
     }
 }

@@ -5,11 +5,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Gems.Jobs.Quartz;
+namespace Gems.Jobs.Quartz.Jobs.JobTriggerFromDb;
 
 public interface ITriggerDataProvider
 {
-   Task<string> GetCronExpression(string triggerName, CancellationToken cancellationToken);
-
    Task<Dictionary<string, object>> GetTriggerData(string triggerName, CancellationToken cancellationToken);
 }

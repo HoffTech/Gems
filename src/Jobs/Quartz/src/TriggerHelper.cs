@@ -4,9 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Gems.Jobs.Quartz.Configuration;
+using Gems.Jobs.Quartz.Handlers.Consts;
+using Gems.Jobs.Quartz.Jobs.JobTriggerFromDb;
 using Gems.Jobs.Quartz.Jobs.JobWithData;
 using Gems.Text.Json;
 
@@ -17,13 +20,20 @@ namespace Gems.Jobs.Quartz;
 
 public class TriggerHelper
 {
-    public CronTriggerImpl CreateCronTrigger(
+    private readonly IEnumerable<ITriggerDataProvider> triggerDataProviderCollection;
+
+    public TriggerHelper(IEnumerable<ITriggerDataProvider> triggerDataProviderCollection)
+    {
+        this.triggerDataProviderCollection = triggerDataProviderCollection;
+    }
+
+    public static CronTriggerImpl CreateCronTrigger(
         string triggerName,
         string triggerGroup,
         string jobName,
         string jobGroup,
         string cronExp,
-        Dictionary<string, object> triggerData)
+        Dictionary<string, object> triggerData = null)
     {
         var newTrigger = new CronTriggerImpl(triggerName, triggerGroup, jobName, jobGroup, cronExp);
         newTrigger.Description = jobName;
@@ -35,19 +45,31 @@ public class TriggerHelper
         return newTrigger;
     }
 
-    public ITriggerDataProvider GetTriggerDbType(TriggersFromDbOptions triggerFromDb)
+    public ITriggerDataProvider GetTriggerDbType(string providerTypeName)
     {
-        var triggerProviderType = Assembly.GetEntryAssembly()?.GetTypes()
-            .Where(x => typeof(ITriggerDataProvider).IsAssignableFrom(x) && x.Name.Contains(triggerFromDb.ProviderType))
-            .Select(Activator.CreateInstance)
-            .Cast<ITriggerDataProvider>()
-            .FirstOrDefault();
-        if (triggerProviderType == null)
-        {
-            throw new InvalidOperationException(
-                $"Для триггера {triggerFromDb.TriggerName}, тип {triggerFromDb.ProviderType} не был найден или не реализует интерфейс ITriggerDataProvider");
-        }
+        return this.triggerDataProviderCollection.FirstOrDefault(curTriggerDataProvider => curTriggerDataProvider.GetType().Name == providerTypeName);
+    }
 
-        return triggerProviderType;
+    public async Task<CronTriggerImpl> GetTriggerFromDb(
+        string jobName,
+        string jobGroup,
+        string cronExpression,
+        TriggersFromDbOptions triggerFromDb,
+        CancellationToken cancellationToken)
+    {
+        var triggerProviderType = this.GetTriggerDbType(triggerFromDb.ProviderType) ?? throw new InvalidOperationException(
+            $"Для триггера {triggerFromDb.TriggerName}, тип {triggerFromDb.ProviderType} не был найден или не реализует интерфейс ITriggerDataProvider");
+
+        var triggerDataDict = await triggerProviderType.GetTriggerData(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
+
+        var trigger = CreateCronTrigger(
+            triggerFromDb.TriggerName ?? jobName,
+            jobGroup ?? JobGroups.DefaultGroup,
+            jobName,
+            jobGroup ?? JobGroups.DefaultGroup,
+            cronExpression,
+            triggerDataDict);
+
+        return trigger;
     }
 }

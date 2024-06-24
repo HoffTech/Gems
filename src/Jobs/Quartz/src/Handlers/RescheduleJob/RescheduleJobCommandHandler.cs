@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Gems.Jobs.Quartz.Configuration;
 using Gems.Jobs.Quartz.Handlers.Consts;
 using Gems.Jobs.Quartz.Handlers.Shared;
+using Gems.Jobs.Quartz.Jobs.JobTriggerFromDb;
 using Gems.Mvc.Filters.Exceptions;
 using Gems.Mvc.GenericControllers;
 
@@ -30,18 +31,21 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
         private readonly SchedulerProvider schedulerProvider;
         private readonly IOptions<JobsOptions> jobsOptions;
         private readonly TriggerHelper triggerHelper;
+        private readonly StoredCronTriggerProvider storedCronTriggerProvider;
         private readonly ILogger<RescheduleJobCommandHandler> logger;
 
         public RescheduleJobCommandHandler(
             SchedulerProvider schedulerProvider,
             IOptions<JobsOptions> jobsOptions,
             TriggerHelper triggerHelper,
-            ILogger<RescheduleJobCommandHandler> logger)
+            ILogger<RescheduleJobCommandHandler> logger,
+            StoredCronTriggerProvider storedCronTriggerProvider)
         {
             this.schedulerProvider = schedulerProvider;
             this.jobsOptions = jobsOptions;
             this.triggerHelper = triggerHelper;
             this.logger = logger;
+            this.storedCronTriggerProvider = storedCronTriggerProvider;
         }
 
         public async Task Handle(RescheduleJobCommand command, CancellationToken cancellationToken)
@@ -54,11 +58,13 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
             var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
             if (await this.RescheduleTriggerWithData(scheduler, command.JobName, command.TriggerName, command.JobGroup, command.CronExpression, cancellationToken).ConfigureAwait(false))
             {
+                await this.WriteToPersistenceStore(command, cancellationToken);
                 return;
             }
 
             if (await this.RescheduleTriggerFromDb(scheduler, command.JobName, command.TriggerName, command.JobGroup, command.CronExpression, cancellationToken).ConfigureAwait(false))
             {
+                await this.WriteToPersistenceStore(command, cancellationToken);
                 return;
             }
 
@@ -66,12 +72,7 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
                 .GetTrigger(
                     new TriggerKey(command.JobName, command.JobGroup ?? JobGroups.DefaultGroup),
                     cancellationToken)
-                .ConfigureAwait(false);
-
-            if (trigger == null)
-            {
-                throw new NotFoundException($"Не найдено задание {command.JobGroup ?? JobGroups.DefaultGroup}.{command.JobName}");
-            }
+                .ConfigureAwait(false) ?? throw new NotFoundException($"Не найдено задание {command.JobGroup ?? JobGroups.DefaultGroup}.{command.JobName}");
 
             var newTrigger = trigger.GetTriggerBuilder()
                 .WithCronSchedule(command.CronExpression)
@@ -91,6 +92,18 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
             {
                 this.logger.LogInformation("Trigger ({TriggerKey}) failed to re-schedule", trigger.JobKey.Name);
             }
+
+            await this.WriteToPersistenceStore(command, cancellationToken);
+        }
+
+        private async Task WriteToPersistenceStore(RescheduleJobCommand command, CancellationToken cancellationToken)
+        {
+            if (!command.NeedWriteToPersistenceStore || !this.jobsOptions.Value.EnablePersistenceStore)
+            {
+                return;
+            }
+
+            await this.storedCronTriggerProvider.WriteCronExpression(command.TriggerName, command.CronExpression, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<bool> RescheduleTriggerWithData(IScheduler scheduler, string jobName, string triggerName, string jobGroup, string cronExpression, CancellationToken cancellationToken)
@@ -114,7 +127,7 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
             }
 
             var triggerOptions = this.jobsOptions.Value.TriggersWithData.GetValueOrDefault(jobName).First(t => t.TriggerName == triggerName);
-            var newTrigger = this.triggerHelper.CreateCronTrigger(
+            var newTrigger = TriggerHelper.CreateCronTrigger(
                 triggerOptions.TriggerName ?? jobName,
                 jobGroup ?? JobGroups.DefaultGroup,
                 jobName,
@@ -165,16 +178,7 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
                 throw new InvalidOperationException($"Для триггера {triggerName} не был найден ProviderType или ProviderType не реализует интерфейс ITriggerDataProvider");
             }
 
-            var triggerProviderType = this.triggerHelper.GetTriggerDbType(triggerOptions);
-            var triggerCronExpr = await triggerProviderType.GetCronExpression(triggerOptions.TriggerName, cancellationToken).ConfigureAwait(false);
-            var triggerData = await triggerProviderType.GetTriggerData(triggerOptions.TriggerName, cancellationToken).ConfigureAwait(false);
-            var newTrigger = this.triggerHelper.CreateCronTrigger(
-                triggerOptions.TriggerName ?? jobName,
-                jobGroup ?? JobGroups.DefaultGroup,
-                jobName,
-                jobGroup ?? JobGroups.DefaultGroup,
-                cronExpression ?? triggerCronExpr,
-                triggerData);
+            var newTrigger = await this.triggerHelper.GetTriggerFromDb(jobName, jobGroup, cronExpression, triggerOptions, cancellationToken);
 
             var rescheduledJobNextTime = await scheduler.RescheduleJob(newTrigger.Key, newTrigger, cancellationToken)
                 .ConfigureAwait(false);
@@ -186,11 +190,9 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
                     rescheduledJobNextTime);
                 return true;
             }
-            else
-            {
-                this.logger.LogInformation("Trigger ({TriggerKey}) failed to re-schedule", newTrigger.JobKey.Name);
-                return false;
-            }
+
+            this.logger.LogInformation("Trigger ({TriggerKey}) failed to re-schedule", newTrigger.JobKey.Name);
+            return false;
         }
     }
 }

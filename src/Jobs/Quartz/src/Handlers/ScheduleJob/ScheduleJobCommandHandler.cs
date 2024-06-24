@@ -26,15 +26,18 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
         private readonly IOptions<JobsOptions> options;
         private readonly SchedulerProvider schedulerProvider;
         private readonly TriggerHelper triggerHelper;
+        private readonly StoredCronTriggerProvider storedCronTriggerProvider;
 
         public ScheduleJobCommandHandler(
             IOptions<JobsOptions> options,
             SchedulerProvider schedulerProvider,
-            TriggerHelper triggerHelper)
+            TriggerHelper triggerHelper,
+            StoredCronTriggerProvider storedCronTriggerProvider)
         {
             this.options = options;
             this.schedulerProvider = schedulerProvider;
             this.triggerHelper = triggerHelper;
+            this.storedCronTriggerProvider = storedCronTriggerProvider;
         }
 
         public async Task Handle(ScheduleJobCommand command, CancellationToken cancellationToken)
@@ -58,15 +61,29 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
 
             if (await this.ScheduleSimpleTrigger(scheduler, command.JobName, command.JobGroup, command.CronExpression, cancellationToken).ConfigureAwait(false))
             {
+                await this.WriteToPersistenceStore(command, cancellationToken);
                 return;
             }
 
             if (await this.ScheduleTriggerWithData(scheduler, command.JobName, command.JobGroup, command.CronExpression, command.TriggerName, cancellationToken).ConfigureAwait(false))
             {
+                await this.WriteToPersistenceStore(command, cancellationToken);
                 return;
             }
 
             await this.ScheduleTriggerFromDb(scheduler, command.JobName, command.JobGroup, command.CronExpression, command.TriggerName, cancellationToken).ConfigureAwait(false);
+
+            await this.WriteToPersistenceStore(command, cancellationToken);
+        }
+
+        private async Task WriteToPersistenceStore(ScheduleJobCommand command, CancellationToken cancellationToken)
+        {
+            if (!command.NeedWriteToPersistenceStore || !this.options.Value.EnablePersistenceStore)
+            {
+                return;
+            }
+
+            await this.storedCronTriggerProvider.WriteCronExpression(command.TriggerName, command.CronExpression, cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task<List<string>> GetTriggersForSchedule(IScheduler scheduler, string jobName, List<string> triggersFromConfiguration, CancellationToken cancellationToken)
@@ -87,7 +104,7 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
                 .Select(r => r.Value)
                 .First();
 
-            var newTrigger = this.triggerHelper.CreateCronTrigger(
+            var newTrigger = TriggerHelper.CreateCronTrigger(
                 jobName,
                 jobGroup ?? JobGroups.DefaultGroup,
                 jobName,
@@ -122,7 +139,7 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
                 .ToList()
                 .First(t => t.TriggerName == triggerName);
 
-            var trigger = this.triggerHelper.CreateCronTrigger(
+            var trigger = TriggerHelper.CreateCronTrigger(
                 triggerFromConf.TriggerName ?? jobName,
                 jobGroup ?? JobGroups.DefaultGroup,
                 jobName,
@@ -175,17 +192,8 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
                 .ToList()
                 .First(t => t.TriggerName == triggerName);
 
-            var triggerProviderType = this.triggerHelper.GetTriggerDbType(triggerFromDb);
-            var triggerCronExpression = await triggerProviderType.GetCronExpression(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
-            var triggerDataDict = await triggerProviderType.GetTriggerData(triggerFromDb.TriggerName, cancellationToken).ConfigureAwait(false);
+            var trigger = await this.triggerHelper.GetTriggerFromDb(jobName, jobGroup, cronExpression, triggerFromDb, cancellationToken);
 
-            var trigger = this.triggerHelper.CreateCronTrigger(
-                triggerFromDb.TriggerName ?? jobName,
-                jobGroup ?? JobGroups.DefaultGroup,
-                jobName,
-                jobGroup ?? JobGroups.DefaultGroup,
-                cronExpression ?? triggerCronExpression,
-                triggerDataDict);
             await scheduler.ScheduleJob(trigger, cancellationToken).ConfigureAwait(false);
         }
 

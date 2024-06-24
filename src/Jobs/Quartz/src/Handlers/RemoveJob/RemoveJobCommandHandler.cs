@@ -25,11 +25,16 @@ namespace Gems.Jobs.Quartz.Handlers.RemoveJob
     {
         private readonly SchedulerProvider schedulerProvider;
         private readonly IOptions<JobsOptions> jobsOptions;
+        private readonly StoredCronTriggerProvider storedCronTriggerProvider;
 
-        public RemoveJobCommandHandler(SchedulerProvider schedulerProvider, IOptions<JobsOptions> jobsOptions)
+        public RemoveJobCommandHandler(
+            SchedulerProvider schedulerProvider,
+            IOptions<JobsOptions> jobsOptions,
+            StoredCronTriggerProvider storedCronTriggerProvider)
         {
             this.schedulerProvider = schedulerProvider;
             this.jobsOptions = jobsOptions;
+            this.storedCronTriggerProvider = storedCronTriggerProvider;
         }
 
         public async Task Handle(RemoveJobCommand command, CancellationToken cancellationToken)
@@ -42,11 +47,13 @@ namespace Gems.Jobs.Quartz.Handlers.RemoveJob
             var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
             if (await this.RemoveTriggerWithData(scheduler, command.JobName, command.TriggerName, command.JobGroup, cancellationToken).ConfigureAwait(false))
             {
+                await this.DeleteFromPersistenceStore(command, cancellationToken);
                 return;
             }
 
             if (await this.RemoveTriggerFromDb(scheduler, command.JobName, command.TriggerName, command.JobGroup, cancellationToken).ConfigureAwait(false))
             {
+                await this.DeleteFromPersistenceStore(command, cancellationToken);
                 return;
             }
 
@@ -55,6 +62,18 @@ namespace Gems.Jobs.Quartz.Handlers.RemoveJob
                     new TriggerKey(command.JobName, command.JobGroup ?? JobGroups.DefaultGroup),
                     cancellationToken)
                 .ConfigureAwait(false);
+
+            await this.DeleteFromPersistenceStore(command, cancellationToken);
+        }
+
+        private async Task DeleteFromPersistenceStore(RemoveJobCommand command, CancellationToken cancellationToken)
+        {
+            if (!command.NeedRemoveFromPersistenceStore || !this.jobsOptions.Value.EnablePersistenceStore)
+            {
+                return;
+            }
+
+            await this.storedCronTriggerProvider.DeleteCronExpression(command.TriggerName, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<bool> RemoveTriggerWithData(IScheduler scheduler, string jobName, string triggerName, string jobGroup, CancellationToken cancellationToken)
