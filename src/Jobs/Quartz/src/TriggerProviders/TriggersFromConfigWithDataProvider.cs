@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 using Gems.Jobs.Quartz.Configuration;
 using Gems.Jobs.Quartz.Handlers.Consts;
+using Gems.Linq;
 
 using Microsoft.Extensions.Options;
 
@@ -28,7 +29,12 @@ public class TriggersFromConfigWithDataProvider : ITriggerProvider
     {
         var result = new List<CronTriggerImpl>();
 
-        foreach (var triggerWithData in this.jobsOptions.Value.TriggersWithData?.Values?
+        if (this.jobsOptions.Value?.TriggersWithData.IsNullOrEmpty() ?? true)
+        {
+            return Task.FromResult(result);
+        }
+
+        foreach (var triggerWithData in this.jobsOptions.Value?.TriggersWithData?.Values?
                      .SelectMany(t => t
                          .Where(o => o.TriggerName == jobName)
                          .Select(o => o)))
