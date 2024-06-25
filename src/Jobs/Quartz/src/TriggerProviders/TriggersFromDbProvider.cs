@@ -33,14 +33,14 @@ public class TriggersFromDbProvider : ITriggerProvider
     {
         var result = new List<CronTriggerImpl>();
 
-        if (this.jobsOptions.Value?.TriggersFromDb.IsNullOrEmpty() ?? true)
+        if ((this.jobsOptions.Value?.TriggersFromDb.IsNullOrEmpty() ?? true)
+            || !(this.jobsOptions.Value?.TriggersFromDb?.ContainsKey(jobName) ?? false))
         {
             return result;
         }
 
         foreach (var triggerFromDbOpt in this.jobsOptions.Value.TriggersFromDb?.Values?
                      .SelectMany(t => t
-                         .Where(o => o.TriggerName == jobName)
                          .Select(o => o)))
         {
             result.Add(await this.triggerHelper.GetTriggerFromDb(jobName, JobGroups.DefaultGroup, triggerFromDbOpt.CronExpression, triggerFromDbOpt, cancellationToken));

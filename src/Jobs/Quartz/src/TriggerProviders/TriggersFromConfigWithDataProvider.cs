@@ -29,14 +29,14 @@ public class TriggersFromConfigWithDataProvider : ITriggerProvider
     {
         var result = new List<CronTriggerImpl>();
 
-        if (this.jobsOptions.Value?.TriggersWithData.IsNullOrEmpty() ?? true)
+        if ((this.jobsOptions.Value?.TriggersWithData.IsNullOrEmpty() ?? true)
+            || !(this.jobsOptions.Value?.TriggersWithData?.ContainsKey(jobName) ?? false))
         {
             return Task.FromResult(result);
         }
 
         foreach (var triggerWithData in this.jobsOptions.Value?.TriggersWithData?.Values?
                      .SelectMany(t => t
-                         .Where(o => o.TriggerName == jobName)
                          .Select(o => o)))
         {
             result.Add(TriggerHelper.CreateCronTrigger(
