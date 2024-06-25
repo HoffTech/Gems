@@ -26,7 +26,7 @@ public class TriggersFromConfigProvider : ITriggerProvider
 
     public Task<List<CronTriggerImpl>> GetTriggers(string jobName, CancellationToken cancellationToken)
     {
-        var result = this.jobsOptions.Value.Triggers.Where(o => o.Key == jobName)
+        var result = this.jobsOptions.Value.Triggers?.Where(o => o.Key == jobName)
             .Select(o => o)
             .Select(trigger => TriggerHelper.CreateCronTrigger(trigger.Key, JobGroups.DefaultGroup, jobName, JobGroups.DefaultGroup, trigger.Value))
             .ToList();

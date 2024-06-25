@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 using Gems.Jobs.Quartz.Configuration;
 using Gems.Jobs.Quartz.Handlers.Consts;
+using Gems.Linq;
 
 using Microsoft.Extensions.Options;
 
@@ -31,6 +32,11 @@ public class TriggersFromDbProvider : ITriggerProvider
     public async Task<List<CronTriggerImpl>> GetTriggers(string jobName, CancellationToken cancellationToken)
     {
         var result = new List<CronTriggerImpl>();
+
+        if (this.jobsOptions.Value?.TriggersFromDb.IsNullOrEmpty() ?? true)
+        {
+            return result;
+        }
 
         foreach (var triggerFromDbOpt in this.jobsOptions.Value.TriggersFromDb?.Values?
                      .SelectMany(t => t
