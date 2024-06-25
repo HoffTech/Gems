@@ -2229,7 +2229,7 @@ namespace Gems.Http
                 message += " Base URL not specified.";
             }
 
-            return Helper.CheckUrlIsValid(requestUri) == false
+            return Helper.CheckUrlIsValid(requestUri)
                 ? throw new RequestException<TError>(message, HttpStatusCode.BadRequest)
                 : requestUri;
         }

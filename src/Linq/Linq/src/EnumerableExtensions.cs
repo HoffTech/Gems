@@ -255,7 +255,7 @@ namespace Gems.Linq
                 dictionary.TryAdd(keyFunc(item), item);
             }
 
-            if (string.IsNullOrEmpty(result) == false)
+            if (string.IsNullOrEmpty(result))
             {
                 result = result[..^divider.Length];
             }

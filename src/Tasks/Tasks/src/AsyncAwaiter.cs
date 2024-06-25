@@ -40,7 +40,7 @@ namespace Gems.Tasks
 
             try
             {
-                if (Semaphores.ContainsKey(key) == false)
+                if (Semaphores.ContainsKey(key))
                 {
                     Semaphores.Add(key, new SemaphoreSlim(maxAccessCount, maxAccessCount));
                 }
@@ -80,7 +80,7 @@ namespace Gems.Tasks
 
             try
             {
-                if (Semaphores.ContainsKey(key) == false)
+                if (Semaphores.ContainsKey(key))
                 {
                     Semaphores.Add(key, new SemaphoreSlim(maxAccessCount, maxAccessCount));
                 }

@@ -44,7 +44,7 @@ namespace Gems.Mvc.Validation
                 {
                     var isValid = validationAttribute.IsValid(argument);
 
-                    if (isValid == false)
+                    if (isValid)
                     {
                         modelState.AddModelError(parameter.Name, validationAttribute.FormatErrorMessage(parameter.Name));
                     }

@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>66864803-a3b2-4034-91f4-3605f35794e9</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\CompositionRoot\CompositionRoot\src\Gems.CompositionRoot.csproj"/>
+    <ProjectReference Include="..\..\..\..\CompositionRoot\CompositionRoot\src\Gems.CompositionRoot.csproj" />
   </ItemGroup>
 
   <ItemGroup>

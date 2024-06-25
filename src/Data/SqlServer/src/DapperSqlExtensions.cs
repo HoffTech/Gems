@@ -1764,7 +1764,7 @@ namespace Gems.Data.SqlServer
             await using var command = new SqlCommand(commandText, connection);
             command.CommandTimeout = 0;
             await using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
-            if (reader.HasRows == false)
+            if (reader.HasRows)
             {
                 yield break;
             }
