@@ -40,7 +40,7 @@ namespace Gems.Tasks
 
             try
             {
-                if (Semaphores.ContainsKey(key))
+                if (!Semaphores.ContainsKey(key))
                 {
                     Semaphores.Add(key, new SemaphoreSlim(maxAccessCount, maxAccessCount));
                 }

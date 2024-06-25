@@ -93,8 +93,8 @@ namespace Gems.Linq.Tests
             Assert.AreEqual("1,4", result);
             Assert.True(dictionary.ContainsKey("1"));
             Assert.True(dictionary.ContainsKey("4"));
-            Assert.True(dictionary.ContainsKey("2"));
-            Assert.True(dictionary.ContainsKey("3"));
+            Assert.False(dictionary.ContainsKey("2"));
+            Assert.False(dictionary.ContainsKey("3"));
         }
 
         /// <summary>

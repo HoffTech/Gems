@@ -1769,7 +1769,7 @@ namespace Gems.Data.Npgsql
             await using var command = new NpgsqlCommand(commandText, connection);
             command.CommandTimeout = 0;
             await using var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
-            if (reader.HasRows)
+            if (!reader.HasRows)
             {
                 yield break;
             }
