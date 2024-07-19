@@ -15,14 +15,14 @@ public static class TestEnvironmentBuilderRedisExtensions
         string name,
         Func<RedisContainer, CancellationToken, Task> setupDatabase = default)
     {
-        return builder.UseRedis(name, (Action<RedisBuilder>)null, setupDatabase);
+        return builder.UseRedis(name, (Func<RedisBuilder, RedisBuilder>)null, setupDatabase);
     }
 
     public static ITestEnvironmentBuilder UseRedis(
         this ITestEnvironmentBuilder builder,
         string name)
     {
-        return builder.UseRedis(name, (Action<RedisBuilder>)null, null);
+        return builder.UseRedis(name, (Func<RedisBuilder, RedisBuilder>)null, null);
     }
 
     public static ITestEnvironmentBuilder UseRedis(
@@ -37,13 +37,13 @@ public static class TestEnvironmentBuilderRedisExtensions
     public static ITestEnvironmentBuilder UseRedis(
         this ITestEnvironmentBuilder builder,
         string name,
-        Action<RedisBuilder> setupContainer = default,
+        Func<RedisBuilder, RedisBuilder> setupContainer = default,
         Func<RedisContainer, CancellationToken, Task> setupDatabase = default)
     {
         return builder.UseComponent(() =>
         {
             var redisBuilder = new RedisBuilder();
-            setupContainer?.Invoke(redisBuilder);
+            redisBuilder = setupContainer?.Invoke(redisBuilder) ?? redisBuilder;
             var container = redisBuilder.Build();
             builder.UseBootstraper(async (env, ct) =>
             {
@@ -60,15 +60,15 @@ public static class TestEnvironmentBuilderRedisExtensions
         this ITestEnvironmentBuilder builder,
         string name,
         string image,
-        Action<RedisBuilder> setupContainer = default,
+        Func<RedisBuilder, RedisBuilder> setupContainer = default,
         Func<RedisContainer, CancellationToken, Task> setupDatabase = default)
     {
         return builder.UseRedis(
             name,
             redisBuilder =>
             {
-                redisBuilder.WithImage(image);
-                setupContainer?.Invoke(redisBuilder);
+                redisBuilder = redisBuilder.WithImage(image);
+                return setupContainer?.Invoke(redisBuilder) ?? redisBuilder;
             },
             setupDatabase);
     }

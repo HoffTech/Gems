@@ -15,14 +15,14 @@ public static class TestEnvironmentBuilderMsSqlExtensions
         string name,
         Func<MsSqlContainer, CancellationToken, Task> setupDatabase = default)
     {
-        return builder.UseMsSql(name, (Action<MsSqlBuilder>)null, setupDatabase);
+        return builder.UseMsSql(name, (Func<MsSqlBuilder, MsSqlBuilder>)null, setupDatabase);
     }
 
     public static ITestEnvironmentBuilder UseMsSql(
         this ITestEnvironmentBuilder builder,
         string name)
     {
-        return builder.UseMsSql(name, (Action<MsSqlBuilder>)null, null);
+        return builder.UseMsSql(name, (Func<MsSqlBuilder, MsSqlBuilder>)null, null);
     }
 
     public static ITestEnvironmentBuilder UseMsSql(
@@ -37,14 +37,14 @@ public static class TestEnvironmentBuilderMsSqlExtensions
     public static ITestEnvironmentBuilder UseMsSql(
         this ITestEnvironmentBuilder builder,
         string name,
-        Action<MsSqlBuilder> setupContainer = default,
+        Func<MsSqlBuilder, MsSqlBuilder> setupContainer = default,
         Func<MsSqlContainer, CancellationToken, Task> setupDatabase = default)
     {
         return builder.UseComponent(() =>
         {
-            var mssqlBuilder = new MsSqlBuilder();
-            setupContainer?.Invoke(mssqlBuilder);
-            var container = mssqlBuilder.Build();
+            var msSqlBuilder = new MsSqlBuilder();
+            msSqlBuilder = setupContainer?.Invoke(msSqlBuilder) ?? msSqlBuilder;
+            var container = msSqlBuilder.Build();
             builder.UseBootstraper(async (env, ct) =>
             {
                 await container.StartAsync();
@@ -60,15 +60,15 @@ public static class TestEnvironmentBuilderMsSqlExtensions
         this ITestEnvironmentBuilder builder,
         string name,
         string image,
-        Action<MsSqlBuilder> setupContainer = default,
+        Func<MsSqlBuilder, MsSqlBuilder> setupContainer = default,
         Func<MsSqlContainer, CancellationToken, Task> setupDatabase = default)
     {
         return builder.UseMsSql(
             name,
             msSqlBuilder =>
             {
-                msSqlBuilder.WithImage(image);
-                setupContainer?.Invoke(msSqlBuilder);
+                msSqlBuilder = msSqlBuilder.WithImage(image);
+                return setupContainer?.Invoke(msSqlBuilder) ?? msSqlBuilder;
             },
             setupDatabase);
     }
