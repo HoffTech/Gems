@@ -15,14 +15,14 @@ namespace Gems.TestInfrastructure.Postgres.Environment
             string name,
             Func<PostgreSqlContainer, CancellationToken, Task> setupDatabase = default)
         {
-            return builder.UsePostgres(name, (Action<PostgreSqlBuilder>)null, setupDatabase);
+            return builder.UsePostgres(name, (Func<PostgreSqlBuilder, PostgreSqlBuilder>)null, setupDatabase);
         }
 
         public static ITestEnvironmentBuilder UsePostgres(
             this ITestEnvironmentBuilder builder,
             string name)
         {
-            return builder.UsePostgres(name, (Action<PostgreSqlBuilder>)null, null);
+            return builder.UsePostgres(name, (Func<PostgreSqlBuilder, PostgreSqlBuilder>)null, null);
         }
 
         public static ITestEnvironmentBuilder UsePostgres(
@@ -37,13 +37,13 @@ namespace Gems.TestInfrastructure.Postgres.Environment
         public static ITestEnvironmentBuilder UsePostgres(
             this ITestEnvironmentBuilder builder,
             string name,
-            Action<PostgreSqlBuilder> setupContainer = default,
+            Func<PostgreSqlBuilder, PostgreSqlBuilder> setupContainer = default,
             Func<PostgreSqlContainer, CancellationToken, Task> setupDatabase = default)
         {
             return builder.UseComponent(() =>
             {
                 var postgresBuilder = new PostgreSqlBuilder();
-                setupContainer?.Invoke(postgresBuilder);
+                postgresBuilder = setupContainer?.Invoke(postgresBuilder) ?? postgresBuilder;
                 var container = postgresBuilder.Build();
                 builder.UseBootstraper(async (env, ct) =>
                 {
@@ -63,15 +63,15 @@ namespace Gems.TestInfrastructure.Postgres.Environment
             this ITestEnvironmentBuilder builder,
             string name,
             string image,
-            Action<PostgreSqlBuilder> setupContainer = default,
+            Func<PostgreSqlBuilder, PostgreSqlBuilder> setupContainer = default,
             Func<PostgreSqlContainer, CancellationToken, Task> setupDatabase = default)
         {
             return builder.UsePostgres(
                 name,
                 postgreSqlBuilder =>
                 {
-                    postgreSqlBuilder.WithImage(image);
-                    setupContainer?.Invoke(postgreSqlBuilder);
+                    postgreSqlBuilder = postgreSqlBuilder.WithImage(image);
+                    return setupContainer?.Invoke(postgreSqlBuilder) ?? postgreSqlBuilder;
                 },
                 setupDatabase);
         }
