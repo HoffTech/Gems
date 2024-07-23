@@ -106,6 +106,30 @@ public class UnspecifiedDateTimeConverterTests
         Console.WriteLine(deserializedData.Value4.ToString("yyyy-MM-ddTHH:mm:sszzz"));
     }
 
+    [Test]
+    public void DeserializeDateTime_DateTimeMillisecondsFormatLowerThenValue_DoesntThrowException()
+    {
+        var deserializedData = "{\"value\":\"2024-05-21T03:18:54.167\"}"
+            .Deserialize<DateTimeWithMillisecondsValueHolder>();
+        Console.WriteLine(deserializedData.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+    }
+
+    [Test]
+    public void DeserializeDateTime_DateTimeMillisecondsFormatHigherThenValue_DoesntThrowException()
+    {
+        var deserializedData = "{\"value\": \"2024-05-21T03:18:54.167\"}"
+            .Deserialize<DateTimeWithHigherMillisecondsValueHolder>();
+        Console.WriteLine(deserializedData.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+    }
+
+    [Test]
+    public void DeserializeDateTime_DateTimeMillisecondsFormatHigherThenValueWithNoCutoff_ThrowException()
+    {
+        var deserializedData = "{\"value\":\"2024-05-21T03:18:54.167\"}";
+
+        Assert.Throws<Exception>(() => deserializedData.Deserialize<DateTimeWithHigherMillisecondsValueHolderWithoutCutoff>());
+    }
+
     private class DateTimeValueHolder
     {
         public DateTime Value { get; set; }
@@ -122,5 +146,30 @@ public class UnspecifiedDateTimeConverterTests
 
         [UnspecifiedDateTimeConverter(DeserializerTimeZone = "Europe/Moscow")]
         public DateTime Value4 { get; set; }
+    }
+
+    private class DateTimeWithMillisecondsValueHolder
+    {
+        [UnspecifiedDateTimeConverter(
+            DeserializerFormat = "yyyy-MM-ddTHH:mm:ss.fffffff",
+            DeserializerTimeZone = "Russian Standard Time")]
+        public DateTime Value { get; set; }
+    }
+
+    private class DateTimeWithHigherMillisecondsValueHolder
+    {
+        [UnspecifiedDateTimeConverter(
+            DeserializerFormat = "yyyy-MM-ddTHH:mm:ss.ffffffffffff",
+            DeserializerTimeZone = "Russian Standard Time")]
+        public DateTime Value { get; set; }
+    }
+
+    private class DateTimeWithHigherMillisecondsValueHolderWithoutCutoff
+    {
+        [UnspecifiedDateTimeConverter(
+            DeserializerFormat = "yyyy-MM-ddTHH:mm:ss.ffffffffffff",
+            DeserializerTimeZone = "Russian Standard Time",
+            DisableTreatmentMilliseconds = true)]
+        public DateTime Value { get; set; }
     }
 }

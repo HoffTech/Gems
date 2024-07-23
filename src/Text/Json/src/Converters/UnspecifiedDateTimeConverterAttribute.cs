@@ -18,6 +18,8 @@ namespace Gems.Text.Json.Converters
 
         public string DeserializerTimeZone { get; set; }
 
+        public bool DisableTreatmentMilliseconds { get; set; }
+
         public override JsonConverter CreateConverter(Type typeToConvert)
         {
             if (typeToConvert != typeof(DateTime))
@@ -50,6 +52,8 @@ namespace Gems.Text.Json.Converters
             {
                 converter.DeserializerTimeZone = this.DeserializerTimeZone;
             }
+
+            converter.DisableTreatmentMilliseconds = this.DisableTreatmentMilliseconds;
 
             return converter;
         }
