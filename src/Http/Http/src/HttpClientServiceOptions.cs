@@ -49,5 +49,10 @@ namespace Gems.Http
         /// Тип метрик для кодов Http.
         /// </summary>
         public Enum StatusCodeMetricType { get; set; }
+
+        /// <summary>
+        /// Схема для заголовка Authorization.
+        /// </summary>
+        public string AuthenticationHeaderScheme { get; set; }
     }
 }
