@@ -37,6 +37,7 @@ namespace Gems.Data.Sample.Operations.Persons.SendAllPersonsToDax
                 if (personsBuffer.Count >= PersonsBatchSize)
                 {
                     await this.SendPersonsToDaxAsync(personsBuffer, cancellationToken).ConfigureAwait(false);
+                    personsBuffer.Clear();
                 }
             }
 

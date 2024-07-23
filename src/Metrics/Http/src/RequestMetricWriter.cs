@@ -28,6 +28,14 @@ namespace Gems.Metrics.Http
             }
         }
 
+        public RequestMetricWriter(IMetricsService metricsService, Enum statusCodeMetricType, string requestUri = null)
+        {
+            this.metricsService = metricsService;
+            this.statusCodeMetricType = statusCodeMetricType;
+
+            this.requestUri = requestUri ?? string.Empty;
+        }
+
         public Task WriteMetricsAsError200(HttpStatusCode statusCode)
         {
             return this.WriteMetrics(statusCode, "error", "error_200");

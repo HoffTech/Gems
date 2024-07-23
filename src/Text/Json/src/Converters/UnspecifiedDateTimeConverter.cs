@@ -5,6 +5,7 @@ using System;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace Gems.Text.Json.Converters
 {
@@ -27,6 +28,8 @@ namespace Gems.Text.Json.Converters
 
         public virtual string DeserializerTimeZone { get; set; }
 
+        public virtual bool DisableTreatmentMilliseconds { get; set; }
+
         public override DateTime Read(
             ref Utf8JsonReader reader,
             Type typeToConvert,
@@ -36,6 +39,8 @@ namespace Gems.Text.Json.Converters
             try
             {
                 var dateTimeFormat = this.DeserializerFormat;
+
+                this.CheckAndSetMilliseconds(ref dateTimeFormat, ref dateTimeAsString);
                 if (this.DeserializerTimeZone != null)
                 {
                     dateTimeFormat ??= DefaultDateTimeFormat;
@@ -92,6 +97,50 @@ namespace Gems.Text.Json.Converters
             }
 
             return offset;
+        }
+
+        private void CheckAndSetMilliseconds(ref string dateTimeFormat, ref string dateTimeAsString)
+        {
+            if (this.DisableTreatmentMilliseconds)
+            {
+                return;
+            }
+
+            var millisecondsFormatRegex = new Regex(@":ss\.f+");
+            var millisecondsRegex = new Regex(@":\d+\.\d+");
+
+            if (string.IsNullOrEmpty(dateTimeFormat) || string.IsNullOrEmpty(dateTimeAsString))
+            {
+                return;
+            }
+
+            if (!millisecondsFormatRegex.IsMatch(dateTimeFormat) || !millisecondsRegex.IsMatch(dateTimeAsString))
+            {
+                return;
+            }
+
+            var millisecondsFormat = millisecondsFormatRegex.Match(dateTimeFormat).Value;
+            var milliseconds = millisecondsRegex.Match(dateTimeAsString).Value;
+
+            const int maxMillisecondsLimitInDtWithSecondsAndDot = 11;
+            if (millisecondsFormat.Length > maxMillisecondsLimitInDtWithSecondsAndDot)
+            {
+                millisecondsFormat = millisecondsFormat[..maxMillisecondsLimitInDtWithSecondsAndDot];
+                dateTimeFormat = millisecondsFormatRegex.Replace(dateTimeFormat, millisecondsFormat);
+            }
+
+            if (millisecondsFormat.Length == milliseconds.Length)
+            {
+                return;
+            }
+
+            if (millisecondsFormat.Length <= milliseconds.Length)
+            {
+                return;
+            }
+
+            var correctMilliseconds = milliseconds.PadRight(millisecondsFormat.Length, '0');
+            dateTimeAsString = millisecondsRegex.Replace(dateTimeAsString, correctMilliseconds);
         }
 
         private DateTime SpecifyDateTimeKind(DateTime dateTimeValue)
