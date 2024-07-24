@@ -2457,7 +2457,7 @@ namespace Gems.Http
                     .ConfigureAwait(false);
             }
 
-            var scheme = string.IsNullOrEmpty(this.options.Value.AuthenticationHeaderScheme)
+            var scheme = string.IsNullOrEmpty(this.options?.Value?.AuthenticationHeaderScheme)
                              ? "Bearer"
                              : this.options.Value.AuthenticationHeaderScheme;
             if (!string.IsNullOrEmpty(this.AccessToken))
