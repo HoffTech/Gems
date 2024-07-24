@@ -2457,9 +2457,12 @@ namespace Gems.Http
                     .ConfigureAwait(false);
             }
 
+            var scheme = string.IsNullOrEmpty(this.options.Value.AuthenticationHeaderScheme)
+                             ? "Bearer"
+                             : this.options.Value.AuthenticationHeaderScheme;
             if (!string.IsNullOrEmpty(this.AccessToken))
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", this.AccessToken);
+                request.Headers.Authorization = new AuthenticationHeaderValue(scheme, this.AccessToken);
             }
         }
 
