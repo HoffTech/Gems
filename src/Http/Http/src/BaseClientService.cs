@@ -15,22 +15,18 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 
+using Gems.Http.Serializers;
 using Gems.Logging.Mvc.LogsCollector;
 using Gems.Metrics;
 using Gems.Metrics.Http;
 using Gems.Mvc;
 using Gems.Tasks;
-using Gems.Text.Json;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
-using Newtonsoft.Json.Linq;
 
 namespace Gems.Http
 {
@@ -122,6 +118,12 @@ namespace Gems.Http
         /// DefaultBoundary для multipart/form-data.
         /// </summary>
         protected virtual string DefaultBoundary => "-------------------Boundary--";
+
+        /// <summary>
+        /// Дополнительные скалярные структуры для сериализации.
+        /// Например DateTime, DateOnly, Guid, DateTimeOffset.
+        /// </summary>
+        protected virtual Type[] AdditionalScalarStructureTypes => null;
 
         /// <summary>
         /// Bearer Токен.
@@ -2095,7 +2097,7 @@ namespace Gems.Http
                     {
                         logsCollector.AddLogsFromPayload(requestData);
                         requestUri += requestUri.IndexOf("?", StringComparison.Ordinal) > 0 ? "&" : "?";
-                        requestUri += await this.SerializeObjectToQueryString(requestData);
+                        requestUri += await QueryStringSerializerHelper.SerializeObjectToQueryString(requestData, this.SerializeAdditionalConverters, this.IsCamelCase);
                     }
 
                     logsCollector.AddPath(requestUri.Split('?')[0]);
@@ -2259,7 +2261,10 @@ namespace Gems.Http
             {
                 var boundaryContent = item.Value is byte[] bytes
                     ? new ByteArrayContent(bytes)
-                    : (HttpContent)new StringContent(this.SerializeObjectToJson(item.Value), item.Encoding, item.MediaType);
+                    : (HttpContent)new StringContent(
+                        JsonSerializerHelper.SerializeObjectToJson(item.Value, this.SerializeAdditionalConverters, this.IsCamelCase),
+                        item.Encoding,
+                        item.MediaType);
                 boundaryContent.Headers.Add("Content-Type", item.MediaType);
                 boundaryContent.Headers.Add("Content-Disposition", $"form-data; name=\"{item.Key}\"; filename=\"{item.FileName}\"");
                 content.Add(boundaryContent);
@@ -2274,9 +2279,9 @@ namespace Gems.Http
         {
             var serializedRequestData = mediaType switch
             {
-                "application/x-www-form-urlencoded" => await this.SerializeObjectToQueryString(requestData),
-                "text/xml" => this.SerializeObjectToXml(requestData),
-                _ => this.SerializeObjectToJson(requestData)
+                "application/x-www-form-urlencoded" => await QueryStringSerializerHelper.SerializeObjectToQueryString(requestData, this.SerializeAdditionalConverters, this.IsCamelCase),
+                "text/xml" => XmlSerializerHelper.SerializeObjectToXml(requestData),
+                _ => JsonSerializerHelper.SerializeObjectToJson(requestData, this.SerializeAdditionalConverters, this.IsCamelCase)
             };
             return serializedRequestData;
         }
@@ -2326,16 +2331,6 @@ namespace Gems.Http
                 return default;
             }
 
-            if (typeof(TResponse) == typeof(string))
-            {
-                if (responseAsString.StartsWith('"'))
-                {
-                    responseAsString = responseAsString.Trim('"');
-                }
-
-                return (TResponse)((object)responseAsString);
-            }
-
             var deserializedResponse = this.DeserializeResponse<TResponse>(response, responseAsString);
             if (deserializedResponse is IHasStatusCode responseWithStatusCode)
             {
@@ -2355,81 +2350,14 @@ namespace Gems.Http
                 var mediaType = response.Content?.Headers?.ContentType?.MediaType ?? this.MediaType;
                 var isXml = mediaType.Equals("text/xml", StringComparison.OrdinalIgnoreCase);
                 var responseAsObj = isXml
-                    ? this.DeserializeObjectFromXml<TResponse>(responseAsString)
-                    : this.DeserializeObjectFromJson<TResponse>(responseAsString);
+                    ? XmlSerializerHelper.DeserializeObjectFromXml<TResponse>(responseAsString)
+                    : JsonSerializerHelper.DeserializeObjectFromJson<TResponse>(responseAsString, this.DeserializeAdditionalConverters, this.AdditionalScalarStructureTypes);
                 return responseAsObj;
             }
             catch (Exception e)
             {
                 throw new DeserializeException(e, responseAsString, response.StatusCode);
             }
-        }
-
-        private bool IsNumericOrBool(Type type)
-        {
-            return type.IsPrimitive || type == typeof(decimal);
-        }
-
-        private bool IsValueTypeOrString(Type type)
-        {
-            return type.IsValueType || type == typeof(string);
-        }
-
-        private TResponse DeserializeObjectFromJson<TResponse>(string json)
-        {
-            if (!this.IsNumericOrBool(typeof(TResponse)) && this.IsValueTypeOrString(typeof(TResponse)) && !json.StartsWith('"'))
-            {
-                json = '"' + json + '"';
-            }
-
-            return json.Deserialize<TResponse>(this.DeserializeAdditionalConverters);
-        }
-
-        private TResponse DeserializeObjectFromXml<TResponse>(string xml)
-        {
-            var serializer = new XmlSerializer(typeof(TResponse));
-            using TextReader reader = new StringReader(xml);
-            return (TResponse)serializer.Deserialize(reader);
-        }
-
-        private string SerializeObjectToJson(object obj)
-        {
-            if (obj is string json)
-            {
-                return json;
-            }
-
-            return obj.Serialize(this.SerializeAdditionalConverters, null, this.IsCamelCase);
-        }
-
-        private async Task<string> SerializeObjectToQueryString(object obj)
-        {
-            if (obj == null)
-            {
-                return string.Empty;
-            }
-
-            if (this.IsValueTypeOrString(obj.GetType()))
-            {
-                return obj as string;
-            }
-
-            var objAsJson = obj.Serialize(this.SerializeAdditionalConverters, null, this.IsCamelCase);
-            return await QueryStringMapper.MapToQueryString(JToken.Parse(objAsJson));
-        }
-
-        private string SerializeObjectToXml(object obj)
-        {
-            var serializer = new XmlSerializer(obj.GetType());
-            using var stream = new MemoryStream();
-            var xmlNamespaces = new XmlSerializerNamespaces();
-            xmlNamespaces.Add(string.Empty, string.Empty);
-            serializer.Serialize(stream, obj, xmlNamespaces);
-            var content = Encoding.UTF8.GetString(stream.ToArray());
-            content = new Regex("^<\\?xml version=\"1.0\"\\?>").Replace(
-                content,
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-            return content;
         }
 
         private async Task AddHeadersAsync(HttpRequestMessage request, IDictionary<string, string> headers, bool isAuthenticationRequest, CancellationToken cancellationToken)
