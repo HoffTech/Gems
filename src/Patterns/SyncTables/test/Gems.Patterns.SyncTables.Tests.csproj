@@ -3,7 +3,7 @@
   <PropertyGroup>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <LangVersion>latestmajor</LangVersion>
-    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="FluentAssertions" Version="6.5.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="NUnit" Version="3.13.3" />
@@ -25,10 +26,43 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Testcontainers.MsSql" Version="3.7.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="3.7.0" />    
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\CompositionRoot\CompositionRoot\src\Gems.CompositionRoot.csproj" />
+    <ProjectReference Include="..\..\..\TestInfrastructure\MsSql\src\Gems.TestInfrastructure.MsSql\Gems.TestInfrastructure.MsSql.csproj" />
+    <ProjectReference Include="..\..\..\TestInfrastructure\Postgres\src\Gems.TestInfrastructure.Postgres\Gems.TestInfrastructure.Postgres.csproj" />
+    <ProjectReference Include="..\..\..\TestInfrastructure\TestInfrastructure\src\Gems.TestInfrastructure\Gems.TestInfrastructure.csproj" />
     <ProjectReference Include="..\src\Gems.Patterns.SyncTables.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ChangeTrackingSync\IntegrationTests\Migrations\Destination\V0.01__Add_Sync_Information.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ChangeTrackingSync\IntegrationTests\Migrations\Source\beforeMigrate.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ChangeTrackingSync\IntegrationTests\Migrations\Destination\V0.02__Add_Destination.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ChangeTrackingSync\IntegrationTests\Migrations\Source\V0.01__Test_Ax_Source.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ChangeTrackingSync\IntegrationTests\Migrations\Destination\R__Destination_Clear.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ChangeTrackingSync\IntegrationTests\Migrations\Destination\R__Destination_Merge.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ChangeTrackingSync\IntegrationTests\Migrations\Destination\R__SyncInfo_Get.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ChangeTrackingSync\IntegrationTests\Migrations\Destination\R__SyncInfo_Upsert.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

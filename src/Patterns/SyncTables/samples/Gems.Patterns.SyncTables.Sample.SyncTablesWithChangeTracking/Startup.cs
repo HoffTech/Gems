@@ -3,10 +3,6 @@
 
 using Gems.CompositionRoot;
 using Gems.HealthChecks;
-using Gems.Logging.Mvc.Behaviors;
-using Gems.Metrics.Behaviors;
-using Gems.Mvc;
-using Gems.Mvc.Behaviors;
 using Gems.Swagger;
 
 using Prometheus;
@@ -18,22 +14,7 @@ public class Startup(IConfiguration configuration)
     public void ConfigureServices(IServiceCollection services)
     {
         services.ConfigureCompositionRoot<Startup>(
-            configuration,
-            opt =>
-            {
-                opt.AddUnitOfWorks = () => { };
-                opt.AddPipelines = () =>
-                {
-                    services.AddHttpContextAccessor();
-                    services.AddPipeline(typeof(ScopeLoggingBehavior<,>));
-                    services.AddPipeline(typeof(EndpointLoggingBehavior<,>));
-                    services.AddPipeline(typeof(NotFoundBehavior<,>));
-                    services.AddPipeline(typeof(ExceptionBehavior<,>));
-                    services.AddPipeline(typeof(ErrorMetricsBehavior<,>));
-                    services.AddPipeline(typeof(TimeMetricBehavior<,>));
-                    services.AddPipeline(typeof(ValidatorBehavior<,>));
-                };
-            });
+            configuration);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

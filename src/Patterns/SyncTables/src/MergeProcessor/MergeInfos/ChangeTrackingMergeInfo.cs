@@ -8,6 +8,7 @@ using Gems.Patterns.SyncTables.EntitiesViews;
 
 namespace Gems.Patterns.SyncTables.MergeProcessor.MergeInfos
 {
+    [Obsolete("Будет удалено в 7.0, нужно пользоваться...")]
     public class ChangeTrackingMergeInfo<TMergeResult> : MergeInfo<TMergeResult>
         where TMergeResult : class, new()
     {

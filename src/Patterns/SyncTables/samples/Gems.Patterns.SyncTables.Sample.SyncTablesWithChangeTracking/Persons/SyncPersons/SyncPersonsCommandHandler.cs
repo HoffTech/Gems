@@ -2,8 +2,9 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using Gems.Mvc.GenericControllers;
-using Gems.Patterns.SyncTables.MergeProcessor;
-using Gems.Patterns.SyncTables.MergeProcessor.MergeInfos;
+using Gems.Patterns.SyncTables.ChangeTrackingSync;
+using Gems.Patterns.SyncTables.ChangeTrackingSync.Settings;
+
 using Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking.Persons.SyncPersons.EntitiesViews;
 using Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking.Persons.SyncPersons.Options;
 
@@ -13,37 +14,89 @@ using Microsoft.Extensions.Options;
 
 namespace Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking.Persons.SyncPersons;
 
-[Endpoint("api/v1/persons", "POST", OperationGroup = "Persons")]
-public class SyncPersonsCommandHandler : IRequestHandler<SyncPersonsCommand, List<RowCounters>>
+[Endpoint("api/v1/sync-persons", "POST", OperationGroup = "Persons")]
+public class SyncPersonsCommandHandler(
+    IChangeTrackingSyncTableProcessor<ExternalPerson, Person, RowCounters> changeTrackingProcessor,
+    IOptions<SyncPersonsInfoOptions> options)
+    : IRequestHandler<SyncPersonsCommand, List<RowCounters>>
 {
-    private readonly ChangeTrackingMergeProcessorFactory processorFactory;
-
-    private readonly IOptions<SyncPersonsInfoOptions> options;
-
-    public SyncPersonsCommandHandler(
-        ChangeTrackingMergeProcessorFactory processorFactory,
-        IOptions<SyncPersonsInfoOptions> options)
+    public async Task<List<RowCounters>> Handle(SyncPersonsCommand request, CancellationToken cancellationToken)
     {
-        this.processorFactory = processorFactory;
-        this.options = options;
-    }
+        var syncResult = await changeTrackingProcessor.Sync(
+            new ChangeTrackingSyncInfo(
+                new SourceDataSettings
+                {
+                    DbKey = "source",
+                    TableName = "dbo.Person",
+                    GetCommandTimeout = options.Value.GetPersonsInfoTimeout,
+                    BatchSize = 100_000,
+                    PrimaryKeyName = "RecId",
+                    ChangesQuery =
+                        """
+                        WITH ChangedPersonCTE
+                        (
+                            [ChangeTrackingVersion],
+                            [OperationType],
+                            [RecId],
+                            [PersonId],
+                            [FirstName],
+                            [LastName],
+                            [Age],
+                            [Gender]
+                        )
+                        AS
+                        (
+                            SELECT
+                                ct.SYS_CHANGE_VERSION [ChangeTrackingVersion],
+                                ct.SYS_CHANGE_OPERATION [OperationType],
+                                ct.[RecId],
+                                [PersonId],
+                                [FirstName],
+                                [LastName],
+                                [Age],
+                                [Gender]
+                            FROM changetable(changes dbo.[Person], @version) as ct
+                            LEFT JOIN dbo.[Person] as it
+                                on ct.RECID = it.RECID
+                        )
 
-    public Task<List<RowCounters>> Handle(SyncPersonsCommand request, CancellationToken cancellationToken)
-    {
-        return new MergeCollection<RowCounters>(
-            new List<BaseMergeProcessor<RowCounters>>
-            {
-                this.processorFactory.CreateChangeTrackingMergeProcessor<ExternalPerson, Person, RowCounters>(
-                    new ChangeTrackingMergeInfo<RowCounters>(
-                        sourceDbKey: "Dax",
-                        tableName: "Persons",
-                        externalSyncQuery: "SELECT * FROM Persons",
-                        mergeFunctionName: "public.persons_mergepersons",
-                        mergeParameterName: "p_persons",
-                        needConvertDateTimeToUtc: true,
-                        getCommandTimeout: this.options.Value.GetPersonsInfoTimeout,
-                        targetDbKey: "DefaultConnection",
-                        SyncPersonsMetricType.GetExternalPersonEntities))
-            }).ProcessCollectionAsync(cancellationToken);
+                        SELECT TOP (@batchSize) WITH TIES
+                            *
+                        FROM  ChangedPersonCTE WITH (FORCESEEK)
+                        ORDER BY ChangeTrackingVersion
+                        OPTION(MAXDOP 1)
+                        """,
+                    FullReloadQuery =
+                        """
+                        select
+                            0 [ChangeTrackingVersion],
+                            'I' [OperationType],
+                            [RecId],
+                            [PersonId],
+                            [FirstName],
+                            [LastName],
+                            [Age],
+                            [Gender]
+                        from dbo.[Person]
+                        where
+                            [RecId] >= @offset and [RecId] < @offset + @batchSize
+                        order by [RecId]
+                        """,
+                    OnRestoreFromBackupDetected = SyncErrorAction.Fail,
+                    OnDestinationVersionOutdated = SyncErrorAction.Fail
+                },
+                new DestinationSettings
+                {
+                    DbKey = "destination",
+                    TableName = "public.person",
+                    MergeFunctionName = "public.person_merge",
+                    MergeParameterName = "p_changed_data",
+                    EnableFullChangesLog = false,
+                    ClearFunctionName = "public.person_clear"
+                },
+                true),
+            cancellationToken);
+
+        return syncResult.MergeResults.ToList();
     }
 }

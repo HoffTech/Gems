@@ -1,6 +1,7 @@
 ﻿// Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using Gems.Patterns.SyncTables.MergeProcessor.MergeInfos;
 
 namespace Gems.Patterns.SyncTables.Tests.Infrastructure.Clients
 {
+    [Obsolete("Будет удалено в 7.0, необходимо перейти на использование ChangeTrackingSyncTableProcessor")]
     public class ChangeTrackingMergeClient
     {
         private readonly ChangeTrackingMergeProcessorFactory processorFactory;

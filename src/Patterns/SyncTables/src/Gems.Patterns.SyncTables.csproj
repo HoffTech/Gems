@@ -23,7 +23,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Data\Data\src\Gems.Data.csproj" />
+    <ProjectReference Include="..\..\..\Data\Npgsql\src\Gems.Data.Npgsql.csproj" />
     <ProjectReference Include="..\..\..\Linq\Linq\src\Gems.Linq.csproj" />
+    <ProjectReference Include="..\..\..\Metrics\Prometheus\src\Gems.Metrics.Prometheus.csproj" />
     <ProjectReference Include="..\..\..\Utils\Utils\src\Gems.Utils.csproj" />
   </ItemGroup>
 

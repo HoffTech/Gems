@@ -68,7 +68,7 @@ namespace Gems.Utils
             }
         }
 
-        private static DateTime ConvertToUtc(DateTime dateTimeValue)
+        public static DateTime ConvertToUtc(DateTime dateTimeValue)
         {
             if (dateTimeValue.Kind != DateTimeKind.Unspecified)
             {

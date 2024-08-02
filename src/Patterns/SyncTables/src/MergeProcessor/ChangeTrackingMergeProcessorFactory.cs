@@ -1,6 +1,8 @@
 ﻿// Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System;
+
 using AutoMapper;
 
 using Gems.Patterns.SyncTables.EntitiesViews;
@@ -8,6 +10,7 @@ using Gems.Patterns.SyncTables.MergeProcessor.MergeInfos;
 
 namespace Gems.Patterns.SyncTables.MergeProcessor
 {
+    [Obsolete("Будет удалено в 7.0, необходимо перейти на использование ChangeTrackingSyncTableProcessor через DI")]
     public class ChangeTrackingMergeProcessorFactory
     {
         private readonly RowVersionProvider rowVersionProvider;
