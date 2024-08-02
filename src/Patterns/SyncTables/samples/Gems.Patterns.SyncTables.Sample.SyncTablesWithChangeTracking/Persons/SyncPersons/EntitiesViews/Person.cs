@@ -7,9 +7,18 @@ using NpgsqlTypes;
 
 namespace Gems.Patterns.SyncTables.Sample.SyncTablesWithChangeTracking.Persons.SyncPersons.EntitiesViews;
 
-[PgType("public.person_type")]
+[PgType("public.t_person_type")]
 public class Person
 {
+    [PgName("ct_version")]
+    public long ChangeTrackingVersion { get; set; }
+
+    [PgName("operation_type")]
+    public string OperationType { get; set; }
+
+    [PgName("rec_id")]
+    public long RecId { get; set; }
+
     [PgName("person_id")]
     public Guid PersonId { get; set; }
 

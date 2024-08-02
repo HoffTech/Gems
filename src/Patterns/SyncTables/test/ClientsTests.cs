@@ -1,6 +1,7 @@
 ﻿// Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,6 +15,7 @@ using NUnit.Framework;
 
 namespace Gems.Patterns.SyncTables.Tests
 {
+    [Obsolete("Будет удалено в 7.0, нужно пользоваться...")]
     [Parallelizable]
     public partial class ClientsTests
     {

@@ -11,4 +11,31 @@
       <ProjectReference Include="..\..\src\Gems.Patterns.SyncTables.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Migrations\Source\beforeMigrate.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Migrations\Source\V0.01__Test_Ax_Source.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Migrations\Destination\V0.01__Add_Sync_Information.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Migrations\Destination\R__SyncInfo_Upsert.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Migrations\Destination\R__SyncInfo_Get.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Migrations\Destination\R__Destination_Merge.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Migrations\Destination\V0.02__Add_Person.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Migrations\Destination\R__Person_Clear.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

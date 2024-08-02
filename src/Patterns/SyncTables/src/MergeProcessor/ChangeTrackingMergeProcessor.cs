@@ -1,6 +1,7 @@
 ﻿// Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -15,6 +16,7 @@ using Gems.Utils;
 
 namespace Gems.Patterns.SyncTables.MergeProcessor
 {
+    [Obsolete("Будет удален в 7.0, необходимо перейти на использование ChangeTrackingSyncTableProcessor")]
     public class ChangeTrackingMergeProcessor<TExternalEntity, TTargetEntity, TMergeResult> : BaseMergeProcessor<TMergeResult>
         where TExternalEntity : ExternalEntity
         where TTargetEntity : class
