@@ -58,13 +58,13 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
             var scheduler = await this.schedulerProvider.GetSchedulerAsync(cancellationToken).ConfigureAwait(false);
             if (await this.RescheduleTriggerWithData(scheduler, command.JobName, command.TriggerName, command.JobGroup, command.CronExpression, cancellationToken).ConfigureAwait(false))
             {
-                await this.WriteToPersistenceStore(command, cancellationToken);
+                await this.WriteToPersistenceStore(scheduler, command, cancellationToken);
                 return;
             }
 
             if (await this.RescheduleTriggerFromDb(scheduler, command.JobName, command.TriggerName, command.JobGroup, command.CronExpression, cancellationToken).ConfigureAwait(false))
             {
-                await this.WriteToPersistenceStore(command, cancellationToken);
+                await this.WriteToPersistenceStore(scheduler, command, cancellationToken);
                 return;
             }
 
@@ -93,17 +93,25 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
                 this.logger.LogInformation("Trigger ({TriggerKey}) failed to re-schedule", trigger.JobKey.Name);
             }
 
-            await this.WriteToPersistenceStore(command, cancellationToken);
+            await this.WriteToPersistenceStore(scheduler, command, cancellationToken);
         }
 
-        private async Task WriteToPersistenceStore(RescheduleJobCommand command, CancellationToken cancellationToken)
+        private async Task WriteToPersistenceStore(IScheduler scheduler, RescheduleJobCommand command, CancellationToken cancellationToken)
         {
             if (!command.NeedWriteToPersistenceStore || !this.jobsOptions.Value.EnablePersistenceStore)
             {
                 return;
             }
 
-            await this.storedCronTriggerProvider.WriteCronExpression(command.TriggerName, command.CronExpression, cancellationToken).ConfigureAwait(false);
+            await this.storedCronTriggerProvider
+                .WriteCronExpression(
+                    scheduler.SchedulerName,
+                    command.TriggerName,
+                    command.TriggerGroup,
+                    command.CronExpression,
+                    TimeZoneInfo.Local.Id,
+                    cancellationToken)
+                .ConfigureAwait(false);
         }
 
         private async Task<bool> RescheduleTriggerWithData(IScheduler scheduler, string jobName, string triggerName, string jobGroup, string cronExpression, CancellationToken cancellationToken)

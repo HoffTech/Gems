@@ -569,7 +569,7 @@ public class DatabaseContext : DbContext
 <summary>Скрипт миграции для подключения персхранилища</summary>
 
 ```sql
-CREATE TABLE IF NOT EXISTS quartz.qrtz_stored_cron_triggers 
+CREATE TABLE IF NOT EXISTS quartz.qrtz_stored_cron_triggers
 (
     sched_name text NOT NULL,
     trigger_name text NOT NULL,
@@ -579,54 +579,68 @@ CREATE TABLE IF NOT EXISTS quartz.qrtz_stored_cron_triggers
     CONSTRAINT qrtz_stored_cron_triggers_pkey PRIMARY KEY (sched_name, trigger_name, trigger_group)
 );
 
-GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE quartz.qrtz_stored_cron_triggers TO quartz_jobstore_user;
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE quartz.qrtz_stored_cron_triggers TO hfedi_quartz_jobstore_user;
 
-CREATE OR REPLACE FUNCTION quartz.get_qrtz_stored_cron_triggers(p_sched_name character varying, p_trigger_name character varying, p_trigger_group character varying)
- RETURNS TABLE(sched_name text, trigger_name text, trigger_group text, cron_expression text, time_zone_id text)
- LANGUAGE plpgsql
- IMMUTABLE STRICT
+CREATE OR REPLACE FUNCTION quartz.get_qrtz_stored_cron_triggers
+(
+    p_sched_name character varying,
+    p_trigger_name character varying,
+    p_trigger_group character varying
+)
+    RETURNS text
+    LANGUAGE plpgsql
+    IMMUTABLE STRICT
 AS $function$
+DECLARE cron_expression text;
 BEGIN
-RETURN query
-SELECT c.sched_name, c.trigger_name, c.trigger_group, c.cron_expression , c.time_zone_id
-FROM quartz.qrtz_stored_cron_triggers AS c
-WHERE   c.sched_name = p_sched_name AND
-    c.trigger_name = p_trigger_name AND
-    c.trigger_group = p_trigger_group
+    SELECT c.cron_expression INTO cron_expression
+    FROM quartz.qrtz_stored_cron_triggers AS c
+    WHERE
+        c.sched_name = p_sched_name
+      AND c.trigger_name = p_trigger_name
+      AND c.trigger_group = p_trigger_group
     LIMIT 1;
-END;
-$function$
-;
 
-GRANT EXECUTE ON FUNCTION quartz.get_qrtz_stored_cron_triggers(varchar,varchar,varchar) TO quartz_jobstore_user;
-                                                              
-CREATE OR REPLACE PROCEDURE quartz.upsert_qrtz_stored_cron_triggers(p_sched_name character varying, p_trigger_name character varying, p_trigger_group character varying, p_cron_expression character varying, p_time_zone_id character varying)
- LANGUAGE plpgsql
+    RETURN cron_expression;
+END;
+$function$;
+
+GRANT EXECUTE ON FUNCTION quartz.get_qrtz_stored_cron_triggers(varchar,varchar,varchar) TO hfedi_quartz_jobstore_user;
+
+CREATE OR REPLACE PROCEDURE quartz.upsert_qrtz_stored_cron_triggers
+(
+    p_sched_name character varying,
+    p_trigger_name character varying,
+    p_trigger_group character varying,
+    p_cron_expression character varying,
+    p_time_zone_id character varying
+)
+    LANGUAGE plpgsql
 AS $procedure$
 BEGIN
     INSERT INTO quartz.qrtz_stored_cron_triggers
     (sched_name, trigger_name, trigger_group, cron_expression, time_zone_id)
     VALUES(p_sched_name, p_trigger_name, p_trigger_group, p_cron_expression, p_time_zone_id)
     ON CONFLICT (sched_name, trigger_name, trigger_group) DO UPDATE
-     SET cron_expression=excluded.cron_expression,
-     time_zone_id=excluded.time_zone_id;
+        SET cron_expression=excluded.cron_expression,
+            time_zone_id=excluded.time_zone_id;
 END;
 $procedure$
 ;
 
-GRANT EXECUTE ON PROCEDURE quartz.upsert_qrtz_stored_cron_triggers(varchar,varchar,varchar,varchar,varchar) TO quartz_jobstore_user;
+GRANT EXECUTE ON PROCEDURE quartz.upsert_qrtz_stored_cron_triggers(varchar,varchar,varchar,varchar,varchar) TO hfedi_quartz_jobstore_user;
 
 CREATE OR REPLACE PROCEDURE quartz.delete_qrtz_stored_cron_triggers(p_trigger_name character varying)
- LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS $procedure$
 BEGIN
-DELETE FROM quartz.qrtz_stored_cron_triggers
-WHERE trigger_name = p_trigger_name;
+    DELETE FROM quartz.qrtz_stored_cron_triggers
+    WHERE trigger_name = p_trigger_name;
 END;
 $procedure$
 ;
 
-GRANT EXECUTE ON PROCEDURE quartz.delete_qrtz_stored_cron_triggers(varchar) TO quartz_jobstore_user;
+GRANT EXECUTE ON PROCEDURE quartz.delete_qrtz_stored_cron_triggers(varchar) TO hfedi_quartz_jobstore_user;
 ```
 
 </details>

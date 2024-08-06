@@ -21,6 +21,8 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
         [FromQuery]
         public string TriggerName { get; set; }
 
+        public string TriggerGroup { get; set; } = "DEFAULT";
+
         public string CronExpression { get; set; }
 
         public bool NeedWriteToPersistenceStore { get; set; }

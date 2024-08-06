@@ -1,6 +1,7 @@
 ﻿// Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -11,18 +12,21 @@ using Gems.Jobs.Quartz.Handlers.Shared;
 using Gems.Jobs.Quartz.TriggerProviders;
 using Gems.Jobs.Quartz.TriggerValidators;
 using Gems.Linq;
-using Gems.Mvc.Filters.Exceptions;
 
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Quartz;
 using Quartz.Impl.Triggers;
 
+using InvalidOperationException = Gems.Mvc.Filters.Exceptions.InvalidOperationException;
+
 namespace Gems.Jobs.Quartz;
 
 public class JobTriggerRegisterHostedService : BackgroundService
 {
+    private readonly ILogger<JobTriggerRegisterHostedService> logger;
     private readonly SchedulerProvider schedulerProvider;
     private readonly IHostApplicationLifetime hostApplicationLifetime;
     private readonly IOptions<JobsOptions> jobsOptions;
@@ -31,6 +35,7 @@ public class JobTriggerRegisterHostedService : BackgroundService
     private readonly StoredCronTriggerProvider storedCronTriggerProvider;
 
     public JobTriggerRegisterHostedService(
+        ILogger<JobTriggerRegisterHostedService> logger,
         SchedulerProvider schedulerProvider,
         IHostApplicationLifetime hostApplicationLifetime,
         IOptions<JobsOptions> jobsOptions,
@@ -38,6 +43,7 @@ public class JobTriggerRegisterHostedService : BackgroundService
         IEnumerable<ITriggerValidator> triggerValidator,
         StoredCronTriggerProvider storedCronTriggerProvider)
     {
+        this.logger = logger;
         this.schedulerProvider = schedulerProvider;
         this.hostApplicationLifetime = hostApplicationLifetime;
         this.jobsOptions = jobsOptions;
@@ -48,12 +54,20 @@ public class JobTriggerRegisterHostedService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        if (!await WaitForAppStartup(this.hostApplicationLifetime, stoppingToken))
+        try
         {
-            return;
-        }
+            if (!await WaitForAppStartup(this.hostApplicationLifetime, stoppingToken))
+            {
+                return;
+            }
 
-        await this.RegisterTriggersFromConfiguration(stoppingToken).ConfigureAwait(false);
+            await this.RegisterTriggersFromConfiguration(stoppingToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "В ходе регистрации триггеров произошла ошибка.");
+            throw;
+        }
     }
 
     private static async Task<bool> WaitForAppStartup(IHostApplicationLifetime lifetime, CancellationToken stoppingToken)
@@ -88,7 +102,7 @@ public class JobTriggerRegisterHostedService : BackgroundService
     {
         foreach (var trigger in triggerCollection)
         {
-            await this.UpdateCronExpression(trigger, cancellationToken).ConfigureAwait(false);
+            await this.UpdateCronExpression(scheduler, trigger, cancellationToken).ConfigureAwait(false);
             await ScheduleTrigger(scheduler, trigger, cancellationToken).ConfigureAwait(false);
         }
     }
@@ -105,18 +119,31 @@ public class JobTriggerRegisterHostedService : BackgroundService
         return triggerCollection;
     }
 
-    private async Task UpdateCronExpression(CronTriggerImpl trigger, CancellationToken cancellationToken)
+    private async Task UpdateCronExpression(
+        IScheduler scheduler,
+        CronTriggerImpl trigger,
+        CancellationToken cancellationToken)
     {
         if (!this.jobsOptions.Value.EnablePersistenceStore)
         {
             return;
         }
 
-        var cronExpression = await this.storedCronTriggerProvider.GetCronExpression(trigger.Name, cancellationToken);
+        var cronExpression = await this.storedCronTriggerProvider
+            .GetCronExpression(scheduler.SchedulerName, trigger.Name, trigger.Group, cancellationToken)
+            .ConfigureAwait(false);
 
         if (string.IsNullOrWhiteSpace(cronExpression))
         {
-            await this.storedCronTriggerProvider.WriteCronExpression(trigger.Name, trigger.CronExpressionString, cancellationToken);
+            await this.storedCronTriggerProvider
+                .WriteCronExpression(
+                    scheduler.SchedulerName,
+                    trigger.Name,
+                    trigger.Group,
+                    trigger.CronExpressionString,
+                    trigger.TimeZone.Id,
+                    cancellationToken)
+                .ConfigureAwait(false);
         }
         else
         {
