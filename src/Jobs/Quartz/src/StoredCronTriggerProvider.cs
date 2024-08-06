@@ -18,20 +18,29 @@ public class StoredCronTriggerProvider
         this.unitOfWorkProvider = unitOfWorkProvider;
     }
 
-    public Task<string> GetCronExpression(string triggerName, CancellationToken cancellationToken = default)
+    public Task<string> GetCronExpression(
+        string schedulerName,
+        string triggerName,
+        string triggerGroup,
+        CancellationToken cancellationToken = default)
     {
         return this.unitOfWorkProvider.GetUnitOfWork(cancellationToken)
             .CallScalarFunctionAsync<string>(
                 "quartz.get_qrtz_stored_cron_triggers",
                 new Dictionary<string, object>
                 {
-                    { "p_trigger_name", triggerName },
+                   ["p_sched_name"] = schedulerName,
+                   ["p_trigger_name"] = triggerName,
+                   ["p_trigger_group"] = triggerGroup
                 });
     }
 
     public Task WriteCronExpression(
+        string schedulerName,
         string triggerName,
+        string triggerGroup,
         string cronExpression,
+        string timezoneId,
         CancellationToken cancellationToken = default)
     {
         return this.unitOfWorkProvider.GetUnitOfWork(cancellationToken)
@@ -39,8 +48,11 @@ public class StoredCronTriggerProvider
                 "quartz.upsert_qrtz_stored_cron_triggers",
                 new Dictionary<string, object>
                 {
-                    { "p_trigger_name", triggerName },
-                    { "p_cron_expression", cronExpression },
+                    ["p_sched_name"] = schedulerName,
+                    ["p_trigger_name"] = triggerName,
+                    ["p_trigger_group"] = triggerGroup,
+                    ["p_cron_expression"] = cronExpression,
+                    ["p_time_zone_id"] = timezoneId
                 });
     }
 

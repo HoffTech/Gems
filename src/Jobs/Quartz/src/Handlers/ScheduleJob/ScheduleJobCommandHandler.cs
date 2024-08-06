@@ -59,37 +59,71 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
                 throw new InvalidOperationException($"Такое задание уже зарегистрировано {command.JobGroup ?? JobGroups.DefaultGroup}.{command.JobName}");
             }
 
-            if (await this.ScheduleSimpleTrigger(scheduler, command.JobName, command.JobGroup, command.CronExpression, cancellationToken).ConfigureAwait(false))
+            if (await this
+                    .ScheduleSimpleTrigger(
+                        scheduler,
+                        command.JobName,
+                        command.JobGroup,
+                        command.CronExpression,
+                        cancellationToken)
+                    .ConfigureAwait(false))
             {
-                await this.WriteToPersistenceStore(command, cancellationToken);
+                await this.WriteToPersistenceStore(scheduler, command, cancellationToken);
                 return;
             }
 
-            if (await this.ScheduleTriggerWithData(scheduler, command.JobName, command.JobGroup, command.CronExpression, command.TriggerName, cancellationToken).ConfigureAwait(false))
+            if (await this
+                    .ScheduleTriggerWithData(
+                        scheduler,
+                        command.JobName,
+                        command.JobGroup,
+                        command.CronExpression,
+                        command.TriggerName,
+                        cancellationToken)
+                    .ConfigureAwait(false))
             {
-                await this.WriteToPersistenceStore(command, cancellationToken);
+                await this.WriteToPersistenceStore(scheduler, command, cancellationToken);
                 return;
             }
 
-            await this.ScheduleTriggerFromDb(scheduler, command.JobName, command.JobGroup, command.CronExpression, command.TriggerName, cancellationToken).ConfigureAwait(false);
+            await this.ScheduleTriggerFromDb(
+                    scheduler,
+                    command.JobName,
+                    command.JobGroup,
+                    command.CronExpression,
+                    command.TriggerName,
+                    cancellationToken)
+                .ConfigureAwait(false);
 
-            await this.WriteToPersistenceStore(command, cancellationToken);
+            await this.WriteToPersistenceStore(scheduler, command, cancellationToken);
         }
 
-        private async Task WriteToPersistenceStore(ScheduleJobCommand command, CancellationToken cancellationToken)
+        private static async Task<List<string>> GetTriggersForSchedule(
+            IScheduler scheduler,
+            string jobName,
+            List<string> triggersFromConfiguration,
+            CancellationToken cancellationToken)
+        {
+            var jobTriggers = (await scheduler.GetTriggersOfJob(new JobKey(jobName), cancellationToken).ConfigureAwait(false)).ToList();
+            return triggersFromConfiguration.Where(triggerName => !jobTriggers.Exists(t => t.Key.Name == triggerName)).ToList();
+        }
+
+        private async Task WriteToPersistenceStore(IScheduler scheduler, ScheduleJobCommand command, CancellationToken cancellationToken)
         {
             if (!command.NeedWriteToPersistenceStore || !this.options.Value.EnablePersistenceStore)
             {
                 return;
             }
 
-            await this.storedCronTriggerProvider.WriteCronExpression(command.TriggerName, command.CronExpression, cancellationToken).ConfigureAwait(false);
-        }
-
-        private static async Task<List<string>> GetTriggersForSchedule(IScheduler scheduler, string jobName, List<string> triggersFromConfiguration, CancellationToken cancellationToken)
-        {
-            var jobTriggers = (await scheduler.GetTriggersOfJob(new JobKey(jobName), cancellationToken).ConfigureAwait(false)).ToList();
-            return triggersFromConfiguration.Where(triggerName => !jobTriggers.Exists(t => t.Key.Name == triggerName)).ToList();
+            await this.storedCronTriggerProvider
+                .WriteCronExpression(
+                    scheduler.SchedulerName,
+                    command.TriggerName,
+                    command.TriggerGroup,
+                    command.CronExpression,
+                    TimeZoneInfo.Local.Id,
+                    cancellationToken)
+                .ConfigureAwait(false);
         }
 
         private async Task<bool> ScheduleSimpleTrigger(IScheduler scheduler, string jobName, string jobGroup, string cronExpression, CancellationToken cancellationToken)
@@ -109,8 +143,7 @@ namespace Gems.Jobs.Quartz.Handlers.ScheduleJob
                 jobGroup ?? JobGroups.DefaultGroup,
                 jobName,
                 jobGroup ?? JobGroups.DefaultGroup,
-                cronExpression ?? triggerCronExpression,
-                null);
+                cronExpression ?? triggerCronExpression);
 
             await scheduler.ScheduleJob(newTrigger, cancellationToken).ConfigureAwait(false);
             return true;
