@@ -97,29 +97,27 @@ public class UnspecifiedDateTimeConverterTests
     }
 
     [Test]
-    public void T2()
-    {
-        var deserializedData = "{\"value1\":123.4567,\"value2\":123.4567,\"value3\":\"\",\"value4\":\"2024-05-21T03:18:54\"}".Deserialize<ValuesHolder>();
-        Console.WriteLine(deserializedData.Value1);
-        Console.WriteLine(deserializedData.Value2);
-        Console.WriteLine(deserializedData.Value3);
-        Console.WriteLine(deserializedData.Value4.ToString("yyyy-MM-ddTHH:mm:sszzz"));
-    }
-
-    [Test]
-    public void DeserializeDateTime_DateTimeMillisecondsFormatLowerThenValue_DoesntThrowException()
+    public void DeserializeDateTime_DateTimeMillisecondsFormatAndValueAreEquals_DoesntThrowException()
     {
         var deserializedData = "{\"value\":\"2024-05-21T03:18:54.167\"}"
-            .Deserialize<DateTimeWithMillisecondsValueHolder>();
-        Console.WriteLine(deserializedData.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+            .Deserialize<DateTimeWithThreeFormatMillisecondsValueHolder>();
+        Assert.AreEqual("2024-05-21T03:18:54.1670000", deserializedData.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
     }
 
     [Test]
     public void DeserializeDateTime_DateTimeMillisecondsFormatHigherThenValue_DoesntThrowException()
     {
         var deserializedData = "{\"value\": \"2024-05-21T03:18:54.167\"}"
-            .Deserialize<DateTimeWithHigherMillisecondsValueHolder>();
-        Console.WriteLine(deserializedData.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+            .Deserialize<DateTimeWithFourFormatMillisecondsValueHolder>();
+        Assert.AreEqual("2024-05-21T03:18:54.1670000", deserializedData.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+    }
+
+    [Test]
+    public void DeserializeDateTime_DateTimeMillisecondsFormatLowerThenValue_DoesntThrowException()
+    {
+        var deserializedData = "{\"value\": \"2024-05-21T03:18:54.167\"}"
+            .Deserialize<DateTimeWithTwoFormatMillisecondsValueHolder>();
+        Assert.AreEqual("2024-05-21T03:18:54.1670000", deserializedData.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
     }
 
     [Test]
@@ -127,7 +125,39 @@ public class UnspecifiedDateTimeConverterTests
     {
         var deserializedData = "{\"value\":\"2024-05-21T03:18:54.167\"}";
 
-        Assert.Throws<Exception>(() => deserializedData.Deserialize<DateTimeWithHigherMillisecondsValueHolderWithoutCutoff>());
+        Assert.Throws<Exception>(() => deserializedData.Deserialize<DateTimeWithHigherFormatMillisecondsValueHolderWithoutCutoff>());
+    }
+
+    [Test]
+    public void DeserializeDateTime_DateTimeMillisecondsValueHigherThenLimitFormat_DoesntThrowException()
+    {
+        var deserializedData = "{\"value\": \"2024-05-21T03:18:54.16700000000000\"}"
+            .Deserialize<DateTimeWithMaxFormatMillisecondsValueHolder>();
+        Assert.AreEqual("2024-05-21T03:18:54.1670000", deserializedData.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+    }
+
+    [Test]
+    public void DeserializeDateTime_DateTimeMillisecondsValueLowerThenFormat_DoesntThrowException()
+    {
+        var deserializedData = "{\"value\": \"2024-05-21T03:18:54.167\"}"
+            .Deserialize<DateTimeWithHigherFormatMillisecondsValueHolder>();
+        Assert.AreEqual("2024-05-21T03:18:54.1670000", deserializedData.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+    }
+
+    [Test]
+    public void DeserializeDateTime_DateTimeEmptyMillisecondsFormat_DoesntThrowException()
+    {
+        var deserializedData = "{\"value\": \"2024-05-21T03:18:54.167\"}"
+            .Deserialize<DateTimeWithEmptyFormatMillisecondsValueHolder>();
+        Assert.AreEqual("2024-05-21T03:18:54.1670000", deserializedData.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+    }
+
+    [Test]
+    public void DeserializeDateTime_DateTimeEmptyMillisecondsValue_DoesntThrowException()
+    {
+        var deserializedData = "{\"value\": \"2024-05-21T03:18:54\"}"
+            .Deserialize<DateTimeWithThreeFormatMillisecondsValueHolder>();
+        Assert.AreEqual("2024-05-21T03:18:54.0000000", deserializedData.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
     }
 
     private class DateTimeValueHolder
@@ -148,28 +178,45 @@ public class UnspecifiedDateTimeConverterTests
         public DateTime Value4 { get; set; }
     }
 
-    private class DateTimeWithMillisecondsValueHolder
+    private class DateTimeWithTwoFormatMillisecondsValueHolder
     {
-        [UnspecifiedDateTimeConverter(
-            DeserializerFormat = "yyyy-MM-ddTHH:mm:ss.fffffff",
-            DeserializerTimeZone = "Russian Standard Time")]
+        [UnspecifiedDateTimeConverter(DeserializerFormat = "yyyy-MM-ddTHH:mm:ss.ff", TargetTimeKind = DateTimeKind.Utc)]
         public DateTime Value { get; set; }
     }
 
-    private class DateTimeWithHigherMillisecondsValueHolder
+    private class DateTimeWithThreeFormatMillisecondsValueHolder
     {
-        [UnspecifiedDateTimeConverter(
-            DeserializerFormat = "yyyy-MM-ddTHH:mm:ss.ffffffffffff",
-            DeserializerTimeZone = "Russian Standard Time")]
+        [UnspecifiedDateTimeConverter(DeserializerFormat = "yyyy-MM-ddTHH:mm:ss.fff", TargetTimeKind = DateTimeKind.Utc)]
         public DateTime Value { get; set; }
     }
 
-    private class DateTimeWithHigherMillisecondsValueHolderWithoutCutoff
+    private class DateTimeWithFourFormatMillisecondsValueHolder
     {
-        [UnspecifiedDateTimeConverter(
-            DeserializerFormat = "yyyy-MM-ddTHH:mm:ss.ffffffffffff",
-            DeserializerTimeZone = "Russian Standard Time",
-            DisableTreatmentMilliseconds = true)]
+        [UnspecifiedDateTimeConverter(DeserializerFormat = "yyyy-MM-ddTHH:mm:ss.ffff", TargetTimeKind = DateTimeKind.Utc)]
+        public DateTime Value { get; set; }
+    }
+
+    private class DateTimeWithMaxFormatMillisecondsValueHolder
+    {
+        [UnspecifiedDateTimeConverter(DeserializerFormat = "yyyy-MM-ddTHH:mm:ss.fffffff", TargetTimeKind = DateTimeKind.Utc)]
+        public DateTime Value { get; set; }
+    }
+
+    private class DateTimeWithHigherFormatMillisecondsValueHolder
+    {
+        [UnspecifiedDateTimeConverter(DeserializerFormat = "yyyy-MM-ddTHH:mm:ss.ffffffffffff", TargetTimeKind = DateTimeKind.Utc)]
+        public DateTime Value { get; set; }
+    }
+
+    private class DateTimeWithHigherFormatMillisecondsValueHolderWithoutCutoff
+    {
+        [UnspecifiedDateTimeConverter(DeserializerFormat = "yyyy-MM-ddTHH:mm:ss.ffffffffffff", DisableTreatmentMilliseconds = true)]
+        public DateTime Value { get; set; }
+    }
+
+    private class DateTimeWithEmptyFormatMillisecondsValueHolder
+    {
+        [UnspecifiedDateTimeConverter(DeserializerFormat = "yyyy-MM-ddTHH:mm:ss", TargetTimeKind = DateTimeKind.Utc)]
         public DateTime Value { get; set; }
     }
 }

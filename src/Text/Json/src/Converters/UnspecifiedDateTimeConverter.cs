@@ -107,20 +107,48 @@ namespace Gems.Text.Json.Converters
             }
 
             var millisecondsFormatRegex = new Regex(@":ss\.f+");
-            var millisecondsRegex = new Regex(@":\d+\.\d+");
+            var millisecondsValueRegex = new Regex(@":\d\d\.\d+");
 
             if (string.IsNullOrEmpty(dateTimeFormat) || string.IsNullOrEmpty(dateTimeAsString))
             {
                 return;
             }
 
-            if (!millisecondsFormatRegex.IsMatch(dateTimeFormat) || !millisecondsRegex.IsMatch(dateTimeAsString))
+            if (!millisecondsFormatRegex.IsMatch(dateTimeFormat) && !millisecondsValueRegex.IsMatch(dateTimeAsString))
+            {
+                return;
+            }
+
+            if (!millisecondsFormatRegex.IsMatch(dateTimeFormat))
+            {
+                var formatWithoutMillisecondsRegex = new Regex(":ss");
+                if (!formatWithoutMillisecondsRegex.IsMatch(dateTimeFormat))
+                {
+                    return;
+                }
+
+                dateTimeFormat = formatWithoutMillisecondsRegex.Replace(dateTimeFormat, ":ss.f");
+            }
+
+            if (!millisecondsValueRegex.IsMatch(dateTimeAsString))
+            {
+                var valueWithoutMillisecondsRegex = new Regex(@"\d\d:\d\d:\d\d");
+                if (!valueWithoutMillisecondsRegex.IsMatch(dateTimeAsString))
+                {
+                    return;
+                }
+
+                var valueWithoutMilliseconds = valueWithoutMillisecondsRegex.Match(dateTimeAsString).Value + ".0";
+                dateTimeAsString = valueWithoutMillisecondsRegex.Replace(dateTimeAsString, valueWithoutMilliseconds);
+            }
+
+            if (!millisecondsFormatRegex.IsMatch(dateTimeFormat) || !millisecondsValueRegex.IsMatch(dateTimeAsString))
             {
                 return;
             }
 
             var millisecondsFormat = millisecondsFormatRegex.Match(dateTimeFormat).Value;
-            var milliseconds = millisecondsRegex.Match(dateTimeAsString).Value;
+            var millisecondsValue = millisecondsValueRegex.Match(dateTimeAsString).Value;
 
             const int maxMillisecondsLimitInDtWithSecondsAndDot = 11;
             if (millisecondsFormat.Length > maxMillisecondsLimitInDtWithSecondsAndDot)
@@ -129,18 +157,32 @@ namespace Gems.Text.Json.Converters
                 dateTimeFormat = millisecondsFormatRegex.Replace(dateTimeFormat, millisecondsFormat);
             }
 
-            if (millisecondsFormat.Length == milliseconds.Length)
+            if (millisecondsValue.Length > maxMillisecondsLimitInDtWithSecondsAndDot)
+            {
+                millisecondsValue = millisecondsValue[..maxMillisecondsLimitInDtWithSecondsAndDot];
+                dateTimeAsString = millisecondsValueRegex.Replace(dateTimeAsString, millisecondsValue);
+            }
+
+            if (millisecondsFormat.Length < millisecondsValue.Length)
+            {
+                var correctMillisecondsFormat = millisecondsFormat.PadRight(millisecondsValue.Length, 'f');
+                dateTimeFormat = millisecondsFormatRegex.Replace(dateTimeFormat, correctMillisecondsFormat);
+                return;
+            }
+
+            if (millisecondsFormat.Length > millisecondsValue.Length)
+            {
+                var correctMillisecondsValue = millisecondsValue.PadRight(millisecondsFormat.Length, '0');
+                dateTimeAsString = millisecondsValueRegex.Replace(dateTimeAsString, correctMillisecondsValue);
+                return;
+            }
+
+            if (millisecondsFormat.Length == millisecondsValue.Length)
             {
                 return;
             }
 
-            if (millisecondsFormat.Length <= milliseconds.Length)
-            {
-                return;
-            }
-
-            var correctMilliseconds = milliseconds.PadRight(millisecondsFormat.Length, '0');
-            dateTimeAsString = millisecondsRegex.Replace(dateTimeAsString, correctMilliseconds);
+            throw new Exception("Что-то пошло не так!");
         }
 
         private DateTime SpecifyDateTimeKind(DateTime dateTimeValue)
