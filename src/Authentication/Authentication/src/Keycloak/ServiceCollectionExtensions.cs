@@ -41,6 +41,7 @@ public static class ServiceCollectionExtensions
                 cookie.Cookie.MaxAge = TimeSpan.FromMinutes(keycloakAuthOptions.CookieOptions.MaxAge);
                 cookie.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 cookie.SlidingExpiration = true;
+                cookie.ExpireTimeSpan = TimeSpan.FromMinutes(1);
             })
             .AddOpenIdConnect(options =>
             {
