@@ -9,5 +9,5 @@ public class CookieOptions
 
     public int MaxAge { get; set; }
 
-    public int ExpireTimeSpan { get; set; } = 30;
+    public double? ExpireTimeSpan { get; set; }
 }
