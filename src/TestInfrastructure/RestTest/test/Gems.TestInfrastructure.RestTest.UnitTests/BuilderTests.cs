@@ -37,7 +37,7 @@ namespace Gems.TestInfrastructure.RestTest.UnitTests
         [TestCase("{{\"POST\"}}", "POST")]
         [TestCase("{{Fake.OneOf(\"delete\", \"DELETE\")}}", "DELETE")]
         [TestCase("", "GET")]
-        // [TestCase(null, "GET")]
+        [TestCase(null, "GET")]
         public void HttpMethodParse(string method, string expectedMethodString)
         {
             var expectedMethod = HttpMethod.Parse(expectedMethodString);
