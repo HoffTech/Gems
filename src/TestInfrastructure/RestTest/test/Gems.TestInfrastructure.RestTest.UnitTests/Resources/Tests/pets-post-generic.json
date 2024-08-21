@@ -1,0 +1,14 @@
+{
+  "request": {
+    "url": "/pets",
+    "method":  "post",
+    "body": {
+      "name": "{{Fake.OneOf(\"cat\", \"dog\", \"cow\")}}",
+      "say": "{{Fake.OneOf(\"meow\", \"woof\", \"moo\")}}",
+      "friends": [
+        "{{Fake.OneOf(\"cat\", \"dog\", \"cow\")}}",
+        "{{Fake.OneOf(\"cat\", \"dog\", \"cow\")}}"
+      ]
+    }
+  }
+}
