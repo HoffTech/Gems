@@ -590,6 +590,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.TestInfrastructure.Res
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.TestInfrastructure.RestTest.UnitTests", "src\TestInfrastructure\RestTest\test\Gems.TestInfrastructure.RestTest.UnitTests\Gems.TestInfrastructure.RestTest.UnitTests.csproj", "{4D6BBE7D-72FD-4FDA-A1AC-F229656CF4B1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{CF4846CE-1B9E-4E15-BB48-800AC407D4E6}"
+	ProjectSection(SolutionItems) = preProject
+		src\TestInfrastructure\RestTest\allure.png = src\TestInfrastructure\RestTest\allure.png
+		src\TestInfrastructure\RestTest\README.md = src\TestInfrastructure\RestTest\README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1226,6 +1232,7 @@ Global
 		{B976A598-CE7A-4F43-B555-8AD989506052} = {3D7134D4-6834-4950-B024-434355A4FB92}
 		{CB4592D1-9FCD-40FF-A0EF-31A41F8FD0DA} = {B976A598-CE7A-4F43-B555-8AD989506052}
 		{4D6BBE7D-72FD-4FDA-A1AC-F229656CF4B1} = {B976A598-CE7A-4F43-B555-8AD989506052}
+		{CF4846CE-1B9E-4E15-BB48-800AC407D4E6} = {B976A598-CE7A-4F43-B555-8AD989506052}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F59BAF6C-0E34-4F38-A0E7-2227592118CE}
