@@ -1,0 +1,10 @@
+{
+  "request": {
+    "url": "/pets",
+    "method":  "post",
+    "body": {
+      "name": "cat",
+      "say": "meow"
+    }
+  }
+}
