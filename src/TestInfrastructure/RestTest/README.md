@@ -7,7 +7,7 @@
 ## Использование в проектах тестов
 Допустим у нас есть готовый проект NUnit. Добавляем в него папки:
 - Resources
-- QA  
+- QA
 
 В папку Resources/QA будем складывать наши интеграционные тесты с расширением json. Файлы должны быть помечены как Copy if newer.
 Добавляем юнит-тест:
@@ -88,34 +88,34 @@ public async Task RunQA()
 ### Рассмотрим секции:
 ```json
 "request": {
-    "method": "POST",
-    "url": "{{BaseUrl}}/{{methodName}}",
-    "body": {
-      "name": "{{Fake.FullName()}}",
-      "salary": "{{Fake.Amount()}}",
-      "age": "{{Fake.Int(18, 55)}}"
-    }
+"method": "POST",
+"url": "{{BaseUrl}}/{{methodName}}",
+"body": {
+"name": "{{Fake.FullName()}}",
+"salary": "{{Fake.Amount()}}",
+"age": "{{Fake.Int(18, 55)}}"
+}
 }
 ```
 
-#### Секция variables 
+#### Секция variables
 содержит переменные:
 ```json
 "variables": {
-  "methodName": "api/v1/create"
+"methodName": "api/v1/create"
 }
 ```
 
-Значения переменных могут быть заданы как выражения. Значения переменных вычисляются перед запуском запроса. 
+Значения переменных могут быть заданы как выражения. Значения переменных вычисляются перед запуском запроса.
 
 #### Секция templates
 содержит шаблоны:
 ```json
 "templates": {
-    "UserTemplate": {
-        "name": "{{Fake.UserName()}}",
-        "password": "{{Fake.Password()}}"
-    }
+"UserTemplate": {
+"name": "{{Fake.UserName()}}",
+"password": "{{Fake.Password()}}"
+}
 }
 ```
 
@@ -123,31 +123,31 @@ public async Task RunQA()
 Пример использования:
 ```json
 "request": {
-    "method": "PUT",
-    "url": "{{BaseUrl}}/users",
-    "body": {
-        "users": ["{{UserTemplate}}", "{{UserTemplate}}", "{{UserTemplate}}"]
-    }
+"method": "PUT",
+"url": "{{BaseUrl}}/users",
+"body": {
+"users": ["{{UserTemplate}}", "{{UserTemplate}}", "{{UserTemplate}}"]
+}
 }
 ```
 
 Код из примера выше создаст запрос из 3х пользователей со случайным именем и паролем:
 ```json
 {
-    "users": [
-        {
-            "name": "user1",
-            "password": "pass1"
-        },
-        {
-            "name": "user2",
-            "password": "pass2"
-        },
-        {
-            "name": "user3",
-            "password": "pass3"
-        }
-    ]
+  "users": [
+    {
+      "name": "user1",
+      "password": "pass1"
+    },
+    {
+      "name": "user2",
+      "password": "pass2"
+    },
+    {
+      "name": "user3",
+      "password": "pass3"
+    }
+  ]
 }
 ```
 
@@ -157,12 +157,12 @@ public async Task RunQA()
 - url – адрес, лучше, если это будет относительный адрес
 - body – (необязательно) объект, который передается в методах POST/PUT
 
-#### Секция asserts 
+#### Секция asserts
 содержит список проверок. Каждая проверка представляет из себя выражение, которое должно вернуть true
 ```json
 "asserts": [
-    "Response.StatusCode==200",
-    "Response.Body.Json.Error==null"
+"Response.StatusCode==200",
+"Response.Body.Json.Error==null"
 ]
 ```
 
@@ -170,15 +170,16 @@ public async Task RunQA()
 содержит переменные, которые могут хранить результат теста. Их можно будет использовать в следующем тесте
 ```json
 "output": {
-    "LastResponse": "{{Response}}"
+"LastResponse": "{{Response}}"
 }
 ```
 ### Встроенные переменные:
-- Fake – для генерации данных запроса. См. https://gitlab.hoff.ru/axdev/libraries/resttest/-/blob/master/src/RestTest.Core/Library/FakerLibrary.cs
-- Assert, Is – для использования в проверках. См.
-- https://gitlab.hoff.ru/axdev/libraries/resttest/-/blob/master/src/RestTest.Core/Asserts/AssertLibrary.cs 
-- https://gitlab.hoff.ru/axdev/libraries/resttest/-/blob/master/src/RestTest.Core/Asserts/AssertIsLibrary.cs 
-- Response – доступна после выполнения первого запроса. Содержит результат   
+- Fake – для генерации данных запроса. Смотреть сюда:
+    - https://gitlab.hoff.ru/axdev/libraries/gems/-/blob/main/src/TestInfrastructure/RestTest/src/Gems.TestInfrastructure.RestTest/Library/FakerLibrary.cs
+- Assert, Is – для использования в проверках. Смотреть сюда:
+    - https://gitlab.hoff.ru/axdev/libraries/gems/-/blob/main/src/TestInfrastructure/RestTest/src/Gems.TestInfrastructure.RestTest/Asserts/AssertLibrary.cs
+    - https://gitlab.hoff.ru/axdev/libraries/gems/-/blob/main/src/TestInfrastructure/RestTest/src/Gems.TestInfrastructure.RestTest/Asserts/AssertIsLibrary.cs
+- Response – доступна после выполнения первого запроса. Содержит результат
 
 ### Структура Response:
 - Body
@@ -187,11 +188,12 @@ public async Task RunQA()
 - StatusCode – (int) HTTP- статус запроса
 - Headers – (Dictionary<string, IEnumerable<string>>) – заголовки ответа
 
-### Выражения  
-Все поля файла теста могут быть заданы в виде выражений. Выражения заключаются в двойные фигурные скобки. Если в значении узла json содержатся несколько выражений или выражения будут перемешаны с текстом, то итоговый узел будет иметь значение типа строка:  
+### Выражения
+Все поля файла теста могут быть заданы в виде выражений.  
+Выражения заключаются в двойные фигурные скобки. Если в значении узла json содержатся несколько выражений или выражения будут перемешаны с текстом, то итоговый узел будет иметь значение типа строка:
 - "stringParam": "Name {{Fake.FullName()}}, Age {{Fake.Age()}}" // string
 
-Если выражение является единственным, то узел будет иметь тип в зависимости от результата вычисления  
+Если выражение является единственным, то узел будет иметь тип в зависимости от результата вычисления
 - "dtParam": "{{DateTime.Now}}" // DateTime
 - "intParam": "{{1 + 2}}" // int
 - "doubleParam": "{{Fake.Amount()}}" // double
