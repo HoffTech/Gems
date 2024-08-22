@@ -30,8 +30,8 @@ namespace Gems.TestInfrastructure.RestTest
             {
                 var searchPattern = Path.GetFileName(path);
                 var directory = Path.GetDirectoryName(path);
-                var options = new EnumerationOptions();
-                options.RecurseSubdirectories = recursive;
+                var options = new EnumerationOptions { RecurseSubdirectories = recursive };
+
                 foreach (var fileName in Directory.EnumerateFiles(directory ?? ".", searchPattern ?? "*.json", options))
                 {
                     yield return await ReadTestCollectionFileAsync(fileName, cancellationToken);
