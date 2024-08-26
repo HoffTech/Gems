@@ -173,7 +173,7 @@ public class TestRunner : IDisposable
                 await this.ExecuteRequestAsync(builder.Build(test.Request), cancellationToken);
             }
 
-            this.EvalOutput(test.Output);
+            this.EvalOutput(test);
             success = true;
 
             foreach (var assertItem in test.Asserts)
