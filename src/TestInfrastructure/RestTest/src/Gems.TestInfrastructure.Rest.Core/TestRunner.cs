@@ -58,11 +58,17 @@ public class TestRunner : IDisposable
 
             if (collection.Tests != null)
             {
+                var outputs = new List<KeyValuePair<string, object>>();
+
                 foreach (var test in collection.Tests)
                 {
+                    test.Variables.AddRange(outputs);
+
                     success &= this.InternalRunTestAsync(test, cancellationToken)
                         .GetAwaiter()
                         .GetResult();
+
+                    outputs.AddRange(test.Output);
                 }
             }
 
@@ -167,7 +173,7 @@ public class TestRunner : IDisposable
                 await this.ExecuteRequestAsync(builder.Build(test.Request), cancellationToken);
             }
 
-            this.AddOutput(test.Output);
+            this.EvalOutput(test.Output);
             success = true;
 
             foreach (var assertItem in test.Asserts)
@@ -319,15 +325,24 @@ public class TestRunner : IDisposable
         }
     }
 
-    private void AddOutput(IEnumerable<KeyValuePair<string, object>> output)
+    private void EvalOutput(Test test)
     {
-        if (output != null)
+        if (test.Output is null)
         {
-            foreach (var kv in output)
-            {
-                this.context.SetVariable(kv.Key, kv.Value);
-            }
+            return;
         }
+
+        var tmp = new List<KeyValuePair<string, object>>();
+
+        foreach (var kv in test.Output)
+        {
+            tmp.Add(new KeyValuePair<string, object>(kv.Key, this.context.Eval(kv.Value)));
+
+            // похоже, это здесь не нужно, оно теряется при PopScope() внутри InternalRunTestAsync блока finally
+            // this.context.SetVariable(kv.Key, tmp);
+        }
+
+        test.Output = tmp;
     }
 
     private void MergeScope(TestScope scope)
