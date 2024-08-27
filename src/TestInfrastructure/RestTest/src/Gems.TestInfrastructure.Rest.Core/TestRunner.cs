@@ -12,6 +12,7 @@ using Gems.TestInfrastructure.Rest.Core.Model;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Gems.TestInfrastructure.Rest.Core;
 
@@ -58,17 +59,11 @@ public class TestRunner : IDisposable
 
             if (collection.Tests != null)
             {
-                var outputs = new List<KeyValuePair<string, object>>();
-
                 foreach (var test in collection.Tests)
                 {
-                    test.Variables.AddRange(outputs);
-
                     success &= this.InternalRunTestAsync(test, cancellationToken)
                         .GetAwaiter()
                         .GetResult();
-
-                    outputs.AddRange(test.Output);
                 }
             }
 
@@ -104,7 +99,7 @@ public class TestRunner : IDisposable
     {
         try
         {
-            return JsonConvert.DeserializeObject(text);
+            return JsonConvert.DeserializeObject<ExpandoObject>(text, new ExpandoObjectConverter());
         }
         catch
         {
@@ -164,7 +159,7 @@ public class TestRunner : IDisposable
             test.Name,
             test.Description,
             test.Author);
-        this.PushScope(test);
+        this.MergeScope(test);
         try
         {
             if (test.Request != null)
@@ -189,7 +184,6 @@ public class TestRunner : IDisposable
         }
         finally
         {
-            this.PopScope();
             lifeCycle.UpdateTestCase(x =>
             {
                 x.status = success ? Status.passed : Status.failed;
@@ -327,38 +321,12 @@ public class TestRunner : IDisposable
 
     private void EvalOutput(Test test)
     {
-        if (test.Output is null)
-        {
-            return;
-        }
-
-        var tmp = new List<KeyValuePair<string, object>>();
-
-        foreach (var kv in test.Output)
-        {
-            tmp.Add(new KeyValuePair<string, object>(kv.Key, this.context.Eval(kv.Value)));
-
-            // похоже, это здесь не нужно, оно теряется при PopScope() внутри InternalRunTestAsync блока finally
-            // this.context.SetVariable(kv.Key, tmp);
-        }
-
-        test.Output = tmp;
+        test.Output?.ForEach(kv => this.context.SetVariable(kv.Key, kv.Value));
     }
 
     private void MergeScope(TestScope scope)
     {
         scope.Variables?.ForEach(kv => this.context.SetVariable(kv.Key, kv.Value));
         scope.Templates?.ForEach(kv => this.context.SetTemplateVariable(kv.Key, kv.Value));
-    }
-
-    private void PushScope(TestScope scope)
-    {
-        this.context.PushScope();
-        this.MergeScope(scope);
-    }
-
-    private void PopScope()
-    {
-        this.context.PopScope();
     }
 }
