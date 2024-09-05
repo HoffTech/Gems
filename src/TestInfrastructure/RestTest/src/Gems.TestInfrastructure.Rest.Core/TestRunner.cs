@@ -195,7 +195,7 @@ public class TestRunner : IDisposable
                 x.status = success ? Status.passed : Status.failed;
                 x.statusDetails = new StatusDetails()
                 {
-                    message = success ? "Test failed" : "Test succeeded",
+                    message = success ? "Test succeeded" : "Test failed",
                     trace = trace.ToString(),
                 };
             });
