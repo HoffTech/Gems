@@ -18,6 +18,7 @@ namespace Gems.Mvc.MultipleModelBinding
             var multipleModelBinderProvider = new MultipleModelBinderProvider(bodyProvider, complexProvider);
 
             options.ModelBinderProviders.Insert(0, multipleModelBinderProvider);
+            options.ModelBinderProviders.Insert(0, new JsonModelBinderProvider());
         }
     }
 }
