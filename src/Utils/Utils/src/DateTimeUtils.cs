@@ -9,6 +9,9 @@ using Gems.Utils.Attributes;
 
 namespace Gems.Utils
 {
+    /// <summary>
+    /// Методы для работы с датами.
+    /// </summary>
     public class DateTimeUtils
     {
         public static void SetUnspecifiedToUtcDateTimeEnumerable<TModel>(IEnumerable<TModel> data)
