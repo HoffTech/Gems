@@ -79,7 +79,7 @@ public class TestRunnerContext
             var first = segments.First();
             return first.SegmentType switch
             {
-                MustacheSegmentType.Text => this.EvalGeneral(first.Value),
+                MustacheSegmentType.Text => first.Value,
                 MustacheSegmentType.Expression => this.EvalExpression(first.Value),
                 _ => throw new ArgumentOutOfRangeException()
             };
@@ -104,30 +104,6 @@ public class TestRunnerContext
         }
 
         return result;
-    }
-
-    public object EvalGeneral(string expression)
-    {
-        if (int.TryParse(expression, out var intValue))
-        {
-            return intValue;
-        }
-        else if (double.TryParse(expression, CultureInfo.InvariantCulture, out var doubleValue))
-        {
-            return doubleValue;
-        }
-        else if (bool.TryParse(expression, out var boolValue))
-        {
-            return boolValue;
-        }
-        else if (this.TryParseTimeSpan(expression, out var tsValue))
-        {
-            return tsValue;
-        }
-        else
-        {
-            return expression;
-        }
     }
 
     public TimeSpan? ParseTimeSpan(string expression)

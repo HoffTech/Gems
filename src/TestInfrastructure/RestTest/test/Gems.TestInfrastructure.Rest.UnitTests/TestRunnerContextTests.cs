@@ -27,6 +27,13 @@ public class TestRunnerContextTests
     }
 
     [Test]
+    public void ParseJson()
+    {
+        var o = Newtonsoft.Json.JsonConvert.DeserializeObject<object>("{ \"setId\": \"123\" }");
+        Console.WriteLine(o.ToString());
+    }
+
+    [Test]
     public void AddExpression()
     {
         var a = this.context.Eval("{{1 + 1}}");
@@ -43,28 +50,28 @@ public class TestRunnerContextTests
     [Test]
     public void BooleanTrue()
     {
-        var a = this.context.Eval("true");
+        var a = this.context.Eval("{{true}}");
         a.Should().Be(true);
     }
 
     [Test]
     public void BooleanFalse()
     {
-        var a = this.context.Eval("false");
+        var a = this.context.Eval("{{false}}");
         a.Should().Be(false);
     }
 
     [Test]
     public void Integer()
     {
-        var a = this.context.Eval("123");
+        var a = this.context.Eval("{{123}}");
         a.Should().Be(123);
     }
 
     [Test]
     public void Double()
     {
-        var a = this.context.Eval("123.56");
+        var a = this.context.Eval("{{123.56}}");
         a.Should().Be(123.56);
     }
 
