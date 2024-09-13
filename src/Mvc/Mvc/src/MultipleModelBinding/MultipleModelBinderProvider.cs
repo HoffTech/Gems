@@ -32,10 +32,8 @@ namespace Gems.Mvc.MultipleModelBinding
                 var complexBinder = this.complexTypeModelBinderProvider.GetBinder(context);
                 return new MultipleModelBinder(bodyBinder, complexBinder);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
     }
 }
