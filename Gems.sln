@@ -584,11 +584,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Http.Samples.DownloadC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.Jobs.Quartz.Samples.PersistenceStore", "src\Jobs\Quartz\samples\Gems.Jobs.Quartz.Samples.PersistenceStore\Gems.Jobs.Quartz.Samples.PersistenceStore.csproj", "{EC78F477-401D-49C9-A954-E63BCD034C5B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RestTest", "RestTest", "{B976A598-CE7A-4F43-B555-8AD989506052}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rest", "Rest", "{B976A598-CE7A-4F43-B555-8AD989506052}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.TestInfrastructure.RestTest", "src\TestInfrastructure\RestTest\src\Gems.TestInfrastructure.RestTest\Gems.TestInfrastructure.RestTest.csproj", "{CB4592D1-9FCD-40FF-A0EF-31A41F8FD0DA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.TestInfrastructure.Rest.Core", "src\TestInfrastructure\RestTest\src\Gems.TestInfrastructure.Rest.Core\Gems.TestInfrastructure.Rest.Core.csproj", "{CB4592D1-9FCD-40FF-A0EF-31A41F8FD0DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.TestInfrastructure.RestTest.UnitTests", "src\TestInfrastructure\RestTest\test\Gems.TestInfrastructure.RestTest.UnitTests\Gems.TestInfrastructure.RestTest.UnitTests.csproj", "{4D6BBE7D-72FD-4FDA-A1AC-F229656CF4B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gems.TestInfrastructure.Rest.UnitTests", "src\TestInfrastructure\RestTest\test\Gems.TestInfrastructure.Rest.UnitTests\Gems.TestInfrastructure.Rest.UnitTests.csproj", "{4D6BBE7D-72FD-4FDA-A1AC-F229656CF4B1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{CF4846CE-1B9E-4E15-BB48-800AC407D4E6}"
 	ProjectSection(SolutionItems) = preProject
