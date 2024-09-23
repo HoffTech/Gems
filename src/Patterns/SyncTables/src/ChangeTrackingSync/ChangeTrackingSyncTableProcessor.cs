@@ -438,7 +438,7 @@ public class ChangeTrackingSyncTableProcessor<TSourceEntity, TDestinationEntity,
     {
         if (syncInfo.NeedConvertDateTimeToUtc)
         {
-            DateTimeUtils.SetUnspecifiedToUtcDateTime(sourceData);
+            DateTimeUtils.SetUnspecifiedToUtcDateTimeEnumerable(sourceData);
         }
 
         // TODO Add customizable transformation logic
