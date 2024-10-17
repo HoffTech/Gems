@@ -78,6 +78,7 @@ public class FeatureToggleService : IFeatureToggleService
                 this.lazyFeatureToggleClient.Value
                     .GetAwaiter()
                     .GetResult();
+                this.ProcessTogglesUpdated();
             }
 
             var featureToggleClient = this.lazyFeatureToggleClient.IsValueCreated
@@ -114,9 +115,8 @@ public class FeatureToggleService : IFeatureToggleService
         if (!this.lazyFeatureToggleClient.IsValueCreated)
         {
             await this.lazyFeatureToggleClient.Value.ConfigureAwait(false);
+            this.ProcessTogglesUpdated();
         }
-
-        this.ProcessTogglesUpdated();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
