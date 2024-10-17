@@ -27,7 +27,7 @@ public class FeatureToggleService : IFeatureToggleService
     private readonly IOptions<FeatureToggleOptions> featureToggleOptions;
     private readonly ILogger<FeatureToggleService> logger;
 
-    private IUnleash featureToggleClient;
+    private readonly Lazy<Task<IUnleash>> lazyFeatureToggleClient;
     private IUnleashContextProvider contextProvider;
 
     public FeatureToggleService(
@@ -40,6 +40,8 @@ public class FeatureToggleService : IFeatureToggleService
         this.featureToggleOptions = featureToggleOptions;
         this.logger = logger;
         this.HolderTypes = featureTogglesTypes;
+
+        this.lazyFeatureToggleClient = new Lazy<Task<IUnleash>>(this.InitializeClient);
     }
 
     public Type[] HolderTypes { get; }
@@ -48,12 +50,16 @@ public class FeatureToggleService : IFeatureToggleService
     {
         get
         {
-            if (this.featureToggleClient?.FeatureToggles == null)
+            var featureToggles = this.lazyFeatureToggleClient.IsValueCreated
+                ? this.lazyFeatureToggleClient.Value.Result.FeatureToggles
+                : null;
+
+            if (featureToggles is null)
             {
                 return new Dictionary<string, bool>();
             }
 
-            return this.featureToggleClient.FeatureToggles
+            return featureToggles
                 .GroupBy(g => g.Name)
                 .ToDictionary(
                     x => x.Key,
@@ -61,15 +67,36 @@ public class FeatureToggleService : IFeatureToggleService
         }
     }
 
+    private IUnleash FeatureToggleClient
+    {
+        get
+        {
+            if (!this.lazyFeatureToggleClient.IsValueCreated)
+            {
+                // This will block only once during the service's lifetime and only if initialization
+                // hasn't already been completed in StartAsync.
+                this.lazyFeatureToggleClient.Value
+                    .GetAwaiter()
+                    .GetResult();
+            }
+
+            var featureToggleClient = this.lazyFeatureToggleClient.IsValueCreated
+                ? this.lazyFeatureToggleClient.Value.Result
+                : null;
+
+            if (featureToggleClient == null
+                || this.contextProvider == null)
+            {
+                throw new ArgumentException("client uninitialized");
+            }
+
+            return featureToggleClient;
+        }
+    }
+
     public bool IsEnabled(string toggleName, bool defaultValue = false)
     {
-        if (this.featureToggleClient == null
-            || this.contextProvider == null)
-        {
-            throw new ArgumentException("client uninitialized");
-        }
-
-        return this.featureToggleClient.IsEnabled(toggleName, defaultValue);
+        return this.FeatureToggleClient.IsEnabled(toggleName, defaultValue);
     }
 
     public bool IsEnabled(
@@ -77,29 +104,28 @@ public class FeatureToggleService : IFeatureToggleService
         Dictionary<string, string> contextProperty,
         bool defaultValue = false)
     {
-        if (this.featureToggleClient == null
-            || this.contextProvider == null)
-        {
-            throw new ArgumentException("client uninitialized");
-        }
-
         var context = this.BuildUnleashContext(contextProperty);
 
-        return this.featureToggleClient.IsEnabled(toggleName, context, defaultValue);
+        return this.FeatureToggleClient.IsEnabled(toggleName, context, defaultValue);
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        return this.InitializeClient();
+        if (!this.lazyFeatureToggleClient.IsValueCreated)
+        {
+            await this.lazyFeatureToggleClient.Value.ConfigureAwait(false);
+        }
+
+        this.ProcessTogglesUpdated();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        this.featureToggleClient?.Dispose();
+        this.lazyFeatureToggleClient.Value?.Result?.Dispose();
         return Task.CompletedTask;
     }
 
-    private async Task InitializeClient()
+    private async Task<IUnleash> InitializeClient()
     {
         var settings = new UnleashSettings
         {
@@ -115,11 +141,11 @@ public class FeatureToggleService : IFeatureToggleService
 
         this.contextProvider = settings.UnleashContextProvider;
 
-        this.featureToggleClient = await new UnleashClientFactory().CreateClientAsync(
+        var featureToggleClient = await new UnleashClientFactory().CreateClientAsync(
             settings,
             synchronousInitialization: this.featureToggleOptions.Value.SynchronousInitialization);
 
-        this.featureToggleClient.ConfigureEvents(c =>
+        featureToggleClient.ConfigureEvents(c =>
         {
             c.ErrorEvent = this.ProcessError;
             c.ImpressionEvent = this.ProcessImpression;
@@ -128,7 +154,8 @@ public class FeatureToggleService : IFeatureToggleService
 
         // initial updates
         this.logger.LogInformation("FeatureToggles initial read on: {updatedOn}", DateTime.UtcNow);
-        this.ProcessTogglesUpdated();
+
+        return featureToggleClient;
     }
 
     private UnleashContext BuildUnleashContext(Dictionary<string, string> contextProperty)
@@ -170,7 +197,8 @@ public class FeatureToggleService : IFeatureToggleService
         // match by name:
         // - case insensitive,
         // - snake_case_will_be ignored
-        var conventionProperties = this.featureToggleClient!.FeatureToggles
+        var conventionProperties = this.FeatureToggleClient
+            .FeatureToggles
             .GroupBy(g =>
                 g.Name.Replace("_", string.Empty).ToLowerInvariant())
             .ToDictionary(
@@ -235,7 +263,8 @@ public class FeatureToggleService : IFeatureToggleService
             return false;
         }
 
-        var featureToggleByAttribute = this.featureToggleClient.FeatureToggles
+        var featureToggleByAttribute = this.FeatureToggleClient
+            .FeatureToggles
             .FirstOrDefault(ft =>
                 ft.Name.Equals(featureToggleAttrubute.FeatureName));
 
