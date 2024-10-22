@@ -2225,13 +2225,13 @@ namespace Gems.Http
         {
             if (configuration == null)
             {
-                this.baseUrl = this.options?.Value.BaseUrl;
+                this.baseUrl = this.options?.Value?.BaseUrl;
                 return;
             }
 
-            if (!(this.options?.Value.BaseUrl?.StartsWith("${ConnectionStrings.") ?? false))
+            if (!(this.options?.Value?.BaseUrl?.StartsWith("${ConnectionStrings.") ?? false))
             {
-                this.baseUrl = this.options?.Value.BaseUrl;
+                this.baseUrl = this.options?.Value?.BaseUrl;
                 return;
             }
 
