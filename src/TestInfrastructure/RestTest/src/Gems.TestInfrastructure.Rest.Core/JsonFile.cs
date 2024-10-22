@@ -1,4 +1,7 @@
-﻿using System.Runtime.CompilerServices;
+﻿// Licensed to the Hoff Tech under one or more agreements.
+// The Hoff Tech licenses this file to you under the MIT license.
+
+using System.Runtime.CompilerServices;
 
 using Gems.TestInfrastructure.Rest.Core.Model;
 

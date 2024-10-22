@@ -8,6 +8,9 @@
     <LangVersion>latestmajor</LangVersion>
     <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
   </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);NU1902</NoWarn>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Npgsql.OpenTelemetry" Version="6.0.10" />

@@ -99,8 +99,7 @@ namespace Gems.Jobs.Quartz.Handlers.RemoveJob
                 && triggersWithData.All(t => t.TriggerName != triggerName))
             {
                 throw new InvalidOperationException(
-                    $"Триггер с именем '{triggerName}' не был найден в конфигурации. Доступные триггеры: {string.Join(", ", this.jobsOptions.Value.TriggersWithData.GetValueOrDefault(jobName)
-                        .Select(t => t.TriggerName))}");
+                    $"Триггер с именем '{triggerName}' не был найден в конфигурации. Доступные триггеры: {string.Join(", ", this.jobsOptions.Value.TriggersWithData.GetValueOrDefault(jobName).Select(t => t.TriggerName))}");
             }
 
             var triggerOptions = this.jobsOptions.Value.TriggersWithData.GetValueOrDefault(jobName).First(t => t.TriggerName == triggerName);
@@ -132,8 +131,7 @@ namespace Gems.Jobs.Quartz.Handlers.RemoveJob
                 && triggersWithData.All(t => t.TriggerName != triggerName))
             {
                 throw new InvalidOperationException(
-                    $"Триггер с именем '{triggerName}' не был найден в конфигурации. Доступные триггеры: {string.Join(", ", this.jobsOptions.Value.TriggersWithData.GetValueOrDefault(jobName)
-                        .Select(t => t.TriggerName))}");
+                    $"Триггер с именем '{triggerName}' не был найден в конфигурации. Доступные триггеры: {string.Join(", ", this.jobsOptions.Value.TriggersWithData.GetValueOrDefault(jobName).Select(t => t.TriggerName))}");
             }
 
             var triggerOptions = this.jobsOptions.Value.TriggersFromDb.GetValueOrDefault(jobName).First(t => t.TriggerName == triggerName);

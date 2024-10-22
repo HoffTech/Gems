@@ -9,6 +9,8 @@ public class SyncPersonsServicesConfiguration : IServicesConfiguration
 {
     public void Configure(IServiceCollection services, IConfiguration configuration)
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         services.AddTableSyncer();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

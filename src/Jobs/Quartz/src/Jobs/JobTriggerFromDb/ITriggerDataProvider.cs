@@ -9,5 +9,5 @@ namespace Gems.Jobs.Quartz.Jobs.JobTriggerFromDb;
 
 public interface ITriggerDataProvider
 {
-   Task<Dictionary<string, object>> GetTriggerData(string triggerName, CancellationToken cancellationToken);
+    Task<Dictionary<string, object>> GetTriggerData(string triggerName, CancellationToken cancellationToken);
 }

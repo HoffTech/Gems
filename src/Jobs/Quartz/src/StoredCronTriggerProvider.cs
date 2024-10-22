@@ -29,9 +29,9 @@ public class StoredCronTriggerProvider
                 "quartz.get_qrtz_stored_cron_triggers",
                 new Dictionary<string, object>
                 {
-                   ["p_sched_name"] = schedulerName,
-                   ["p_trigger_name"] = triggerName,
-                   ["p_trigger_group"] = triggerGroup
+                    ["p_sched_name"] = schedulerName,
+                    ["p_trigger_name"] = triggerName,
+                    ["p_trigger_group"] = triggerGroup
                 });
     }
 

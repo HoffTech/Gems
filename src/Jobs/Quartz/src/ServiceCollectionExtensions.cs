@@ -98,6 +98,7 @@ namespace Gems.Jobs.Quartz
                 configurePlugins?.Invoke(q, jobsOptions);
 
                 q.SetProperty("quartz.threadPool.type", "Quartz.Simpl.DefaultThreadPool, Quartz");
+#pragma warning disable CS0618 // Type or member is obsolete
                 q.SetProperty("quartz.threadPool.maxConcurrency", jobsOptions.MaxConcurrency?.ToString() ?? "25");
                 if (jobsOptions.BatchTriggerAcquisitionMaxCount != null)
                 {
@@ -108,7 +109,7 @@ namespace Gems.Jobs.Quartz
                 {
                     q.SetProperty("quartz.jobStore.acquireTriggersWithinLock", jobsOptions.AcquireTriggersWithinLock.ToString().ToLower());
                 }
-
+#pragma warning restore CS0618 // Type or member is obsolete
                 QuartzPropertiesSetter.SetProperties(q, jobsOptions.QuartzProperties);
 
                 foreach (var (jobType, jobName) in JobRegister.JobNameByJobTypeMap)

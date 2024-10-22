@@ -1,7 +1,8 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿// Licensed to the Hoff Tech under one or more agreements.
+// The Hoff Tech licenses this file to you under the MIT license.
 
-using Gems.Metrics.Http;
+using System;
+using System.Text.Json.Serialization;
 
 namespace Gems.Http.Samples.Mertics.RequestOverride.PingPong.SendPingCommand.PongApi.Dto
 {

@@ -9,7 +9,8 @@ using MediatR;
 namespace Gems.Http.Samples.UseTemplateUri.PingPong.SendPingCommand;
 
 [Endpoint("api/v1/samples/ping", "GET", OperationGroup = "Samples", Summary = "Отправляет запрос на получение pong.")]
-public class SendPingCommandHandler(PongService pongService) : IRequestHandler<SendPingCommand, string>
+public class SendPingCommandHandler(PongService pongService)
+    : IRequestHandler<SendPingCommand, string>
 {
     public Task<string> Handle(SendPingCommand command, CancellationToken cancellationToken)
     {

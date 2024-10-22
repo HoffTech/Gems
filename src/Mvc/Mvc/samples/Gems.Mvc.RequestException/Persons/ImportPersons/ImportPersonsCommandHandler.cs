@@ -21,7 +21,7 @@ public class ImportPersonsCommandHandler : IRequestHandler<ImportPersonsCommand>
 
     public async Task Handle(ImportPersonsCommand command, CancellationToken cancellationToken)
     {
-        var persons = this.LoadPersons(command.CsvFile);
+        var persons = this.LoadPersons();
 
         foreach (var person in persons)
         {
@@ -31,7 +31,7 @@ public class ImportPersonsCommandHandler : IRequestHandler<ImportPersonsCommand>
         }
     }
 
-    private IEnumerable<Person> LoadPersons(IFormFile csvFile)
+    private IEnumerable<Person> LoadPersons()
     {
         return new[] { new Person() };
     }

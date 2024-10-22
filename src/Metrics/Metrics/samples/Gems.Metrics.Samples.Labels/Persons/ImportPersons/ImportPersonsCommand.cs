@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-using Gems.Metrics.Samples.Labels.Persons.CreatePerson.Dto;
+using Gems.Metrics.Samples.Labels.Persons.ImportPersons.Dto;
 
 using MediatR;
 

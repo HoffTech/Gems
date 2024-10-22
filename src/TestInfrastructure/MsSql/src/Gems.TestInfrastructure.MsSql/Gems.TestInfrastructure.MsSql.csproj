@@ -12,10 +12,15 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+   <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+   <WarningsAsErrors />
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\..\TestInfrastructure\src\Gems.TestInfrastructure\Gems.TestInfrastructure.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="Dapper" Version="2.1.28" />

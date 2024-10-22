@@ -5,6 +5,9 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);SA1516</NoWarn>
+  </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.1" />

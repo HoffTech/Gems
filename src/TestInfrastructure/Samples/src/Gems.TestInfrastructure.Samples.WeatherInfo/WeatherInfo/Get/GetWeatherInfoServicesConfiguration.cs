@@ -1,4 +1,7 @@
-﻿using Gems.Mvc;
+﻿// Licensed to the Hoff Tech under one or more agreements.
+// The Hoff Tech licenses this file to you under the MIT license.
+
+using Gems.Mvc;
 using Gems.TestInfrastructure.Samples.WeatherInfo.WeatherInfo.Get.Clients;
 
 namespace Gems.TestInfrastructure.Samples.WeatherInfo.WeatherInfo.Get

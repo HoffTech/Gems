@@ -1,4 +1,7 @@
-﻿namespace Gems.Http.Samples.Mertics.RequestOverride.PingPong.SendPingCommand.PongApi
+﻿// Licensed to the Hoff Tech under one or more agreements.
+// The Hoff Tech licenses this file to you under the MIT license.
+
+namespace Gems.Http.Samples.Mertics.RequestOverride.PingPong.SendPingCommand.PongApi
 {
     public enum PongMetricType
     {

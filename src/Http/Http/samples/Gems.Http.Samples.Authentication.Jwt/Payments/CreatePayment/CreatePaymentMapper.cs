@@ -4,11 +4,10 @@
 using AutoMapper;
 
 using Gems.Http.Samples.Authentication.Jwt.Payments.CreatePayment.BankApi.Dto;
+using Gems.Http.Samples.Authentication.Jwt.Payments.CreatePayment.Dto;
 
 namespace Gems.Http.Samples.Authentication.Jwt.Payments.CreatePayment
 {
-    using PaymentDto = Dto.PaymentDto;
-
     public class CreatePaymentMapper : Profile
     {
         public CreatePaymentMapper()

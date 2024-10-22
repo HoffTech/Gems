@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+﻿// Licensed to the Hoff Tech under one or more agreements.
+// The Hoff Tech licenses this file to you under the MIT license.
+
+using System.Diagnostics;
 using System.Dynamic;
 using System.Net.Mime;
 using System.Text;
@@ -39,14 +42,13 @@ public class TestRunner : IDisposable
         this.logger = logger;
     }
 
-    public async Task<bool> RunAsync(
+    public Task<bool> RunAsync(
         TestCollection collection,
         IEnumerable<TestScope> globals,
         CancellationToken cancellationToken = default)
     {
         var lifeCycle = AllureLifecycle.Instance;
         lifeCycle.StartTestContainer(CreateAllureTestResultContainer(collection));
-        AllureContext context = null;
         try
         {
             var success = true;
@@ -67,7 +69,7 @@ public class TestRunner : IDisposable
                 }
             }
 
-            return success;
+            return Task.FromResult(success);
         }
         finally
         {
@@ -78,21 +80,6 @@ public class TestRunner : IDisposable
     public void Dispose()
     {
         this.httpClient?.Dispose();
-    }
-
-    private HttpClient GetOrCreateHttpClient()
-    {
-        if (this.externalHttpClient != null)
-        {
-            return this.externalHttpClient;
-        }
-
-        if (this.httpClient == null)
-        {
-            this.httpClient = new HttpClient();
-        }
-
-        return this.httpClient;
     }
 
     private static object SafeDeserializeJson(string text)
@@ -140,12 +127,27 @@ public class TestRunner : IDisposable
         }
     }
 
+    private HttpClient GetOrCreateHttpClient()
+    {
+        if (this.externalHttpClient != null)
+        {
+            return this.externalHttpClient;
+        }
+
+        if (this.httpClient == null)
+        {
+            this.httpClient = new HttpClient();
+        }
+
+        return this.httpClient;
+    }
+
     private async Task<bool> InternalRunTestAsync(
         Test test,
         CancellationToken cancellationToken)
     {
         var lifeCycle = AllureLifecycle.Instance;
-        lifeCycle.StartTestCase(new()
+        lifeCycle.StartTestCase(new TestResult
         {
             name = test.Name,
             description = test.Description,

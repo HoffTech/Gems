@@ -11,7 +11,8 @@ namespace Gems.Jobs.Quartz.Samples.HappyTreeJobs.UnstableJob;
 
 [Endpoint("workers/UnstableJob", "POST", OperationGroup = "workers")]
 [JobHandler("UnstableJob")]
-public class UnstableJobCommandHandler(ILogger<UnstableJobCommandHandler> logger) : IRequestHandler<UnstableJobCommand>
+public class UnstableJobCommandHandler(ILogger<UnstableJobCommandHandler> logger)
+    : IRequestHandler<UnstableJobCommand>
 {
     public async Task Handle(UnstableJobCommand request, CancellationToken cancellationToken)
     {

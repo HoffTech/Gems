@@ -1,3 +1,6 @@
+// Licensed to the Hoff Tech under one or more agreements.
+// The Hoff Tech licenses this file to you under the MIT license.
+
 using DotNet.Testcontainers.Containers;
 
 using Gems.TestInfrastructure.Environment;
@@ -13,7 +16,7 @@ public static class TestEnvironmentBuilderMsSqlExtensions
     public static ITestEnvironmentBuilder UseMsSql(
         this ITestEnvironmentBuilder builder,
         string name,
-        Func<MsSqlContainer, CancellationToken, Task> setupDatabase = default)
+        Func<MsSqlContainer, CancellationToken, Task> setupDatabase)
     {
         return builder.UseMsSql(name, (Func<MsSqlBuilder, MsSqlBuilder>)null, setupDatabase);
     }
@@ -22,7 +25,7 @@ public static class TestEnvironmentBuilderMsSqlExtensions
         this ITestEnvironmentBuilder builder,
         string name)
     {
-        return builder.UseMsSql(name, (Func<MsSqlBuilder, MsSqlBuilder>)null, null);
+        return builder.UseMsSql(name, (Func<MsSqlBuilder, MsSqlBuilder>)null);
     }
 
     public static ITestEnvironmentBuilder UseMsSql(
@@ -37,7 +40,7 @@ public static class TestEnvironmentBuilderMsSqlExtensions
     public static ITestEnvironmentBuilder UseMsSql(
         this ITestEnvironmentBuilder builder,
         string name,
-        Func<MsSqlBuilder, MsSqlBuilder> setupContainer = default,
+        Func<MsSqlBuilder, MsSqlBuilder> setupContainer,
         Func<MsSqlContainer, CancellationToken, Task> setupDatabase = default)
     {
         return builder.UseComponent(() =>
@@ -50,7 +53,10 @@ public static class TestEnvironmentBuilderMsSqlExtensions
                 await container.StartAsync();
                 env.RegisterComponent(name, container, typeof(MsSqlContainer), typeof(DockerContainer));
                 env.RegisterComponent<IDatabaseContainer>(name, new MsSqlDatabaseContainer(container));
-                await setupDatabase?.Invoke(container, ct);
+                if (setupDatabase != null)
+                {
+                    await setupDatabase.Invoke(container, ct);
+                }
             });
             return container;
         });

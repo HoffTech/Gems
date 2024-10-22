@@ -8,7 +8,7 @@ public class TriggersFromDbOptions
     public string TriggerName { get; set; }
 
     /// <summary>
-    /// Значение по умолчанию, на случай отсутствия значения в провайдере
+    /// Значение по умолчанию, на случай отсутствия значения в провайдере.
     /// </summary>
     public string CronExpression { get; set; }
 

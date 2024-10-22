@@ -1,3 +1,6 @@
+// Licensed to the Hoff Tech under one or more agreements.
+// The Hoff Tech licenses this file to you under the MIT license.
+
 using Dapper;
 
 using FluentAssertions;
@@ -6,8 +9,6 @@ using Gems.TestInfrastructure.Assertion.Database;
 using Gems.TestInfrastructure.Environment;
 using Gems.TestInfrastructure.Postgres.Environment;
 using Gems.TestInfrastructure.Postgres.Utils.Database;
-
-using Testcontainers.PostgreSql;
 
 namespace Gems.TestInfrastructure.Samples.EfData.IntegrationTests
 {
@@ -21,7 +22,7 @@ namespace Gems.TestInfrastructure.Samples.EfData.IntegrationTests
             await using var env = await new TestEnvironmentBuilder()
                 .UsePostgres(
                     ContainerName,
-                    (c, ct) => PostgresEfMigrationExtension.MigrateAsync<Context>((PostgreSqlContainer)c, ct))
+                    (c, ct) => PostgresEfMigrationExtension.MigrateAsync<Context>(c, ct))
                 .BuildAsync();
             await using var connection = await env.ConnectPostgresAsync(ContainerName);
             var schema = await connection.SchemaAsync();

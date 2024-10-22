@@ -2,7 +2,6 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using MediatR;

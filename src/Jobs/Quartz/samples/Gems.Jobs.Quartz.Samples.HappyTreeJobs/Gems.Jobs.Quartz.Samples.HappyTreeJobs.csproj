@@ -4,8 +4,10 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
     </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);SA1516</NoWarn>
+  </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\..\CompositionRoot\CompositionRoot\src\Gems.CompositionRoot.csproj"/>
@@ -15,5 +17,5 @@
       <None Update="appsettings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-    </ItemGroup>  
+    </ItemGroup>
 </Project>

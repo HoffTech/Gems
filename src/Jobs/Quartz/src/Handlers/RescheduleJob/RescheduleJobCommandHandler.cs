@@ -124,8 +124,7 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
             if (string.IsNullOrEmpty(triggerName))
             {
                 throw new InvalidOperationException(
-                    $"Необходимо указать имя триггера из списка: {string.Join(", ", this.jobsOptions.Value.TriggersWithData.GetValueOrDefault(jobName)
-                        .Select(t => t.TriggerName))}");
+                    $"Необходимо указать имя триггера из списка: {string.Join(", ", this.jobsOptions.Value.TriggersWithData.GetValueOrDefault(jobName).Select(t => t.TriggerName))}");
             }
 
             if (this.jobsOptions.Value.TriggersWithData.TryGetValue(jobName, out var triggersWithData)
@@ -170,8 +169,7 @@ namespace Gems.Jobs.Quartz.Handlers.RescheduleJob
             if (string.IsNullOrEmpty(triggerName))
             {
                 throw new InvalidOperationException(
-                    $"Необходимо указать имя триггера из списка: {string.Join(", ", this.jobsOptions.Value.TriggersFromDb.GetValueOrDefault(jobName)
-                        .Select(t => t.TriggerName))}");
+                    $"Необходимо указать имя триггера из списка: {string.Join(", ", this.jobsOptions.Value.TriggersFromDb.GetValueOrDefault(jobName).Select(t => t.TriggerName))}");
             }
 
             if (this.jobsOptions.Value.TriggersFromDb.TryGetValue(jobName, out var triggersWithData)

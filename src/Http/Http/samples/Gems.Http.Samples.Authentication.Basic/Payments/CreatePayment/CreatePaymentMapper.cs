@@ -9,8 +9,6 @@ using PaymentDto = Gems.Http.Samples.Authentication.Basic.Payments.CreatePayment
 
 namespace Gems.Http.Samples.Authentication.Basic.Payments.CreatePayment
 {
-    using PaymentDto = Dto.PaymentDto;
-
     public class CreatePaymentMapper : Profile
     {
         public CreatePaymentMapper()

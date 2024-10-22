@@ -14,13 +14,9 @@ namespace Gems.Jobs.Quartz.Samples.PersistenceStore.RunExampleWorkerWithData;
 [Endpoint("api/v1/ExampleTriggerWithData", "GET", Summary = "Тест", OperationGroup = "Workers")]
 public class RunExampleWorkerWithDataCommandHandler : IRequestHandler<RunExampleWorkerCommandWithData>
 {
-    public async Task Handle(RunExampleWorkerCommandWithData request, CancellationToken cancellationToken)
+    public Task Handle(RunExampleWorkerCommandWithData request, CancellationToken cancellationToken)
     {
-        var data = request.SomeData;
-        var data2 = request.SomeData2;
-
         // do smth
-
-        await Task.Delay(1000, cancellationToken);
+        return Task.Delay(1000, cancellationToken);
     }
 }

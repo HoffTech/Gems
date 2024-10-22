@@ -12,7 +12,6 @@ public class TemplateUriTests
     /// <summary>
     /// Возвращает uri со всеми подстановками плейсхолдеров.
     /// </summary>
-    /// <param name="uri">uri.</param>
     [Test]
     public void GetUri_ValidUriAndPlaceholders_ReturnsUri()
     {

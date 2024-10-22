@@ -3,9 +3,7 @@
 
 using System;
 
-using Gems.Metrics.Samples.Labels.Persons.ImportPersons;
-
-namespace Gems.Metrics.Samples.Labels.Persons.CreatePerson.Dto
+namespace Gems.Metrics.Samples.Labels.Persons.ImportPersons.Dto
 {
     public record PersonDto
     {

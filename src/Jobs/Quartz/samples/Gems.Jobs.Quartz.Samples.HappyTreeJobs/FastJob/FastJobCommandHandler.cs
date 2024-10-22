@@ -11,7 +11,8 @@ namespace Gems.Jobs.Quartz.Samples.HappyTreeJobs.FastJob;
 
 [Endpoint("workers/FastJob", "POST", OperationGroup = "workers")]
 [JobHandler("FastJob")]
-public class FastJobCommandHandler(ILogger<FastJobCommandHandler> logger) : IRequestHandler<FastJobCommand>
+public class FastJobCommandHandler(ILogger<FastJobCommandHandler> logger)
+    : IRequestHandler<FastJobCommand>
 {
     public Task Handle(FastJobCommand request, CancellationToken cancellationToken)
     {

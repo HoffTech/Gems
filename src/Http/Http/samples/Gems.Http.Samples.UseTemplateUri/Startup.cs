@@ -5,12 +5,13 @@ using Gems.CompositionRoot;
 using Gems.HealthChecks;
 using Gems.Logging.Mvc.Behaviors;
 using Gems.Metrics.Behaviors;
+using Gems.Mvc;
 using Gems.Mvc.Behaviors;
 using Gems.Swagger;
 
 using Prometheus;
 
-namespace Gems.Mvc.Sample.LoadFile;
+namespace Gems.Http.Samples.UseTemplateUri;
 
 public class Startup(IConfiguration configuration)
 {

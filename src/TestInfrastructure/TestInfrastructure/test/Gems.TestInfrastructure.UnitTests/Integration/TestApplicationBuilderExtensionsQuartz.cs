@@ -1,3 +1,6 @@
+// Licensed to the Hoff Tech under one or more agreements.
+// The Hoff Tech licenses this file to you under the MIT license.
+
 using FluentAssertions;
 
 using Gems.TestInfrastructure.Integration;
@@ -15,7 +18,6 @@ namespace Gems.TestInfrastructure.UnitTests.Integration
         public void RemoveQuartzHostedService()
         {
             DoTest(
-                services => services.AddSingleton<QuartzHostedService>(),
                 builder => builder.RemoveQuartzHostedService(),
                 (builder, services) =>
                 {
@@ -26,7 +28,6 @@ namespace Gems.TestInfrastructure.UnitTests.Integration
         }
 
         private static ITestApplicationBuilder DoTest(
-            Action<IServiceCollection> arrange,
             Action<ITestApplicationBuilder> act,
             Action<Mock<ITestApplicationBuilder>, IServiceCollection> assert)
         {

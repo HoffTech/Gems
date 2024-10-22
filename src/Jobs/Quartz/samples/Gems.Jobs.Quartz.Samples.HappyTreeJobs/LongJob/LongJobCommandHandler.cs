@@ -11,7 +11,8 @@ namespace Gems.Jobs.Quartz.Samples.HappyTreeJobs.LongJob;
 
 [Endpoint("workers/LongJob", "POST", OperationGroup = "workers")]
 [JobHandler("LongJob")]
-public class LongJobCommandHandler(ILogger<LongJobCommandHandler> logger) : IRequestHandler<LongJobCommand>
+public class LongJobCommandHandler(ILogger<LongJobCommandHandler> logger)
+    : IRequestHandler<LongJobCommand>
 {
     public async Task Handle(LongJobCommand request, CancellationToken cancellationToken)
     {
