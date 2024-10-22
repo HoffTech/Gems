@@ -39,12 +39,13 @@ namespace Gems.Http.Tests
                     Mock.Of<IMetricsService>(),
                     Mock.Of<ILogger<BaseClientServiceHelper>>(),
                     requestLogCollectorMock.Object,
-                    httpClientFactoryMock.Object));
+                    httpClientFactoryMock.Object,
+                    null));
 
             var (response, error) = await client.TrySendRequestAsync<string, string>(
                 HttpMethod.Get,
-                "https://ya.ru",
-                null,
+                "https://ya.ru".ToTemplateUri(),
+                new DeviceInfoRequest() { Limit = 10, Offset = 10 },
                 null,
                 CancellationToken.None);
 

@@ -25,6 +25,7 @@ using Gems.Metrics.Http;
 using Gems.Mvc;
 using Gems.Tasks;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -37,6 +38,7 @@ namespace Gems.Http
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IMetricsService metricsService;
         private readonly Func<ILogger, RequestLogsCollector> logsCollectorFactoryMethod;
+        private string baseUrl;
 
         protected BaseClientService(IOptions<HttpClientServiceOptions> options, BaseClientServiceHelper helper)
         {
@@ -47,6 +49,7 @@ namespace Gems.Http
                 ? helper.LogsCollectorFactory.Create
                 : this.CreateRequestLogsCollector;
             this.httpClientFactory = helper.HttpClientFactory;
+            this.SetBaseUrl(helper.Configuration);
         }
 
         /// <summary>
@@ -62,7 +65,7 @@ namespace Gems.Http
         /// <summary>
         /// Базовый url сервиса.
         /// </summary>
-        protected virtual string BaseUrl => this.options?.Value?.BaseUrl ?? string.Empty;
+        protected virtual string BaseUrl => this.baseUrl;
 
         /// <summary>
         /// Начиная с какого http статуса делать повторные запросы в случае ошибки. По умолчанию 499.
@@ -2194,7 +2197,7 @@ namespace Gems.Http
                 return new HttpClient();
             }
 
-            if (this.BaseUrl == null)
+            if (string.IsNullOrEmpty(this.BaseUrl))
             {
                 throw new RequestException<TError>("Failed download certificate. You must specify BaseUrl.", HttpStatusCode.BadRequest);
             }
@@ -2216,6 +2219,25 @@ namespace Gems.Http
             await using var sslStream = new SslStream(client.GetStream(), true, (_, _, _, _) => true);
             await sslStream.AuthenticateAsClientAsync(domain);
             return new X509Certificate2(sslStream.RemoteCertificate!);
+        }
+
+        private void SetBaseUrl(IConfiguration configuration)
+        {
+            if (configuration == null)
+            {
+                this.baseUrl = this.options?.Value.BaseUrl;
+                return;
+            }
+
+            if (!(this.options?.Value.BaseUrl?.StartsWith("${ConnectionStrings.") ?? false))
+            {
+                this.baseUrl = this.options?.Value.BaseUrl;
+                return;
+            }
+
+            this.baseUrl = this.baseUrl.Replace("${ConnectionStrings.", string.Empty);
+            this.baseUrl = this.baseUrl.TrimEnd('}');
+            this.baseUrl = configuration.GetConnectionString(this.baseUrl);
         }
 
         private string GetRequestUrl<TResponse, TError>(TemplateUri templateUri)
@@ -2331,19 +2353,16 @@ namespace Gems.Http
                 return default;
             }
 
-            var deserializedResponse = this.DeserializeResponse<TResponse>(response, responseAsString);
+            var deserializedResponse = this.DeserializeResponse<TResponse>(response, responseAsString, logsCollector);
             if (deserializedResponse is IHasStatusCode responseWithStatusCode)
             {
                 responseWithStatusCode.StatusCode = (int)response.StatusCode;
             }
 
-            logsCollector.AddResponse(deserializedResponse);
-            logsCollector.AddLogsFromPayload(deserializedResponse);
-
             return deserializedResponse;
         }
 
-        private TResponse DeserializeResponse<TResponse>(HttpResponseMessage response, string responseAsString)
+        private TResponse DeserializeResponse<TResponse>(HttpResponseMessage response, string responseAsString, RequestLogsCollector logsCollector)
         {
             try
             {
@@ -2352,10 +2371,14 @@ namespace Gems.Http
                 var responseAsObj = isXml
                     ? XmlSerializerHelper.DeserializeObjectFromXml<TResponse>(responseAsString)
                     : JsonSerializerHelper.DeserializeObjectFromJson<TResponse>(responseAsString, this.DeserializeAdditionalConverters, this.AdditionalScalarStructureTypes);
+
+                logsCollector.AddResponse(responseAsObj);
+                logsCollector.AddLogsFromPayload(responseAsObj);
                 return responseAsObj;
             }
             catch (Exception e)
             {
+                logsCollector.AddResponse(responseAsString);
                 throw new DeserializeException(e, responseAsString, response.StatusCode);
             }
         }
