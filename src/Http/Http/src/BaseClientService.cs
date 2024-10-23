@@ -2223,15 +2223,19 @@ namespace Gems.Http
 
         private void SetBaseUrl(IConfiguration configuration)
         {
+            this.baseUrl = this.options?.Value?.BaseUrl;
             if (configuration == null)
             {
-                this.baseUrl = this.options?.Value?.BaseUrl;
                 return;
             }
 
-            if (!(this.options?.Value?.BaseUrl?.StartsWith("${ConnectionStrings.") ?? false))
+            if (this.baseUrl == null)
             {
-                this.baseUrl = this.options?.Value?.BaseUrl;
+                return;
+            }
+
+            if (!this.baseUrl.StartsWith("${ConnectionStrings."))
+            {
                 return;
             }
 
