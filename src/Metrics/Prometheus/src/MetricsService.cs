@@ -42,9 +42,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateCounter(name, description, labelValues).Inc(increment);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"Counter failed. name: {name}, description: {description}, increment: {increment}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"Counter failed. name: {name}, description: {description}, increment: {increment}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -57,9 +57,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateCounter(name, labelValues).Inc(increment);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"Counter failed. name: {name}, increment: {increment}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"Counter failed. name: {name}, increment: {increment}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -72,9 +72,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateCounter(enumValue, labelValues).Inc(increment);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"Counter failed. enum: {enumValue}, increment: {increment}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"Counter failed. enum: {enumValue}, increment: {increment}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -87,9 +87,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateCounter(metricInfo).Inc(increment);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"Counter failed. metricInfo: {metricInfo}, increment: {increment}.");
+                this.logger.LogError($"Counter failed. metricInfo: {metricInfo}, increment: {increment}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -102,9 +102,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateCounter(name, description, labelValues).IncTo(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. name: {name}, description: {description}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. name: {name}, description: {description}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -117,9 +117,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateCounter(name, labelValues).IncTo(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. name: {name}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. name: {name}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -132,9 +132,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateCounter(enumValue, labelValues).IncTo(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. enum: {enumValue}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. enum: {enumValue}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -147,9 +147,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateCounter(metricInfo).IncTo(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. metricInfo: {metricInfo}, targetValue: {targetValue}.");
+                this.logger.LogError($"CounterTo failed. metricInfo: {metricInfo}, targetValue: {targetValue}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -162,9 +162,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(name, description, labelValues).Inc(increment);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. name: {name}, description: {description}, increment: {increment}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. name: {name}, description: {description}, increment: {increment}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -193,9 +193,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(enumValue, labelValues).Inc(increment);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. enum: {enumValue}, increment: {increment}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. enum: {enumValue}, increment: {increment}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -208,9 +208,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(metricInfo).Inc(increment);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. metricInfo: {metricInfo}, increment: {increment}.");
+                this.logger.LogError($"CounterTo failed. metricInfo: {metricInfo}, increment: {increment}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -223,9 +223,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(name, description, labelValues).Dec(decrement);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. name: {name}, description: {description}, decrement: {decrement}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. name: {name}, description: {description}, decrement: {decrement}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -238,9 +238,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(name, labelValues).Dec(decrement);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. name: {name}, decrement: {decrement}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. name: {name}, decrement: {decrement}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -253,9 +253,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(enumValue, labelValues).Dec(decrement);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. enum: {enumValue}, decrement: {decrement}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. enum: {enumValue}, decrement: {decrement}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -268,9 +268,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(metricInfo).Dec(decrement);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. metricInfo: {metricInfo}, decrement: {decrement}.");
+                this.logger.LogError($"CounterTo failed. metricInfo: {metricInfo}, decrement: {decrement}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -283,9 +283,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(name, description, labelValues).DecTo(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. name: {name}, description: {description}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. name: {name}, description: {description}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -298,9 +298,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(name, labelValues).DecTo(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. name: {name}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. name: {name}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -313,9 +313,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(enumValue, labelValues).DecTo(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. enum: {enumValue}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. enum: {enumValue}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -328,9 +328,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(metricInfo).DecTo(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. metricInfo: {metricInfo}, targetValue: {targetValue}.");
+                this.logger.LogError($"CounterTo failed. metricInfo: {metricInfo}, targetValue: {targetValue}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -343,9 +343,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(name, description, labelValues).IncTo(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. name: {name}, description: {description}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. name: {name}, description: {description}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -358,9 +358,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(name, labelValues).IncTo(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. name: {name}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. name: {name}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -373,9 +373,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(enumVaue, labelValues).IncTo(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. enum: {enumVaue}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. enum: {enumVaue}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -388,9 +388,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(metricInfo).IncTo(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. metricInfo: {metricInfo}, targetValue: {targetValue}.");
+                this.logger.LogError($"CounterTo failed. metricInfo: {metricInfo}, targetValue: {targetValue}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -403,9 +403,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(name, description, labelValues).Set(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. name: {name}, description: {description}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. name: {name}, description: {description}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -418,9 +418,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(name, labelValues).Set(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. name: {name}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. name: {name}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -433,9 +433,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(enumValue, labelValues).Set(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. enum: {enumValue}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"CounterTo failed. enum: {enumValue}, targetValue: {targetValue}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -448,9 +448,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateGauge(metricInfo).Set(targetValue);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"CounterTo failed. metricInfo: {metricInfo}, targetValue: {targetValue}.");
+                this.logger.LogError($"CounterTo failed. metricInfo: {metricInfo}, targetValue: {targetValue}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -463,9 +463,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateHistogram(name, description, labelValues).Observe(value);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"Histogram failed. name: {name}, description: {description}, value: {value}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"Histogram failed. name: {name}, description: {description}, value: {value}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -478,9 +478,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateHistogram(name, labelValues).Observe(value);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"Histogram failed. name: {name}, value: {value}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"Histogram failed. name: {name}, value: {value}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -493,9 +493,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateHistogram(enumValue, labelValues).Observe(value);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"Histogram failed. enum: {enumValue}, value: {value}, labelValues: {string.Join(',', labelValues)}.");
+                this.logger.LogError($"Histogram failed. enum: {enumValue}, value: {value}, labelValues: {string.Join(',', labelValues)}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -508,9 +508,9 @@ namespace Gems.Metrics.Prometheus
             {
                 this.PrometheusMetricsFactory.CreateHistogram(metricInfo).Observe(value);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                this.logger.LogError($"Histogram failed. metricInfo: {metricInfo}, value: {value}.");
+                this.logger.LogError($"Histogram failed. metricInfo: {metricInfo}, value: {value}. {GetFullError(exception)}");
             }
 
             return Task.CompletedTask;
@@ -544,6 +544,19 @@ namespace Gems.Metrics.Prometheus
         public Task ResetMetrics()
         {
             return Task.CompletedTask;
+        }
+
+        private static string GetFullError(Exception e)
+        {
+            var m = string.Empty;
+            var current = e;
+            while (current != null)
+            {
+                m += $"ExceptionType: {current.GetType().Name}, ExceptionMessage: {current.Message}, ExceptionStackTrace: {Environment.NewLine}{current.StackTrace}{Environment.NewLine}{Environment.NewLine}";
+                current = current.InnerException;
+            }
+
+            return m;
         }
     }
 }
