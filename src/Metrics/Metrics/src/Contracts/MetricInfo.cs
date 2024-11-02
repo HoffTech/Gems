@@ -43,5 +43,10 @@ namespace Gems.Metrics.Contracts
         {
             return HashCode.Combine(this.Name, string.Join(',', this.LabelValues));
         }
+
+        public override string ToString()
+        {
+            return $"{this.Name}; {string.Join(',', this.LabelNames)}; {string.Join(',', this.LabelValues)}";
+        }
     }
 }
