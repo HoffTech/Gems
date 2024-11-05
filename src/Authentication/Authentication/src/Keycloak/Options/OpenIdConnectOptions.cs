@@ -11,6 +11,8 @@ namespace Gems.Authentication.Keycloak.Options
 
         public string MetadataAddress { get; set; }
 
+        public bool RequireHttpsMetadata { get; set; }
+
         public string Authority { get; set; }
 
         public string SignedOutRedirectUri { get; set; }

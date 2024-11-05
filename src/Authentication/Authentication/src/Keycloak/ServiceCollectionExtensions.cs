@@ -58,7 +58,7 @@ public static class ServiceCollectionExtensions
                 options.ResponseType = OpenIdConnectResponseType.Code;
                 options.SaveTokens = true;
                 options.GetClaimsFromUserInfoEndpoint = true;
-                options.RequireHttpsMetadata = false;
+                options.RequireHttpsMetadata = keycloakAuthOptions.OpenIdConnectOptions.RequireHttpsMetadata;
                 options.NonceCookie.SameSite = SameSiteMode.Unspecified;
                 options.CorrelationCookie.SameSite = SameSiteMode.Unspecified;
 
