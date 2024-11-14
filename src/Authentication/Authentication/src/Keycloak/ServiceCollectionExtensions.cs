@@ -69,8 +69,9 @@ public static class ServiceCollectionExtensions
                 };
                 options.Events.OnRedirectToIdentityProvider = context =>
                 {
-                    context.Request.Scheme = "https";
-                    return Task.CompletedTask;
+                    var builder = new UriBuilder(context.ProtocolMessage.RedirectUri) { Scheme = "https", Port = -1 };
+                    context.ProtocolMessage.RedirectUri = builder.ToString();
+                    return Task.FromResult(0);
                 };
             });
     }
