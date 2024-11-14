@@ -11,7 +11,7 @@ namespace Gems.Authentication.Keycloak.Options
 
         public string MetadataAddress { get; set; }
 
-        public bool RequireHttpsMetadata { get; set; }
+        public bool RequireHttpsMetadata { get; set; } = true;
 
         public string Authority { get; set; }
 

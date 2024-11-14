@@ -2,6 +2,7 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
+using System.Threading.Tasks;
 
 using Gems.Authentication.Keycloak.Options;
 
@@ -65,6 +66,11 @@ public static class ServiceCollectionExtensions
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = keycloakAuthOptions.OpenIdConnectOptions.TokenValidationParameter.NameClaimType
+                };
+                options.Events.OnRedirectToIdentityProvider = context =>
+                {
+                    context.Request.Scheme = "https";
+                    return Task.CompletedTask;
                 };
             });
     }
