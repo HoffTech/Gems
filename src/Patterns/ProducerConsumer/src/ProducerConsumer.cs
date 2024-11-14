@@ -36,7 +36,12 @@ namespace Gems.Patterns.ProducerConsumer
             this.exceptionHandleTypes = exceptionHandleTypes;
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return this.StartAsync(0, cancellationToken);
+        }
+
+        public async Task StartAsync(int consumerCount, CancellationToken cancellationToken)
         {
             if (this.taskInfos != null)
             {
@@ -45,7 +50,11 @@ namespace Gems.Patterns.ProducerConsumer
 
             const int producerTasksCount = 1;
             const int producerTaskIndex = 0;
-            var consumerCount = Environment.ProcessorCount <= 1 ? 1 : Environment.ProcessorCount - 1;
+
+            if (consumerCount <= 0)
+            {
+                consumerCount = Environment.ProcessorCount <= 1 ? 1 : Environment.ProcessorCount - 1;
+            }
 
             this.taskInfos = new BlockingCollection<TTaskInfo>(consumerCount);
 
