@@ -67,12 +67,16 @@ public static class ServiceCollectionExtensions
                 {
                     NameClaimType = keycloakAuthOptions.OpenIdConnectOptions.TokenValidationParameter.NameClaimType
                 };
-                options.Events.OnRedirectToIdentityProvider = context =>
+
+                if (keycloakAuthOptions.OpenIdConnectOptions.UseHttpsSchemeForRedirectToIdentityProvider)
                 {
-                    var builder = new UriBuilder(context.ProtocolMessage.RedirectUri) { Scheme = "https", Port = -1 };
-                    context.ProtocolMessage.RedirectUri = builder.ToString();
-                    return Task.FromResult(0);
-                };
+                    options.Events.OnRedirectToIdentityProvider = context =>
+                    {
+                        var builder = new UriBuilder(context.ProtocolMessage.RedirectUri) { Scheme = "https", Port = -1 };
+                        context.ProtocolMessage.RedirectUri = builder.ToString();
+                        return Task.FromResult(0);
+                    };
+                }
             });
     }
 }

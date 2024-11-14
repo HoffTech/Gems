@@ -13,6 +13,8 @@ namespace Gems.Authentication.Keycloak.Options
 
         public bool RequireHttpsMetadata { get; set; } = true;
 
+        public bool UseHttpsSchemeForRedirectToIdentityProvider { get; set; } = false;
+
         public string Authority { get; set; }
 
         public string SignedOutRedirectUri { get; set; }
