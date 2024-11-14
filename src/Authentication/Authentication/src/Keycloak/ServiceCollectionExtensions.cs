@@ -2,6 +2,7 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
+using System.Threading.Tasks;
 
 using Gems.Authentication.Keycloak.Options;
 
@@ -58,7 +59,7 @@ public static class ServiceCollectionExtensions
                 options.ResponseType = OpenIdConnectResponseType.Code;
                 options.SaveTokens = true;
                 options.GetClaimsFromUserInfoEndpoint = true;
-                options.RequireHttpsMetadata = false;
+                options.RequireHttpsMetadata = keycloakAuthOptions.OpenIdConnectOptions.RequireHttpsMetadata;
                 options.NonceCookie.SameSite = SameSiteMode.Unspecified;
                 options.CorrelationCookie.SameSite = SameSiteMode.Unspecified;
 
@@ -66,6 +67,16 @@ public static class ServiceCollectionExtensions
                 {
                     NameClaimType = keycloakAuthOptions.OpenIdConnectOptions.TokenValidationParameter.NameClaimType
                 };
+
+                if (keycloakAuthOptions.OpenIdConnectOptions.UseHttpsSchemeForRedirectToIdentityProvider)
+                {
+                    options.Events.OnRedirectToIdentityProvider = context =>
+                    {
+                        var builder = new UriBuilder(context.ProtocolMessage.RedirectUri) { Scheme = "https", Port = -1 };
+                        context.ProtocolMessage.RedirectUri = builder.ToString();
+                        return Task.FromResult(0);
+                    };
+                }
             });
     }
 }
