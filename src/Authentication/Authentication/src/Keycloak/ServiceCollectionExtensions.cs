@@ -79,8 +79,8 @@ public static class ServiceCollectionExtensions
 
                     options.Events.OnSignedOutCallbackRedirect = context =>
                     {
-                        var builder = new UriBuilder(context.ProtocolMessage.RedirectUri) { Scheme = "https", Port = -1 };
-                        context.ProtocolMessage.RedirectUri = builder.ToString();
+                        var builder = new UriBuilder(context.ProtocolMessage.PostLogoutRedirectUri) { Scheme = "https", Port = -1 };
+                        context.ProtocolMessage.PostLogoutRedirectUri = builder.ToString();
                         return Task.FromResult(0);
                     };
                 }
