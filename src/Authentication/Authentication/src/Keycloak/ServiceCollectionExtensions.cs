@@ -76,6 +76,13 @@ public static class ServiceCollectionExtensions
                         context.ProtocolMessage.RedirectUri = builder.ToString();
                         return Task.FromResult(0);
                     };
+
+                    options.Events.OnRedirectToIdentityProviderForSignOut = context =>
+                    {
+                        var builder = new UriBuilder(context.ProtocolMessage.PostLogoutRedirectUri) { Scheme = "https", Port = -1 };
+                        context.ProtocolMessage.PostLogoutRedirectUri = builder.ToString();
+                        return Task.FromResult(0);
+                    };
                 }
             });
     }
