@@ -19,5 +19,11 @@ namespace Gems.Mvc.Filters.Exceptions
         {
             this.StatusCode = 422;
         }
+
+        public InvalidOperationException(string message, string errorCode, bool isBusiness) : base(message, errorCode, isBusiness)
+        {
+            this.StatusCode = 422;
+        }
+
     }
 }
