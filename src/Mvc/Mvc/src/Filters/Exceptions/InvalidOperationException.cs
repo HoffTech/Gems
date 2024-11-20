@@ -24,6 +24,5 @@ namespace Gems.Mvc.Filters.Exceptions
         {
             this.StatusCode = 422;
         }
-
     }
 }
