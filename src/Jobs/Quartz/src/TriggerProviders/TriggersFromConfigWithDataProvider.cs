@@ -2,7 +2,6 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,9 +34,7 @@ public class TriggersFromConfigWithDataProvider : ITriggerProvider
             return Task.FromResult(result);
         }
 
-        foreach (var triggerWithData in this.jobsOptions.Value?.TriggersWithData?.Values?
-                     .SelectMany(t => t
-                         .Select(o => o)))
+        foreach (var triggerWithData in this.jobsOptions.Value.TriggersWithData[jobName])
         {
             result.Add(TriggerHelper.CreateCronTrigger(
                 triggerWithData.TriggerName,
