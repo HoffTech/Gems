@@ -113,7 +113,10 @@ public class JobTriggerRegisterHostedService : BackgroundService
 
         foreach (var (_, jobName) in JobRegister.JobNameByJobTypeMap)
         {
-            triggerCollection.AddRange(await this.CollectTriggersByJobName(jobName, cancellationToken).ConfigureAwait(false));
+            triggerCollection.AddRange(
+                await this
+                    .CollectTriggersByJobName(jobName, cancellationToken)
+                    .ConfigureAwait(false));
         }
 
         return triggerCollection;
