@@ -6,6 +6,7 @@ using Gems.Metrics;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Gems.Http;
 
@@ -15,14 +16,16 @@ public class BaseClientServiceHelper
         IMetricsService metricsService,
         ILogger<BaseClientServiceHelper> logger,
         IRequestLogsCollectorFactory logsCollectorFactory,
+        IOptions<RequestLogsCollectorOptions> requestLogsCollectorOptions,
         IHttpClientFactory httpClientFactory,
         IConfiguration configuration)
     {
-        this.Configuration = configuration;
         this.MetricsService = metricsService;
         this.Logger = logger;
         this.LogsCollectorFactory = logsCollectorFactory;
+        this.RequestLogsCollectorOptions = requestLogsCollectorOptions;
         this.HttpClientFactory = httpClientFactory;
+        this.Configuration = configuration;
     }
 
     public IMetricsService MetricsService { get; }
@@ -30,6 +33,8 @@ public class BaseClientServiceHelper
     public ILogger<BaseClientServiceHelper> Logger { get; }
 
     public IRequestLogsCollectorFactory LogsCollectorFactory { get; }
+
+    public IOptions<RequestLogsCollectorOptions> RequestLogsCollectorOptions { get; }
 
     public IHttpClientFactory HttpClientFactory { get; }
 

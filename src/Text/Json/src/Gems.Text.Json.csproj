@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="system.text.json" Version="6.0.7" />
+    <PackageReference Include="system.text.json" Version="6.0.11" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,7 @@
 ﻿// Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System.Collections.Generic;
 using System.Xml.Linq;
 
 using Gems.Logging.Security;
@@ -30,9 +31,19 @@ namespace Gems.Logging.Mvc.LogsCollector
             this.logger = logger;
         }
 
-        public RequestLogsCollector Create(ILogger loggerInstance = null)
+        public RequestLogsCollector Create()
         {
-            return new SecureRequestLogsCollector(this.objectFilter, this.jsonFilter, this.xmlFilter, loggerInstance ?? this.logger);
+            return this.Create(null, null);
+        }
+
+        public RequestLogsCollector Create(ILogger loggerInstance)
+        {
+            return this.Create(loggerInstance, null);
+        }
+
+        public RequestLogsCollector Create(ILogger loggerInstance, List<List<LogLevelOptions>> logLevelsByHttpStatus)
+        {
+            return new SecureRequestLogsCollector(this.objectFilter, this.jsonFilter, this.xmlFilter, loggerInstance ?? this.logger, logLevelsByHttpStatus);
         }
     }
 }

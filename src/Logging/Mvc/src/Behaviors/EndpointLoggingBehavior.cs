@@ -2,6 +2,7 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Gems.Logging.Mvc.Behaviors
 {
@@ -26,17 +28,20 @@ namespace Gems.Logging.Mvc.Behaviors
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ILogger<EndpointLoggingBehavior<TRequest, TResponse>> logger;
         private readonly IRequestLogsCollectorFactory logsCollectorFactory;
+        private readonly IOptions<RequestLogsCollectorOptions> requestLogsCollectorOptions;
         private readonly IConverter<Exception, BusinessErrorViewModel> exceptionConverter;
 
         public EndpointLoggingBehavior(
             IHttpContextAccessor httpContextAccessor,
             ILogger<EndpointLoggingBehavior<TRequest, TResponse>> logger,
             IRequestLogsCollectorFactory logsCollectorFactory,
+            IOptions<RequestLogsCollectorOptions> requestLogsCollectorOptions,
             IConverter<Exception, BusinessErrorViewModel> exceptionConverter)
         {
             this.httpContextAccessor = httpContextAccessor;
             this.logger = logger;
             this.logsCollectorFactory = logsCollectorFactory;
+            this.requestLogsCollectorOptions = requestLogsCollectorOptions;
             this.exceptionConverter = exceptionConverter;
         }
 
@@ -45,7 +50,7 @@ namespace Gems.Logging.Mvc.Behaviors
             var sw = new Stopwatch();
             sw.Start();
             var context = this.httpContextAccessor.HttpContext;
-            var logsCollector = this.logsCollectorFactory.Create(this.logger);
+            var logsCollector = this.CreateRequestLogsCollector(request);
             this.AddEndpointLogs(context, logsCollector);
             logsCollector.AddLogsFromPayload(request);
             logsCollector.AddRequest(request);
@@ -103,6 +108,23 @@ namespace Gems.Logging.Mvc.Behaviors
             {
                 logsCollector.AddEndpointSummary(endpoint.Summary);
             }
+        }
+
+        private RequestLogsCollector CreateRequestLogsCollector(IRequestEndpointLogging request)
+        {
+            var logLevelsByHttpStatus = new List<List<LogLevelOptions>>
+            {
+                request.GetLogLevelsByHttpStatus(),
+                this.requestLogsCollectorOptions?.Value?.LogLevelsByHttpStatus,
+                RequestLogsCollectorOptions.DefaultLogLevelsByHttpStatus
+            };
+
+            if (this.logsCollectorFactory != null)
+            {
+                return this.logsCollectorFactory.Create(this.logger, logLevelsByHttpStatus);
+            }
+
+            return new RequestLogsCollector(this.logger, logLevelsByHttpStatus);
         }
     }
 }

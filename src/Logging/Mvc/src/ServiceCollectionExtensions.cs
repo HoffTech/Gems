@@ -6,6 +6,7 @@ using System;
 using Gems.Logging.Mvc.LogsCollector;
 using Gems.Logging.Security;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Gems.Logging.Mvc
@@ -16,6 +17,16 @@ namespace Gems.Logging.Mvc
 
         public static void AddSecureLogging(this IServiceCollection services)
         {
+            AddSecureLogging(services, null);
+        }
+
+        public static void AddSecureLogging(this IServiceCollection services, IConfiguration configuration)
+        {
+            if (configuration != null)
+            {
+                services.Configure<RequestLogsCollectorOptions>(configuration.GetSection(RequestLogsCollectorOptions.Name));
+            }
+
             services.AddSingleton<IRequestLogsCollectorFactory, SecureRequestLogsCollectorFactory>();
             services.AddLoggingFilter(builder => builder.Register(new SecureKeyJsonHttpSource(new Uri(SecureKeyJsonHttpSourceUrl))));
         }

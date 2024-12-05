@@ -37,7 +37,8 @@ namespace Gems.Http
         private readonly ILogger logger;
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IMetricsService metricsService;
-        private readonly Func<ILogger, RequestLogsCollector> logsCollectorFactoryMethod;
+        private readonly IRequestLogsCollectorFactory logsCollectorFactory;
+        private readonly IOptions<RequestLogsCollectorOptions> requestLogsCollectorOptions;
         private string baseUrl;
 
         protected BaseClientService(IOptions<HttpClientServiceOptions> options, BaseClientServiceHelper helper)
@@ -45,9 +46,8 @@ namespace Gems.Http
             this.options = options;
             this.logger = helper.Logger;
             this.metricsService = helper.MetricsService;
-            this.logsCollectorFactoryMethod = helper.LogsCollectorFactory != null
-                ? helper.LogsCollectorFactory.Create
-                : this.CreateRequestLogsCollector;
+            this.logsCollectorFactory = helper.LogsCollectorFactory;
+            this.requestLogsCollectorOptions = helper.RequestLogsCollectorOptions;
             this.httpClientFactory = helper.HttpClientFactory;
             this.SetBaseUrl(helper.Configuration);
         }
@@ -127,6 +127,11 @@ namespace Gems.Http
         /// Например DateTime, DateOnly, Guid, DateTimeOffset.
         /// </summary>
         protected virtual Type[] AdditionalScalarStructureTypes => null;
+
+        /// <summary>
+        /// Уровни ошибок по статусам или группам статусов 200, 400 и 500.
+        /// </summary>
+        protected virtual List<LogLevelOptions> LogLevelsByHttpStatus => null;
 
         /// <summary>
         /// Bearer Токен.
@@ -2087,7 +2092,9 @@ namespace Gems.Http
                 requestData,
                 templateUri.GetTemplateUri());
 
-            var logsCollector = this.logsCollectorFactoryMethod(this.logger);
+            var logsCollector = this.CreateRequestLogsCollector();
+            logsCollector.AddPath(templateUri.GetTemplateUri());
+
             var timeMetric = metricWriter.GetTimeMetric();
             var sw = new Stopwatch();
             sw.Start();
@@ -2103,7 +2110,6 @@ namespace Gems.Http
                         requestUri += await QueryStringSerializerHelper.SerializeObjectToQueryString(requestData, this.SerializeAdditionalConverters, this.IsCamelCase);
                     }
 
-                    logsCollector.AddPath(requestUri.Split('?')[0]);
                     var request = new HttpRequestMessage(httpMethod, requestUri);
 
                     var mediaType = ExtractMediaTypeFromHeaders(headers);
@@ -2467,9 +2473,22 @@ namespace Gems.Http
             }
         }
 
-        private RequestLogsCollector CreateRequestLogsCollector(ILogger loggerInstance = null)
+        private RequestLogsCollector CreateRequestLogsCollector()
         {
-            return new RequestLogsCollector(loggerInstance);
+            var logLevelsByHttpStatus = new List<List<LogLevelOptions>>
+            {
+                this.LogLevelsByHttpStatus,
+                this.options?.Value?.LogLevelsByHttpStatus,
+                this.requestLogsCollectorOptions?.Value?.LogLevelsByHttpStatus,
+                RequestLogsCollectorOptions.DefaultLogLevelsByHttpStatus
+            };
+
+            if (this.logsCollectorFactory != null)
+            {
+                return this.logsCollectorFactory.Create(this.logger, logLevelsByHttpStatus);
+            }
+
+            return new RequestLogsCollector(this.logger, logLevelsByHttpStatus);
         }
     }
 }

@@ -18,12 +18,27 @@ namespace Gems.Logging.Mvc.LogsCollector
         private const string ResponseStatusKey = "responseStatus";
 
         private readonly ILogger logger;
+        private readonly List<List<LogLevelOptions>> logLevelsByHttpStatus;
 
         private readonly Dictionary<string, object> logs = new Dictionary<string, object>();
 
         public RequestLogsCollector(ILogger logger)
         {
             this.logger = logger;
+            this.logLevelsByHttpStatus = new List<List<LogLevelOptions>>
+                                         {
+                                             RequestLogsCollectorOptions.DefaultLogLevelsByHttpStatus
+                                         };
+        }
+
+        public RequestLogsCollector(ILogger logger, List<List<LogLevelOptions>> logLevelsByHttpStatus = null)
+        {
+            this.logger = logger;
+            this.logLevelsByHttpStatus = logLevelsByHttpStatus?.Where(x => x != null).ToList()
+                                         ?? new List<List<LogLevelOptions>>
+                                         {
+                                             RequestLogsCollectorOptions.DefaultLogLevelsByHttpStatus
+                                         };
         }
 
         public void AddLogsFromPayload(object obj)
@@ -126,7 +141,7 @@ namespace Gems.Logging.Mvc.LogsCollector
             var template = string.Join(", ", this.logs.Keys.Select(x => $"{x}: {{{x}}}"));
             var args = this.logs.Values.ToArray();
 
-            this.logger?.Log(this.GetLogLevel(), template, args);
+            this.logger?.Log(this.GetLogLevelByHttpStatus(), template, args);
         }
 
         private static string MapDataToString(object data)
@@ -166,20 +181,58 @@ namespace Gems.Logging.Mvc.LogsCollector
             }
         }
 
-        private LogLevel GetLogLevel()
+        private LogLevel GetLogLevelByHttpStatus()
         {
             if (this.logs.TryGetValue(ResponseStatusKey, out var responseStatus))
             {
-                if (responseStatus != null &&
-                    responseStatus is int intResponseStatus &&
-                    intResponseStatus >= 400 &&
-                    intResponseStatus <= 599)
+                if (responseStatus is int intResponseStatus)
                 {
-                    return LogLevel.Error;
+                    if (this.TryGetLogLevelByHttpStatus(intResponseStatus, out var logLevel))
+                    {
+                        return logLevel;
+                    }
+
+                    if (intResponseStatus <= 399 && this.TryGetLogLevelByHttpStatus(200, out logLevel))
+                    {
+                        return logLevel;
+                    }
+
+                    if (intResponseStatus <= 499 && this.TryGetLogLevelByHttpStatus(400, out logLevel))
+                    {
+                        return logLevel;
+                    }
+
+                    if (intResponseStatus <= 599 && this.TryGetLogLevelByHttpStatus(500, out logLevel))
+                    {
+                        return logLevel;
+                    }
+
+                    if (intResponseStatus is >= 400 and <= 599)
+                    {
+                        return LogLevel.Error;
+                    }
                 }
             }
 
             return LogLevel.Information;
+        }
+
+        private bool TryGetLogLevelByHttpStatus(int status, out LogLevel level)
+        {
+            foreach (var logLevelsByHttpStatusItem in this.logLevelsByHttpStatus)
+            {
+                foreach (var logLevelsByHttpStatusItemInner in logLevelsByHttpStatusItem)
+                {
+                    if (logLevelsByHttpStatusItemInner.Status == status)
+                    {
+                        level = logLevelsByHttpStatusItemInner.Level;
+                        return true;
+                    }
+                }
+            }
+
+            level = LogLevel.None;
+            return false;
         }
     }
 }

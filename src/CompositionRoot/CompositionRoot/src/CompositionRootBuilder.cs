@@ -161,7 +161,7 @@ public class CompositionRootBuilder<TFromAssemblyContaining>
 
     private void AddSecureLogging()
     {
-        this.services.AddSecureLogging();
+        this.services.AddSecureLogging(this.configuration);
     }
 
     private void AddProducers()

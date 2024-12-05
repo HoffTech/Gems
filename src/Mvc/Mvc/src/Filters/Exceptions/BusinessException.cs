@@ -34,6 +34,15 @@ namespace Gems.Mvc.Filters.Exceptions
             };
         }
 
+        public BusinessException(string message, int statusCode)
+        {
+            this.Error = new ErrorInside
+            {
+                Message = message
+            };
+            this.StatusCode = statusCode;
+        }
+
         public BusinessException(string message, string errorCode)
         {
             this.Error = new ErrorInside

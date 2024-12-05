@@ -1,6 +1,7 @@
 ﻿// Licensed to the Hoff Tech under one or more agreements.
 // The Hoff Tech licenses this file to you under the MIT license.
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -23,8 +24,9 @@ namespace Gems.Logging.Mvc.LogsCollector
             IPropertyFilter<ObjectToJsonProjection> objectFilter,
             IPropertyFilter<JToken> jsonFilter,
             IPropertyFilter<XElement> xmlFilter,
-            ILogger logger)
-            : base(logger)
+            ILogger logger,
+            List<List<LogLevelOptions>> logLevelsByHttpStatus)
+            : base(logger, logLevelsByHttpStatus)
         {
             this.objectFilter = objectFilter;
             this.jsonFilter = jsonFilter;

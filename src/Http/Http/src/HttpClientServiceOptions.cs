@@ -2,6 +2,9 @@
 // The Hoff Tech licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
+
+using Gems.Logging.Mvc.LogsCollector;
 
 namespace Gems.Http
 {
@@ -54,5 +57,10 @@ namespace Gems.Http
         /// Схема для заголовка Authorization.
         /// </summary>
         public string AuthenticationHeaderScheme { get; set; }
+
+        /// <summary>
+        /// Уровни ошибок по статусам или группам статусов 200, 400 и 500.
+        /// </summary>
+        public List<LogLevelOptions> LogLevelsByHttpStatus { get; set; }
     }
 }

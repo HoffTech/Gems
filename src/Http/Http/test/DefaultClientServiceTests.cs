@@ -30,8 +30,8 @@ namespace Gems.Http.Tests
 
             var requestLogCollectorMock = new Mock<IRequestLogsCollectorFactory>();
             requestLogCollectorMock
-                .Setup(x => x.Create(It.IsAny<ILogger>()))
-                .Returns(new RequestLogsCollector(NullLogger.Instance));
+                .Setup(x => x.Create(It.IsAny<ILogger>(), null))
+                .Returns(new RequestLogsCollector(NullLogger.Instance, null));
 
             var client = new DefaultClientService(
                 Mock.Of<IOptions<HttpClientServiceOptions>>(),
@@ -39,6 +39,7 @@ namespace Gems.Http.Tests
                     Mock.Of<IMetricsService>(),
                     Mock.Of<ILogger<BaseClientServiceHelper>>(),
                     requestLogCollectorMock.Object,
+                    null,
                     httpClientFactoryMock.Object,
                     null));
 
