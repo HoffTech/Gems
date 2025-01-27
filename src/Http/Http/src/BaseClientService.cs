@@ -58,6 +58,11 @@ namespace Gems.Http
         public Exception LastException { get; private set; }
 
         /// <summary>
+        /// Опция для указания логировать запрос или нет.
+        /// </summary>
+        protected virtual bool LogRequest => this.options?.Value?.LogRequest ?? true;
+
+        /// <summary>
         /// MediaType по умолчанию.
         /// </summary>
         protected virtual string MediaType => "application/json";
@@ -2282,7 +2287,12 @@ namespace Gems.Http
 
             logsCollector.AddLogsFromPayload(requestData);
             var serializedRequestData = await this.SerializeRequestData(requestData, mediaType);
-            logsCollector.AddRequest(requestData);
+
+            if (this.LogRequest)
+            {
+                logsCollector.AddRequest(requestData);
+            }
+
             return new StringContent(serializedRequestData, Encoding.UTF8, mediaType);
         }
 
