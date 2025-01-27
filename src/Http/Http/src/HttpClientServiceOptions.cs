@@ -62,5 +62,10 @@ namespace Gems.Http
         /// Уровни ошибок по статусам или группам статусов 200, 400 и 500.
         /// </summary>
         public List<LogLevelOptions> LogLevelsByHttpStatus { get; set; }
+
+        /// <summary>
+        /// Логировать запрос или нет.
+        /// </summary>
+        public bool LogRequest { get; set; }
     }
 }
