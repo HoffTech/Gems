@@ -77,8 +77,13 @@ namespace Gems.Logging.Mvc.LogsCollector
                     return dataAsString;
                 }
 
-                if (!(this.objectFilter.SecureKeyProvider.GetSource<IObjectPropertyFilterSource>() is
-                        IObjectPropertyFilterSource source))
+                if (data is IEnumerable<object> collection)
+                {
+                    var filteredCollection = collection.Select(this.FilterObject).ToList();
+                    return filteredCollection;
+                }
+
+                if (this.objectFilter.SecureKeyProvider.GetSource<IObjectPropertyFilterSource>() is not IObjectPropertyFilterSource source)
                 {
                     return data;
                 }
