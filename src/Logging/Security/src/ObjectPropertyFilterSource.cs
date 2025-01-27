@@ -45,7 +45,14 @@ namespace Gems.Logging.Security
                 }
 
                 var propType = prop.PropertyType;
-                if (propType.GetTypeInfo().IsClass)
+
+                // Обработка массивов и коллекций
+                if (propType.IsArray || (propType.IsGenericType && propType.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+                {
+                    var elementType = propType.IsArray ? propType.GetElementType() : propType.GetGenericArguments()[0];
+                    this.Register(elementType); // Рекурсивно регистрировать элементы массива
+                }
+                else if (propType.GetTypeInfo().IsClass)
                 {
                     this.Register(propType);
                 }
