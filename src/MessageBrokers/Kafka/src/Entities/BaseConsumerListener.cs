@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -153,6 +155,7 @@ namespace Gems.MessageBrokers.Kafka.Entities
                         DateTime.UtcNow);
 
                     var command = this.GetConsumerCommand(consumeResult, cancellationToken);
+                    this.SetMetadata(consumeResult, command);
 
                     // обработать результат чтения топика:
                     await this.mediator.Send(command, cancellationToken).ConfigureAwait(false);
@@ -187,6 +190,25 @@ namespace Gems.MessageBrokers.Kafka.Entities
                         DateTime.UtcNow);
                 }
             }
+        }
+
+        private void SetMetadata(ConsumeResult<TKey, TValue> consumeResult, THandlerCommand command)
+        {
+            if (command is not IHasMessageMetadata<TKey> commandWithMetadata)
+            {
+                return;
+            }
+
+            commandWithMetadata.Key = consumeResult.Message.Key;
+            commandWithMetadata.Offset = consumeResult.Offset;
+            commandWithMetadata.Partition = consumeResult.Partition;
+            commandWithMetadata.Headers = consumeResult.Message.Headers
+                .Select(x => new
+                {
+                    name = x.Key,
+                    value = Encoding.UTF8.GetString(x.GetValueBytes())
+                })
+                .ToDictionary(x => x.name, y => y.value);
         }
 
         private void CommitConsumeResult(ConsumeResult<TKey, TValue> consumeResult)
