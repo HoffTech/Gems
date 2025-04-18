@@ -1137,7 +1137,7 @@ namespace Gems.Data.Npgsql
                     this.connection,
                     this.transaction,
                     storeProcedureName,
-                    new DynamicParameters(),
+                    parameters,
                     commandTimeout,
                     this.cancellationToken).ConfigureAwait(false);
             }
