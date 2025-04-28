@@ -2115,7 +2115,7 @@ namespace Gems.Http
                         requestUri += await QueryStringSerializerHelper.SerializeObjectToQueryString(requestData, this.SerializeAdditionalConverters, this.IsCamelCase);
                     }
 
-                    var request = new HttpRequestMessage(httpMethod, requestUri);
+                    using var request = new HttpRequestMessage(httpMethod, requestUri);
 
                     var mediaType = ExtractMediaTypeFromHeaders(headers);
                     await this.AddHeadersAsync(request, headers, isAuthenticationRequest, cancellationToken);
@@ -2133,7 +2133,7 @@ namespace Gems.Http
                         httpClient.Timeout = TimeSpan.FromMilliseconds(this.RequestTimeout);
                     }
 
-                    var response = await httpClient.SendAsync(request, cancellationToken);
+                    using var response = await httpClient.SendAsync(request, cancellationToken);
 
                     logsCollector.AddResponseHeaders(response.Headers.ToDictionary(x => x.Key, y => string.Join(';', y.Value)));
                     var deserializedResponse = await this.ReadResponseAsync<TResponse, TError>(response, logsCollector);
