@@ -79,7 +79,7 @@ namespace Gems.TestInfrastructure.Integration
         public static ITestApplicationBuilder RemoveServiceImplementationByFullName(this ITestApplicationBuilder builder, string implementationTypeFullName)
         {
             return builder.ConfigureServices(s => s
-                .Where(x => x.ImplementationType.FullName == implementationTypeFullName)
+                .Where(x => x.ImplementationType?.FullName == implementationTypeFullName)
                 .ToList()
                 .ForEach(x => s.Remove(x)));
         }
@@ -87,7 +87,7 @@ namespace Gems.TestInfrastructure.Integration
         public static ITestApplicationBuilder RemoveServiceImplementationByName(this ITestApplicationBuilder builder, string implementationTypeName)
         {
             return builder.ConfigureServices(s => s
-                .Where(x => x.ImplementationType.Name == implementationTypeName)
+                .Where(x => x.ImplementationType?.Name == implementationTypeName)
                 .ToList()
                 .ForEach(x => s.Remove(x)));
         }
