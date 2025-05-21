@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -38,6 +39,13 @@ namespace Gems.Jobs.Quartz
             var requestType = targetRequestHandlerTypeArguments.FirstOrDefault();
 
             var jobType = GetJobType(requestType, targetRequestHandlerTypeArguments, isConcurrent);
+
+            if (name != null
+                && JobNameByJobTypeMap.GetValueOrDefault(jobType) == name
+                && JobNameByRequestTypeMap.GetValueOrDefault(requestType) == name)
+            {
+                return;
+            }
 
             if (!JobNameByJobTypeMap.TryAdd(jobType, name) || !JobNameByRequestTypeMap.TryAdd(requestType, name))
             {
